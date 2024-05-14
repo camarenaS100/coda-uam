@@ -1,4 +1,5 @@
 from typing import Any, Dict
+from django.shortcuts import get_object_or_404
 from django.db.models.query import QuerySet
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, HttpResponse
@@ -17,8 +18,12 @@ from django.views.generic.list import ListView
 from django.http import HttpResponseBadRequest
 from django.views.generic import View
 
+from django.http import HttpResponse
+#from .models import Tutoria
+
 from . import forms as userForms
 from .mixins import BaseAccessMixin, CodaViewMixin, AlumnoViewMixin, CordinadorViewMixin, TutorViewMixin
+
 
 # TODO Remove test views
 def login_view_test(request):
@@ -187,7 +192,8 @@ class CreateTutorView(CodaViewMixin, CreateView):
     #model = Tutor
     form_class = userForms.FormTutor
 
-    
+
+
 
 
 # class AceptarTutoriaView(View):

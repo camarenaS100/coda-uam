@@ -1,21 +1,20 @@
+import qrcode
 from typing import Any, Dict
 from django.shortcuts import get_object_or_404, redirect
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
-#from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic import View
 from django.urls import reverse_lazy
 from django.utils.text import slugify
-import qrcode
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from .models import Tutoria
 from .forms import FormTutorias
@@ -27,14 +26,14 @@ from notifications.signals import notify
 from smtplib import SMTPException
 
 from django.http import FileResponse
+from django.utils import timezone
 from reportlab.pdfgen import canvas
 from io import BytesIO
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from django.shortcuts import get_object_or_404
-from reportlab.lib.styles import ParagraphStyle
-from django.utils import timezone
 
 #Funcion para descargar pdf
 def generar_pdf(request):
@@ -42,12 +41,12 @@ def generar_pdf(request):
 
     # Obtener las fechas seleccionadas del formulario HTML
     fecha_inicio_str = request.GET.get('fecha_inicio')
-    fecha_fin_str = request.GET.get('fecha_fin')
+    fecha_fin_str = request.GET.get('fecha_fin') 
 
     # Convertir las fechas de cadena a objetos de fecha si se han proporcionado
     if fecha_inicio_str and fecha_fin_str:
         fecha_inicio = timezone.datetime.strptime(fecha_inicio_str, '%Y-%m-%d')
-        fecha_fin = timezone.datetime.strptime(fecha_fin_str, '%Y-%m-%d')
+        fecha_fin = timezone.datetime.strptime(fecha_fin_str, '%Y-%m-%d') + timedelta(days=1)
 
         # Filtrar las tutorías por las fechas seleccionadas
         tutorias_tutor = Tutoria.objects.filter(tutor=tutor_loggeado, fecha__range=(fecha_inicio, fecha_fin))
@@ -77,7 +76,7 @@ def generar_pdf(request):
     elements.append(Spacer(1, 12))  # Ajusta el segundo valor para controlar la altura de la separación
 
     # Agregar datos como una tabla
-    data = [["Alumno", 'Fecha', 'Hora', 'Tema', 'Observaciones']]
+    data = [["Alumno", 'Fecha', 'Hora', 'Tema', 'Notas']]
 
     for tutoria in tutorias_tutor:
         data.append([
@@ -85,6 +84,7 @@ def generar_pdf(request):
             tutoria.fecha.strftime('%Y-%m-%d'),
             tutoria.fecha.strftime('%I:%M %p'),
             tutoria.get_tema_display(),
+            tutoria.descripcion,
         ])
 
     # Estilo de la tabla
@@ -111,6 +111,47 @@ def generar_pdf(request):
 
     # Devolver el PDF como una respuesta de archivo
     return FileResponse(buffer, as_attachment=True, filename='tabla.pdf')
+
+#Generar archivo txt de tutorias
+def generar_archivo_txt(request,pk):
+
+    # Genera el contenido del archivo de texto (aquí es solo un ejemplo)
+    tutor = Tutor.objects.get(pk=pk)
+    tutorias = Tutoria.objects.filter(tutor=tutor)
+
+    # Obtener las fechas seleccionadas del formulario HTML
+    fecha_inicio_str = request.GET.get('fecha_inicio')
+    fecha_fin_str = request.GET.get('fecha_fin') 
+
+    # Convertir las fechas de cadena a objetos de fecha si se han proporcionado
+    if fecha_inicio_str and fecha_fin_str:
+        fecha_inicio = timezone.datetime.strptime(fecha_inicio_str, '%Y-%m-%d')
+        fecha_fin = timezone.datetime.strptime(fecha_fin_str, '%Y-%m-%d') + timedelta(days=1)
+
+        # Filtrar las tutorías por las fechas seleccionadas
+        tutorias = Tutoria.objects.filter(tutor=tutor, fecha__range=(fecha_inicio, fecha_fin))
+    else:
+        # Si no se han proporcionado fechas, obtener todas las tutorías del tutor
+        tutorias = Tutoria.objects.filter(tutor=tutor)
+    
+    contenido = "Tutorias \n"
+    for tutoria in tutorias:
+        contenido += f"Alumno: {tutoria.alumno.first_name} {tutoria.alumno.last_name}\n"
+        contenido += f"Tutor: {tutoria.tutor.first_name} {tutoria.tutor.last_name}\n"
+        contenido += f"Fecha: {tutoria.fecha}\n"
+        contenido += f"Tema: {tutoria.get_tema_display()}\n"
+        contenido += f"Notas: {tutoria.descripcion}\n\n"
+
+    # Escribe el contenido en un archivo de texto
+    with open("tutoria.txt", "w") as archivo:
+        archivo.write(contenido)
+
+    # Abre el archivo de texto y lo sirve como una respuesta HTTP para descargarlo
+    with open("tutoria.txt", "rb") as archivo:
+        response = HttpResponse(archivo.read(), content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename=archivo.txt'
+        return response
+
 
 # Create your views here.
 def index(request):
@@ -141,7 +182,7 @@ class TutoriaUpdateView(BaseAccessMixin, UpdateView):
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         rol = self.request.user.get_rol()
         if rol == TUTOR:
-             tutor = Tutor.objects.get(pk=self.request.user)
+            tutor = Tutor.objects.get(pk=self.request.user)
         recipient = Alumno.objects.filter(pk=self.get_object().alumno)
 
         notify.send(tutor, recipient=recipient, verb='Tutoria Modificada')
@@ -233,11 +274,11 @@ class HistorialTutoriasListView(BaseAccessMixin, ListView):
         
         return queryset
 
-
-
+class HistorialTutoriasGenerateView(BaseAccessMixin, ListView):
+    model = Tutoria
+    template_name = 'Tutorias/generarhistorialtutoria.html'
 
 class VerTutoriasCoordinadorListView(CordinadorViewMixin, ListView):
-     
     model = Tutoria
     template_name='Tutorias/verTutorias_cordinador.html'
 
@@ -277,12 +318,10 @@ class VerTutoriasCoordinadorPorTutorListView(CordinadorViewMixin, ListView):
         return context
 
 
-class VerTutoriasCodaListView(CodaViewMixin, ListView):
-     
+class VerTutoriasCodaListView(CodaViewMixin, ListView):    
     model = Tutoria
     template_name='Tutorias/verTutorias_cooda.html'
     
-
     def get_queryset(self) -> QuerySet[Any]:
         
         queryset = super().get_queryset().filter(tutor=self.kwargs.get('pk'))   

@@ -27,7 +27,6 @@ urlpatterns = [
     path('registrar-alumno/', views.CreateAlumnoView.as_view(), name='crear-alumno'),
     path('registrar-tutor/', views.CreateTutorView.as_view(), name='crear-tutor'),
     path('registrar-coordinador/', views.CreateCordinadorView.as_view(), name='crear-coordinador'),
-    
 
 
     # ... (other existing URL patterns)
