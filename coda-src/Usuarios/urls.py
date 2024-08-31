@@ -28,6 +28,7 @@ urlpatterns = [
     path('registrar-tutor/', views.CreateTutorView.as_view(), name='crear-tutor'),
     path('registrar-coordinador/', views.CreateCordinadorView.as_view(), name='crear-coordinador'),
     path('export-tutorias/<int:tutor_id>/', views.export_tutorias_to_xlsx, name='export_tutorias'),
+    
 
 
     # ... (other existing URL patterns)

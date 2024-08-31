@@ -32,7 +32,7 @@ urlpatterns = [
     path('tutorados-tutor/', views.VerTutoradosTutorListView.as_view(), name='Tutorados-tutor'),
     path('tutorias-tutor/', views.VerTutoriasTutorListView.as_view(),name='Tutorias-tutor'),
     path('crear-tutoria/<int:pk_alumno>/', views.CrearTutoriaPorAlumnoView.as_view(), name='crear-tutoria'),
-    
+     path('export-tutorias/<int:tutor_id>/', views.export_tutorias_to_xlsx, name='export_tutorias'),
     # URLS CODA 
     path('tutores-coda/', views.VerTutoresListView.as_view(), name='Tutores-Coda'),
     path('tutorias-coda/<int:pk>', views.VerTutoriasCodaListView.as_view(), name='Tutorias-Coda'),
