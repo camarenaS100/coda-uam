@@ -36,7 +36,8 @@
                                                     <td>{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }}</td>
                                                     <td>{{ tutoria.fecha|date }}</td>
                                                     <td>{{ tutoria.fecha|date:"P" }}</td>
-                                                    <td>{{ tutoria.get_tema_display }} </td>
+                                                    <!--Se agregó |join:", " para quitar notación de lista-->
+                                                    <td>{{ tutoria.get_tema_display |join:", " }} </td>
                                                     <td>{{ tutoria.tutor.first_name }} {{ tutoria.tutor.last_name }}</td>
                                                     <td>
                                                         {% if tutoria.estado == 'ACE' %}

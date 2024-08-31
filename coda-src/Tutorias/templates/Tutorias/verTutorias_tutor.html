@@ -44,7 +44,7 @@
                     <td>{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }}</td>
                     <td>{{ tutoria.fecha|date }}</td>
                     <td>{{ tutoria.fecha|date:"P" }}</td>
-                    <td>{{ tutoria.get_tema_display}} </td>
+                    <td>{{ tutoria.get_tema_display|join:", " }} </td>
                     <td>
                       <a href="{% url 'Tutorias-update' pk=tutoria.pk %}">Editar Tutoria</a>
                     </td>
