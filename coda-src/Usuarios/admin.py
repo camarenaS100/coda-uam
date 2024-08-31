@@ -49,7 +49,7 @@ class UserAdmin(BaseUserAdmin):
 
     fieldsets = (
         (None, {'fields': ('email', 'password', 'matricula')}),
-        (('Información Personal'), {'fields': ('first_name', 'last_name', 'foto')}),
+        (('Información Personal'), {'fields': ('first_name', 'last_name','sexo', 'foto')}),
         (('Permisos'), {'fields': ('is_active', 'is_staff', 'is_superuser',
                                        'groups', 'user_permissions')}),
         (('Fechas importantes'), {'fields': ('last_login', 'date_joined')}),
@@ -57,10 +57,10 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email','matricula', 'password1', 'password2'),
+            'fields': ('email','matricula', 'password1', 'password2', 'sexo'),
         }),
     )
-    list_display = ('pk', 'email', 'matricula', 'first_name', 'last_name', 'is_staff')
+    list_display = ('pk', 'email', 'matricula', 'first_name', 'last_name', 'is_staff', 'sexo')
     search_fields = ('pk', 'email', 'matricula', 'first_name', 'last_name')
     ordering = ('pk',)
 
@@ -145,7 +145,7 @@ class AlumnoAdmin(ImportExportModelAdmin, UserAdmin):
 
     fieldsets = (
         (None, {'fields': ('email', 'password', 'matricula', 'tutor_asignado',)}),
-        (('Información Personal'), {'fields': ('first_name', 'last_name', 'foto', 'carrera')}),
+        (('Información Personal'), {'fields': ('first_name', 'last_name','sexo', 'estado','foto', 'carrera')}),
         (('Permisos'), {'fields': ('is_active', 'is_staff', 'is_superuser',
                                        'groups', 'user_permissions')}),
         (('Fechas importantes'), {'fields': ('last_login', 'date_joined')}),
@@ -153,10 +153,10 @@ class AlumnoAdmin(ImportExportModelAdmin, UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email','matricula','tutor_asignado', 'password1', 'password2'),
+            'fields': ('email','matricula','tutor_asignado', 'password1', 'password2', 'sexo', 'estado'),
         }),
     )
-    list_display = ('pk', 'email', 'matricula', 'carrera', 'first_name', 'last_name', 'is_staff')
+    list_display = ('pk', 'email', 'matricula', 'carrera', 'first_name', 'last_name','sexo','estado', 'is_staff')
     search_fields = ('pk', 'email', 'matricula', 'carrera', 'first_name', 'last_name')
     ordering = ('pk','carrera')
 
