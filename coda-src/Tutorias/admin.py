@@ -8,13 +8,22 @@ from import_export.widgets import CharWidget
 
 class TutoriaResource(resources.ModelResource):
     tema_display = fields.Field(column_name='tema', attribute='tema', widget=CharWidget())
+    alumno_full_name = fields.Field(column_name='alumno_full_name')
+    tutor_full_name = fields.Field(column_name='tutor_full_name')
 
     class Meta:
         model = Tutoria
-        fields = ('id', 'tema_display', 'alumno', 'tutor', 'descripcion', 'fecha')
-    
+        fields = ('id', 'tema_display', 'alumno_full_name', 'tutor_full_name', 'descripcion', 'fecha')
+
     def dehydrate_tema_display(self, tutoria):
         return tutoria.get_tema_display()
+
+    def dehydrate_alumno_full_name(self, tutoria):
+        return f"{tutoria.alumno.first_name} {tutoria.alumno.last_name}"
+
+    def dehydrate_tutor_full_name(self, tutoria):
+        return f"{tutoria.tutor.first_name} {tutoria.tutor.last_name}"
+
 
 
 class TutoriasAdmin(ImportExportModelAdmin, admin.ModelAdmin):
