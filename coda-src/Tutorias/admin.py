@@ -10,6 +10,8 @@ class TutoriaResource(resources.ModelResource):
     tema_display = fields.Field(column_name='tema', attribute='tema', widget=CharWidget())
     alumno_full_name = fields.Field(column_name='alumno_full_name')
     tutor_full_name = fields.Field(column_name='tutor_full_name')
+    alumno_matricula = fields.Field(column_name='alumno_matricula')
+    tutor_matricula = fields.Field(column_name='tutor_matricula')
 
     class Meta:
         model = Tutoria
@@ -23,6 +25,12 @@ class TutoriaResource(resources.ModelResource):
 
     def dehydrate_tutor_full_name(self, tutoria):
         return f"{tutoria.tutor.first_name} {tutoria.tutor.last_name}"
+    
+    def dehydrate_alumno_matricula(self, tutoria):
+        return f"{tutoria.alumno.matricula}"
+    
+    def dehydrate_tutor_matricula(self, tutoria):
+        return f"{tutoria.tutor.matricula}"
 
 
 
