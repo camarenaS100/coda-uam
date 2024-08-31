@@ -19,11 +19,9 @@ from django.http import HttpResponseBadRequest
 from django.views.generic import View
 
 from django.http import HttpResponse
-import openpyxl
 #from .models import Tutoria
 
 from . import forms as userForms
-from .models import Tutoria, Tutor
 from .mixins import BaseAccessMixin, CodaViewMixin, AlumnoViewMixin, CordinadorViewMixin, TutorViewMixin
 
 
@@ -196,36 +194,7 @@ class CreateTutorView(CodaViewMixin, CreateView):
 
 
 
-def export_tutorias_to_xlsx(request, tutor_id):
-    # Get the tutor instance
-    tutor = get_object_or_404(Tutor, id=tutor_id)
 
-    # Create a workbook and select the active worksheet
-    workbook = openpyxl.Workbook()
-    worksheet = workbook.active
-    worksheet.title = f'Tutorias de {tutor.nombre}'
-
-    # Define the headers
-    headers = ['Alumno', 'Fecha', 'Hora', 'Tema', 'Observaciones']
-    worksheet.append(headers)
-
-    # Fetch tutorias for the specified tutor
-    tutorias = Tutoria.objects.filter(tutor=tutor)
-
-    # Add data to the worksheet
-    for tutoria in tutorias:
-        row = [
-            f"{tutoria.alumno.first_name} {tutoria.alumno.last_name}",
-            tutoria.fecha.strftime('%Y-%m-%d'),
-            tutoria.fecha.strftime('%H:%M:%S'),
-            tutoria.get_tema_display(),
-            tutoria.descripcion,
-        ]
-        worksheet.append(row)
-
-    # Set the content type and attachment header
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename=Tutorias_{tutor.nombre}.xlsx'
 
 # class AceptarTutoriaView(View):
 #     def post(self, request, pk):

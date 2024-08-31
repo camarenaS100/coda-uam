@@ -34,7 +34,6 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from django.shortcuts import get_object_or_404
-import openpyxl
 
 #Funcion para descargar pdf
 def generar_pdf(request):
@@ -534,38 +533,3 @@ class CrearTutoriaPorAlumnoView(TutorViewMixin, CreateView):
         form.instance.slug = slug
 
         return super().form_valid(form)
-
-def export_tutorias_to_xlsx(request, tutor_id):
-    # Get the tutor instance
-    tutor = get_object_or_404(Tutor, id=tutor_id)
-
-    # Create a workbook and select the active worksheet
-    workbook = openpyxl.Workbook()
-    worksheet = workbook.active
-    worksheet.title = f'Tutorias de {tutor.nombre}'
-
-    # Define the headers
-    headers = ['Alumno', 'Fecha', 'Hora', 'Tema', 'Observaciones']
-    worksheet.append(headers)
-
-    # Fetch tutorias for the specified tutor
-    tutorias = Tutoria.objects.filter(tutor=tutor)
-
-    # Add data to the worksheet
-    for tutoria in tutorias:
-        row = [
-            f"{tutoria.alumno.first_name} {tutoria.alumno.last_name}",
-            tutoria.fecha.strftime('%Y-%m-%d'),
-            tutoria.fecha.strftime('%H:%M:%S'),
-            tutoria.get_tema_display(),
-            tutoria.descripcion,
-        ]
-        worksheet.append(row)
-
-    # Set the content type and attachment header
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename=Tutorias_{tutor.nombre}.xlsx'
-
-    # Save the workbook to the response
-    workbook.save(response)
-    return response
