@@ -37,7 +37,8 @@
                                         </td>
                                         <td>{{ tutoria.fecha|date }}</td>
                                         <td>{{ tutoria.fecha|date:"P" }}</td>
-                                        <td>{{ tutoria.get_tema_display}}</td>
+                                        <!--Se agregó |join:", " para quitar notación de lista-->
+                                        <td>{{ tutoria.get_tema_display |join:", " }} </td>
                                         <td>{{ tutoria.descripcion}}</td>
                                         <td></td>
                                     </tr>

@@ -52,7 +52,7 @@
         <td>{{ tutoria.fecha|date }}</td>
         <td>{{ tutoria.fecha|date:"P" }}</td>
         <td>{{ tutoria.tutor.first_name }} {{ tutoria.tutor.last_name }}</td>
-        <td>{{ tutoria.get_tema_display }} </td>
+        <td>{{ tutoria.get_tema_display |join:", " }} </td>
         <td>{{ tutoria.get_descripcion_display }} </td>
         
         <td>
