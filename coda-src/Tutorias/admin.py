@@ -18,7 +18,8 @@ class TutoriaResource(resources.ModelResource):
         fields = ('id', 'tema_display', 'alumno_full_name', 'tutor_full_name', 'descripcion', 'fecha')
 
     def dehydrate_tema_display(self, tutoria):
-        return ', '.join(tutoria.get_tema_display())
+        temas_display = [tema for tema in tutoria.get_tema_display()]
+        return ', '.join(temas_display)
 
     def dehydrate_alumno_full_name(self, tutoria):
         return f"{tutoria.alumno.first_name} {tutoria.alumno.last_name}"
@@ -44,6 +45,8 @@ class TutoriasAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
     def tema_display(self, obj):
         return ', '.join(obj.get_tema_display())
+    
+    tema_display.short_description = 'Temas'
     
     search_fields = ('tema', 'alumno', 'tutor', 'fecha')
 
