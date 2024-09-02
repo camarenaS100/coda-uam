@@ -18,7 +18,7 @@ class TutoriaResource(resources.ModelResource):
         fields = ('id', 'tema_display', 'alumno_full_name', 'tutor_full_name', 'descripcion', 'fecha')
 
     def dehydrate_tema_display(self, tutoria):
-        return tutoria.get_tema_display()
+        return ', '.join(tutoria.get_tema_display())
 
     def dehydrate_alumno_full_name(self, tutoria):
         return f"{tutoria.alumno.first_name} {tutoria.alumno.last_name}"
@@ -34,12 +34,17 @@ class TutoriaResource(resources.ModelResource):
 
 
 
+
 class TutoriasAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     """Define admin model for Tutoria objects"""
 
     resource_class = TutoriaResource
+    
+    list_display = ('tema_display', 'alumno', 'tutor', 'descripcion', 'fecha')
 
-    list_display = ('tema', 'alumno', 'tutor', 'descripcion', 'fecha')
+    def tema_display(self, obj):
+        return ', '.join(obj.get_tema_display())
+    
     search_fields = ('tema', 'alumno', 'tutor', 'fecha')
 
 admin.site.register(Tutoria, TutoriasAdmin)
