@@ -42,12 +42,18 @@ def generar_pdf(request):
     # Obtener las fechas seleccionadas del formulario HTML
     fecha_inicio_str = request.GET.get('fecha_inicio')
     fecha_fin_str = request.GET.get('fecha_fin') 
+    # Obtención de los checkbox
+    alumno = request.GET.get('alumno') 
+    fecha = request.GET.get('fecha') 
+    hora = request.GET.get('hora') 
+    tema = request.GET.get('tema') 
+    notas = request.GET.get('notas') 
+    todo = request.GET.get('todo')
 
     # Convertir las fechas de cadena a objetos de fecha si se han proporcionado
     if fecha_inicio_str and fecha_fin_str:
         fecha_inicio = timezone.datetime.strptime(fecha_inicio_str, '%Y-%m-%d')
         fecha_fin = timezone.datetime.strptime(fecha_fin_str, '%Y-%m-%d') + timedelta(days=1)
-
         # Filtrar las tutorías por las fechas seleccionadas
         tutorias_tutor = Tutoria.objects.filter(tutor=tutor_loggeado, fecha__range=(fecha_inicio, fecha_fin))
     else:
@@ -83,9 +89,34 @@ def generar_pdf(request):
             f"{tutoria.alumno.first_name} {tutoria.alumno.last_name}",
             tutoria.fecha.strftime('%Y-%m-%d'),
             tutoria.fecha.strftime('%I:%M %p'),
-            tutoria.get_tema_display(),
+            # tutoria.get_tema_display(),
+            # Agregar lista de temas al pdf
+            Paragraph(', '.join(tutoria.get_tema_display())),
             tutoria.descripcion,
         ])
+
+    # Eliminación de columnas
+    if todo == None:
+        if alumno == None:
+            ind = data[0].index("Alumno")
+            for i in range(len(data)):
+                data[i].remove(data[i][ind])
+        if fecha == None:
+            ind = data[0].index("Fecha")
+            for i in range(len(data)):
+                data[i].remove(data[i][ind])
+        if hora == None:
+            ind = data[0].index("Hora")
+            for i in range(len(data)):
+                data[i].remove(data[i][ind])
+        if tema == None:
+            ind = data[0].index("Tema")
+            for i in range(len(data)):
+                data[i].remove(data[i][ind])
+        if notas == None:
+            ind = data[0].index("Notas")
+            for i in range(len(data)):
+                data[i].remove(data[i][ind]) 
 
     # Estilo de la tabla
     style = TableStyle([
@@ -209,7 +240,9 @@ class TutoriaCreateView(AlumnoViewMixin, CreateView):
         if rol == ALUMNO:
             recipient = Tutor.objects.get(pk=alumno.tutor_asignado)
 
-        notify.send(alumno, recipient=recipient, verb='Nueva solicitud de tutoria', description=f'{form.instance.get_tema_display()}')
+        # notify.send(alumno, recipient=recipient, verb='Nueva solicitud de tutoria', description=f'{form.instance.get_tema_display()}')
+        # Eliminar corchetes de la lista
+        notify.send(alumno, recipient=recipient, verb='Nueva solicitud de tutoria', description=f'{", ".join(form.instance.get_tema_display())}')
         
         # TODO utilizar una rutina para mandar los correos
         #send_mail(

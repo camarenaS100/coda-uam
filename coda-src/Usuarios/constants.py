@@ -32,3 +32,16 @@ TEMPLATES = {
 }
 
 CORREO = 'tutorias.beta.uamc@gmail.com'
+
+SEXOS = [
+    ('', "Seleccione un sexo"),
+    ("M","Masculino"),
+    ("F","Femenino"),
+]
+
+ESTADOS_ALUMNO = [
+    ('', 'Selecciona un estado'),
+    (1,"Activo"),
+    (2,"No reinscrito"),
+    (10, "Inscrito sin carga académica")
+]
