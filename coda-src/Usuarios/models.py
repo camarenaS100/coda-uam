@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from .constants import ROLES, CARRERAS
 from Tutorias.constants import TEMAS, OTRO
-from .constants import CODA, TUTOR, COORDINADOR, ALUMNO
+from .constants import CODA, TUTOR, COORDINADOR, ALUMNO, SEXOS, ESTADOS_ALUMNO
 
 class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
@@ -50,6 +50,7 @@ class Usuario(AbstractUser):
     email = models.EmailField(unique=True)
     correo_personal = models.EmailField(max_length=50, blank=True, null=True)
     rol = models.CharField(max_length=8, choices=ROLES, default="USR")
+    sexo = models.CharField(max_length=30, choices=SEXOS, null=True)
     #nombre = models.CharField(max_length=150)
 
     USERNAME_FIELD = "email"
@@ -127,6 +128,7 @@ class Alumno(Usuario):
     carrera = models.CharField(max_length=30, choices=CARRERAS)
     trayectoria = models.FileField(null=True, blank=True, upload_to=alumno_trayectoria_path)
     tutor_asignado = models.ForeignKey(Tutor, on_delete=models.PROTECT)
+    estado = models.IntegerField( choices=ESTADOS_ALUMNO, null=True)
 
     def save(self, commit=True) -> None:
         self.rol = ALUMNO
