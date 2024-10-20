@@ -579,7 +579,7 @@ class RealizarSeguimientoView(View):
         tutoria = get_object_or_404(Tutoria, pk=pk)
         
         # Mostrar la pagina de seguimiento con los datos llenados
-        return render(request, 'tutorias/seguimiento_form.html', {'tutoria': tutoria})
+        return render(request, 'Tutorias/seguimientoTutoria.html', {'tutoria': tutoria})
 
     def post(self, request, pk):
         # Obtener tutoria a modificar por medio de llave primaria
