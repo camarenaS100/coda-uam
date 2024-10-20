@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from Usuarios.models import Alumno, Tutor
-from .constants import TEMAS, SERVICIO, PENDIENTE, ESTADO
+from .constants import TEMAS, SERVICIO, PENDIENTE, ESTADO, DURACION_ASESORIA
 
 # Create your models here.
 class Tutoria(models.Model):
@@ -17,7 +17,7 @@ class Tutoria(models.Model):
     estado = models.CharField(PENDIENTE, max_length=4, choices=ESTADO, default=PENDIENTE)
     # campos para el seguimiento de tutoría
     asistencia = models.BooleanField(default=False, blank=True, null=True)
-    duracion = models.IntegerField(default=0, blank=True, null=True)
+    duracion = models.IntegerField(DURACION_ASESORIA,default=0, blank=True, null=True)
     firma_documentos_beca = models.BooleanField(default=False, blank=True, null=True)
     beca_otorgada = models.CharField(max_length=255, blank=True, null=True)
     asesoria_especializada = models.BooleanField(default=False, blank=True, null=True)

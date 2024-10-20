@@ -1,6 +1,6 @@
 from django import forms
 from .models import Tutoria
-from .constants import TEMAS, ESTADO, ACEPTADO, PENDIENTE
+from .constants import TEMAS, ESTADO, ACEPTADO, PENDIENTE, DURACION_ASESORIA
 
 class FormTutorias(forms.ModelForm):
 
@@ -18,18 +18,18 @@ class FormTutorias(forms.ModelForm):
         model = Tutoria
         fields = ['tema', 'fecha', 'descripcion']
 
-# class FormSeguimiento(forms.ModelForm):    #esto se debería de usar?
-#     asistencia = forms.BooleanField(required=False)
-#     duracion = forms.ChoiceField(choices=DURACION_ASESORIA, required=False)
-#     firma_documentos_beca = forms.BooleanField(required=False)
-#     beca_otorgada = forms.CharField(max_length=255, required=False)
-#     asesoria_especializada = forms.BooleanField(required=False)
-#     observaciones = forms.CharField(widget=forms.Textarea, max_length=1000, required=False)
-#     impacto_tutoria = forms.IntegerField(required=False)
-#     resultados_tutoria = forms.CharField(widget=forms.Textarea, max_length=1000, required=False)
+class FormSeguimiento(forms.ModelForm):    #esto se debería de usar?
+    asistencia = forms.BooleanField(required=False)
+    duracion = forms.ChoiceField(choices=DURACION_ASESORIA, required=False)
+    firma_documentos_beca = forms.BooleanField(required=False)
+    beca_otorgada = forms.CharField(max_length=255, required=False)
+    asesoria_especializada = forms.BooleanField(required=False)
+    observaciones = forms.CharField(widget=forms.Textarea, max_length=1000, required=False)
+    impacto_tutoria = forms.IntegerField(required=False)
+    resultados_tutoria = forms.CharField(widget=forms.Textarea, max_length=1000, required=False)
 
-#     class Meta:
-#         model = Tutoria
-#         fields = ['asistencia', 'duracion', 'firma_documentos_beca', 'beca_otorgada', 'asesoria_especializada', 'observaciones', 'impacto_tutoria', 'resultados_tutoria']
-#         exclude = ['alumno', 'tutor', 'tema', 'fecha', 'descripcion', 'estado']
+    class Meta:
+        model = Tutoria
+        fields = ['asistencia', 'duracion', 'firma_documentos_beca', 'beca_otorgada', 'asesoria_especializada', 'observaciones', 'impacto_tutoria', 'resultados_tutoria']
+        exclude = ['alumno', 'tutor', 'tema', 'fecha', 'descripcion', 'estado']
 
