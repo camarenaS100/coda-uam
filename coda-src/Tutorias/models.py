@@ -15,6 +15,15 @@ class Tutoria(models.Model):
     fecha = models.DateTimeField()
     descripcion = models.CharField(max_length=255, blank=True, null=True)
     estado = models.CharField(PENDIENTE, max_length=4, choices=ESTADO, default=PENDIENTE)
+    # campos para el seguimiento de tutoría
+    asistencia = models.BooleanField(default=False, blank=True, null=True)
+    duracion = models.IntegerField(default=0, blank=True, null=True)
+    firma_documentos_beca = models.BooleanField(default=False, blank=True, null=True)
+    beca_otorgada = models.CharField(max_length=255, blank=True, null=True)
+    asesoria_especializada = models.BooleanField(default=False, blank=True, null=True)
+    observaciones = models.CharField(max_length=1000, blank=True, null=True)
+    impacto_tutoria = models.IntegerField(default=0, blank=True, null=True)
+    resultados_tutoria = models.CharField(max_length=1000, blank=True, null=True)
 
     def __str__(self) -> str:
         string_tutoria = f'{self.alumno.first_name} {self.alumno.last_name}: tutoria {self.pk}'

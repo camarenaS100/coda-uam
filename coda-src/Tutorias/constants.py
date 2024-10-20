@@ -44,3 +44,11 @@ ESTADO = [
     (RECHAZADO, 'Rechazada'),
     (PENDIENTE, 'Pendiente')
 ]
+
+DURACION_ASESORIA = [
+    (0, 'Menos de 30 minutos'),
+    (1, '30 minutos'),
+    (2, '1 hora'),
+    (3, '2 horas'),
+    (4, 'Más de dos horas')
+]
