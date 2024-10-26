@@ -571,7 +571,7 @@ class CrearTutoriaPorAlumnoView(TutorViewMixin, CreateView):
 
 class RealizarSeguimientoView(TutorViewMixin, UpdateView):
     model = Tutoria
-    form_class = FormSeguimiento
+    #form_class = FormSeguimiento
     fields = ['asistencia', 'duracion', 'firma_documentos_beca', 'beca_otorgada', 'asesoria_especializada', 'observaciones', 'impacto_tutoria', 'resultados_tutoria']
     template_name = 'Tutorias/seguimientoTutoria.html'
     success_url =  reverse_lazy('Tutorias-historial')
