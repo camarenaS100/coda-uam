@@ -22,6 +22,14 @@
                                         <th>Tema</th>
                                         <th>Observaciones</th>
                                         <th>Seguimiento</th> <!-- New Seguimiento column -->
+                                        <th>Asistencia</th>
+                                        <th>Duración de la tutoría</th>
+                                        <th>¿Firma de documentos de beca?</th>
+                                        <th>Nombre de la beca otorgada</th>
+                                        <th>¿Requirió asesoría especializada?</th>
+                                        <th>Aspectos tratados en la tutoría</th>
+                                        <th>Impacto tutoría</th>
+                                        <th>Resultados de tutoría</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -37,6 +45,17 @@
                                             <a href="{% url 'save_seguimiento' pk=tutoria.pk %}" class="btn btn-primary">Realizar</a>
                                             </a>
                                         </td>
+                                        <!--Boolean-->
+                                        <td>{{ tutoria.asistencia|yesno:"Sí,No" }}</td>
+                                        <td>{{ tutoria.duracion }}</td>
+                                        <!--Boolean-->
+                                        <td>{{ tutoria.firma_documentos_beca|yesno:"Sí,No" }}</td>
+                                        <td>{{ tutoria.beca_otorgada }}</td>
+                                        <!--Boolean-->
+                                        <td>{{ tutoria.asesoria_especializada|yesno:"Sí,No" }}</td>
+                                        <td>{{ tutoria.observaciones }}</td>
+                                        <td>{{ tutoria.impacto_tutoria }}</td>
+                                        <td>{{ tutoria.resultados_tutoria }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
