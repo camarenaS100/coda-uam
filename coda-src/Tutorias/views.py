@@ -17,7 +17,7 @@ from django.core.mail import send_mail
 from datetime import datetime, timedelta
 
 from .models import Tutoria
-from .forms import FormTutorias
+from .forms import FormTutorias, FormSeguimiento
 # from .forms import FormSeguimiento # de nuevo, no estoy seguro
 from .constants import PENDIENTE, ACEPTADO, RECHAZADO #, DURACION_ASESORIA # de nuevo, no estoy seguro
 from Usuarios.constants import TUTOR, ALUMNO, COORDINADOR, TEMPLATES, CORREO
@@ -569,43 +569,16 @@ class CrearTutoriaPorAlumnoView(TutorViewMixin, CreateView):
         return super().form_valid(form)
 
 
-class RealizarSeguimientoView(View):
+class RealizarSeguimientoView(TutorViewMixin, UpdateView):
     model = Tutoria
+    form_class = FormSeguimiento
+    fields = ['asistencia', 'duracion', 'firma_documentos_beca', 'beca_otorgada', 'asesoria_especializada', 'observaciones', 'impacto_tutoria', 'resultados_tutoria']
     template_name = 'Tutorias/seguimientoTutoria.html'
     success_url =  reverse_lazy('Tutorias-historial')
-    # forms = FormTutoria  # No sé si se deba validar el formulario...
-    def get(self, request, pk):
-        # Obtener la tutoría por medio de la llave primaria
-        tutoria = get_object_or_404(Tutoria, pk=pk)
-        
-        # Mostrar la pagina de seguimiento con los datos llenados
-        return render(request, 'Tutorias/seguimientoTutoria.html', {'tutoria': tutoria})
 
-    def post(self, request, pk):
-        # Obtener tutoria a modificar por medio de llave primaria
-        tutoria = get_object_or_404(Tutoria, pk=pk)
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        tutor = Tutor.objects.get(pk=self.request.user)
+        recipient = Alumno.objects.filter(pk=self.get_object().alumno)
 
-        # Obtener datos del formuario enviados en POST
-        asistencia = request.POST.get('asistencia') == 'True'
-        duracion = request.POST.get('duracion')
-        firma_documentos_beca = request.POST.get('firma_documentos_beca') == 'True'
-        beca_otorgada = request.POST.get('beca_otorgada', '')
-        asesoria_especializada = request.POST.get('asesoria_especializada') == 'True'
-        observaciones = request.POST.get('observaciones', '')
-        impacto_tutoria = request.POST.get('impacto_tutoria')
-        resultados_tutoria = request.POST.get('resultados_tutoria', '')
-
-        # Actualizar datos
-        tutoria.asistencia = asistencia
-        tutoria.duracion = duracion
-        tutoria.firma_documentos_beca = firma_documentos_beca
-        tutoria.beca_otorgada = beca_otorgada
-        tutoria.asesoria_especializada = asesoria_especializada
-        tutoria.observaciones = observaciones
-        tutoria.impacto_tutoria = impacto_tutoria
-        tutoria.resultados_tutoria = resultados_tutoria
-
-        # Guardar cambios
-        tutoria.save()
-
-        #messages.success(request, 'El seguimiento ha sido guardado exitosamente.')
+        notify.send(tutor, recipient=recipient, verb='Seguimiento de tutoria realizado')
+        return super().form_valid(form)
