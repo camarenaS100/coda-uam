@@ -38,6 +38,10 @@ class Tutoria(models.Model):
         choices = dict(TEMAS)
         # return choices
         return [choices.get(t, "Unknown") for t in self.tema]
+    
+    def get_duracion_display(self):
+        choices = dict(DURACION_ASESORIA)
+        return choices.get(self.duracion, "Unknown")
 
     
 class Asesoria(models.Model):

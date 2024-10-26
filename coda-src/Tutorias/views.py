@@ -307,13 +307,6 @@ class HistorialTutoriasListView(BaseAccessMixin, ListView):
             queryset = super().get_queryset().all()
         
         return queryset
-    
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super().get_context_data(**kwargs)
-        # Add the DURACION_ASESORIA dictionary to the context
-        context['DURACION_ASESORIA'] = DURACION_ASESORIA
-        return context
 
 class HistorialTutoriasGenerateView(BaseAccessMixin, ListView):
     model = Tutoria
