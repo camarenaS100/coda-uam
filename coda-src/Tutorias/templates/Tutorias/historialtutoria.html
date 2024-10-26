@@ -47,7 +47,13 @@
                                         </td>
                                         <!--Boolean-->
                                         <td>{{ tutoria.asistencia|yesno:"Sí,No" }}</td>
-                                        <td>{{ tutoria.duracion }}</td>
+                                        <td>
+                                            {% if tutoria.duracion %}
+                                                {{ DURACION_ASESORIA[tutoria.duracion] }}
+                                            {% else %}
+                                                No especificado
+                                            {% endif %}
+                                        </td>
                                         <!--Boolean-->
                                         <td>{{ tutoria.firma_documentos_beca|yesno:"Sí,No" }}</td>
                                         <td>{{ tutoria.beca_otorgada }}</td>
