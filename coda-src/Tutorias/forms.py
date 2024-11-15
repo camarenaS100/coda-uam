@@ -18,7 +18,7 @@ class FormTutorias(forms.ModelForm):
         model = Tutoria
         fields = ['tema', 'fecha', 'descripcion']
 
-class FormSeguimiento(forms.ModelForm):    #esto se debería de usar?
+class FormSeguimiento(forms.ModelForm):
     asistencia = forms.BooleanField(required=False)
     duracion = forms.ChoiceField(choices=DURACION_ASESORIA, required=False)
     firma_documentos_beca = forms.BooleanField(required=False)
