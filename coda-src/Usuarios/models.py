@@ -108,7 +108,7 @@ class Coda(Usuario):
 
 class Cordinador(Usuario):
     cubiculo = models.IntegerField()
-    horario  = models.FileField(null=True, blank=True)
+    horario = models.FileField(null=True, blank=True)
     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
     es_coordinador = models.BooleanField(default=True)
     es_tutor = models.BooleanField(default=False)
@@ -118,9 +118,32 @@ class Cordinador(Usuario):
         verbose_name = 'Cordinador'
         verbose_name_plural = 'Cordinadores'
 
-    def save(self, commit=True) -> None:
+    def save(self, *args, **kwargs):
         self.rol = COORDINADOR
-        return super(Cordinador, self).save()
+        super().save(*args, **kwargs)  # Guarda el Cordinador primero
+
+        if self.es_tutor:
+            # Si es tutor, asegurarse de que también está en la tabla Tutor
+            tutor, created = Tutor.objects.update_or_create(
+                email=self.email,
+                defaults={
+                    "matricula": self.matricula,
+                    "first_name": self.first_name,
+                    "last_name": self.last_name,
+                    "cubiculo": self.cubiculo,
+                    "horario": self.horario,
+                    "coordinacion": self.coordinacion,
+                    "es_coordinador": True,  # Para reflejar su rol como coordinador también
+                    "es_tutor": True,
+                    "tema_tutorias": OTRO,  # Valor por defecto
+                }
+            )
+
+    def delete(self, *args, **kwargs):
+        # Si el Coordinador es eliminado, también eliminar su entrada como Tutor si existe
+        Tutor.objects.filter(email=self.email).delete()
+        super().delete(*args, **kwargs)
+
 
 def alumno_trayectoria_path(instance, filename):
     return f'Usuarios/trayectorias/alumno_{instance.user.matricula}/{filename}'
