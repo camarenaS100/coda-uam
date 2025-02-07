@@ -84,6 +84,7 @@ class Tutor(Usuario):
         super().save(*args, **kwargs)
 
 
+
 class Coda(Usuario):
     cubiculo = models.IntegerField()
     horario  = models.FileField(null=True, blank=True)
@@ -117,17 +118,11 @@ class Cordinador(Usuario):
         self.rol = COORDINADOR
         super().save(*args, **kwargs)
 
-        # Si el coordinador también es tutor, creamos o actualizamos su registro como Tutor
+        # Si el coordinador también es tutor, solo actualizamos sus atributos en la base de datos
         if self.es_tutor:
-            Tutor.objects.update_or_create(
-                id=self.id,  # Asegura que el Tutor tenga el mismo ID
-                defaults={
-                    "cubiculo": self.cubiculo,
-                    "horario": self.horario,
-                    "coordinacion": self.coordinacion,
-                    "es_coordinador": True,  # Es tanto Cordinador como Tutor
-                    "es_tutor": True,
-                }
+            Usuario.objects.filter(id=self.id).update(
+                es_tutor=True,
+                es_coordinador=True  # Ya que es ambos
             )
 
 
