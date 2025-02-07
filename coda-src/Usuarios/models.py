@@ -73,20 +73,15 @@ class Tutor(Usuario):
     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
     es_coordinador = models.BooleanField(default=False)
     es_tutor = models.BooleanField(default=True)
-    tema_tutorias = models.CharField(max_length=4,choices=TEMAS, default=OTRO) # Tema por defecto para las tutorias
+    tema_tutorias = models.CharField(max_length=4, choices=TEMAS, default=OTRO)  # Tema por defecto para tutorías
 
     class Meta:
         verbose_name = 'Tutor'
         verbose_name_plural = 'Tutores'
 
-    def save(self, commit=True) -> None:
+    def save(self, *args, **kwargs):
         self.rol = TUTOR
-
-        # Deprecated
-        # if self.es_coordinador :
-        #     self.rol = "COR"
-            
-        return super(Tutor, self).save()
+        super().save(*args, **kwargs)
 
 
 class Coda(Usuario):
@@ -108,7 +103,7 @@ class Coda(Usuario):
 
 class Cordinador(Usuario):
     cubiculo = models.IntegerField()
-    horario = models.FileField(null=True, blank=True)
+    horario  = models.FileField(null=True, blank=True)
     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
     es_coordinador = models.BooleanField(default=True)
     es_tutor = models.BooleanField(default=False)
@@ -120,29 +115,20 @@ class Cordinador(Usuario):
 
     def save(self, *args, **kwargs):
         self.rol = COORDINADOR
-        super().save(*args, **kwargs)  # Guarda el Cordinador primero
+        super().save(*args, **kwargs)
 
+        # Si el coordinador también es tutor, creamos o actualizamos su registro como Tutor
         if self.es_tutor:
-            # Si es tutor, asegurarse de que también está en la tabla Tutor
-            tutor, created = Tutor.objects.update_or_create(
-                email=self.email,
+            Tutor.objects.update_or_create(
+                id=self.id,  # Asegura que el Tutor tenga el mismo ID
                 defaults={
-                    "matricula": self.matricula,
-                    "first_name": self.first_name,
-                    "last_name": self.last_name,
                     "cubiculo": self.cubiculo,
                     "horario": self.horario,
                     "coordinacion": self.coordinacion,
-                    "es_coordinador": True,  # Para reflejar su rol como coordinador también
+                    "es_coordinador": True,  # Es tanto Cordinador como Tutor
                     "es_tutor": True,
-                    "tema_tutorias": OTRO,  # Valor por defecto
                 }
             )
-
-    def delete(self, *args, **kwargs):
-        # Si el Coordinador es eliminado, también eliminar su entrada como Tutor si existe
-        Tutor.objects.filter(email=self.email).delete()
-        super().delete(*args, **kwargs)
 
 
 def alumno_trayectoria_path(instance, filename):
