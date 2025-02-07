@@ -72,6 +72,7 @@ class Tutor(Usuario):
     horario  = models.FileField(null=True, blank=True)
     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
     es_coordinador = models.BooleanField(default=False)
+    es_tutor = models.BooleanField(default=True)
     tema_tutorias = models.CharField(max_length=4,choices=TEMAS, default=OTRO) # Tema por defecto para las tutorias
 
     class Meta:
@@ -110,6 +111,7 @@ class Cordinador(Usuario):
     horario  = models.FileField(null=True, blank=True)
     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
     es_coordinador = models.BooleanField(default=True)
+    es_tutor = models.BooleanField(default=False)
     tutor_tutorias = models.BooleanField(default=True)
 
     class Meta:

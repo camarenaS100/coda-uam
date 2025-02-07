@@ -1,6 +1,6 @@
 {% extends "Usuarios/HeaderAndFooterFachada.html"%} 
 
-{% block title %} Historial Tutorias  {% endblock %} 
+{% block title %} Historial Tutorías  {% endblock %} 
 
 {% block body %}
 <!--Ver Tutorias-->
@@ -10,10 +10,7 @@
             <div class="col-lg-8 col-xl-10">
                 <div class="card border-top border-bottom border-4" style="border-color: #f08200 !important">
                     <div class="card-body p-4">
-                        <h3 class="fw-bold mb-5 text-primary">Historial de tutorias</h3>
-
-
-                        <!--Inicio de table-->
+                        <h3 class="fw-bold mb-5 text-primary">Historial de tutorías</h3>
 
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
@@ -24,30 +21,46 @@
                                         <th>Hora</th>
                                         <th>Tema</th>
                                         <th>Observaciones</th>
+                                        <th>Seguimiento</th> <!-- New Seguimiento column -->
+                                        <th>Asistencia</th>
+                                        <th>Duración de la tutoría</th>
+                                        <th>¿Firma de documentos de beca?</th>
+                                        <th>Nombre de la beca otorgada</th>
+                                        <th>¿Requirió asesoría especializada?</th>
+                                        <th>Aspectos tratados en la tutoría</th>
+                                        <th>Impacto tutoría</th>
+                                        <th>Resultados de tutoría</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {% for tutoria in object_list %}
                                     <tr>
-                                        {% for tutoria in object_list %}
-                                    </tr>
-
-                                    <tr>
+                                        <td>{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }}</td>
+                                        <td>{{ tutoria.fecha|date:"Y-m-d" }}</td>
+                                        <td>{{ tutoria.fecha|date:"H:i" }}</td>
+                                        <td>{{ tutoria.get_tema_display |join:", " }}</td>
+                                        <td>{{ tutoria.descripcion }}</td>
                                         <td>
-                                            {{ tutoria.alumno.first_name }} {{tutoria.alumno.last_name }}
+                                            <!-- Se supone que la llave primaria se pasa como parte del url a la página de seguimiento... -->
+                                            <a href="{% url 'save_seguimiento' pk=tutoria.pk %}" class="btn btn-primary">Realizar</a>
+                                            </a>
                                         </td>
-                                        <td>{{ tutoria.fecha|date }}</td>
-                                        <td>{{ tutoria.fecha|date:"P" }}</td>
-                                        <!--Se agregó |join:", " para quitar notación de lista-->
-                                        <td>{{ tutoria.get_tema_display |join:", " }} </td>
-                                        <td>{{ tutoria.descripcion}}</td>
-                                        <td></td>
+                                        <!--Boolean-->
+                                        <td>{{ tutoria.asistencia|yesno:"Sí,No" }}</td>
+                                        <td>{{ tutoria.get_duracion_display }}</td>
+                                        <!--Boolean-->
+                                        <td>{{ tutoria.firma_documentos_beca|yesno:"Sí,No" }}</td>
+                                        <td>{{ tutoria.beca_otorgada }}</td>
+                                        <!--Boolean-->
+                                        <td>{{ tutoria.asesoria_especializada|yesno:"Sí,No" }}</td>
+                                        <td>{{ tutoria.observaciones }}</td>
+                                        <td>{{ tutoria.impacto_tutoria }}</td>
+                                        <td>{{ tutoria.resultados_tutoria }}</td>
                                     </tr>
-
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
-                        <!--Fin de table-->
                     </div>
                 </div>
             </div>
