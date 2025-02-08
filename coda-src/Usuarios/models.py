@@ -109,7 +109,9 @@ class Cordinador(Usuario):
     tutor_tutorias = models.BooleanField(default=True)
     es_coordinador = models.BooleanField(default=True)
     es_tutor = models.BooleanField(default=False)
-    tutor = models.OneToOneField(Tutor, null=True, blank=True, on_delete=models.CASCADE)  # Relación uno a uno con Tutor
+    tutor_relacion = models.OneToOneField(
+        Tutor, null=True, blank=True, on_delete=models.CASCADE, related_name="cordinador"
+    )
 
     class Meta:
         verbose_name = 'Cordinador'
