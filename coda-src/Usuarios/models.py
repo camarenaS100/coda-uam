@@ -174,12 +174,3 @@ class Alumno(Usuario):
     #@property
     #def get_tutor_fullname(self) -> str:
     #    return f'{self.tutor_asignado.first_name} {self.tutor_asignado.last_name}'
-
-
-
-
-# class Coordinador(Usuario):
-#     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
-#     class Meta:
-#         verbose_name = 'Coordinador'
-#         verbose_name_plural = 'Coordinadores'
