@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from .constants import ROLES, CARRERAS
 from Tutorias.constants import TEMAS, OTRO
@@ -108,19 +109,52 @@ class Coda(Usuario):
 
 class Cordinador(Usuario):
     cubiculo = models.IntegerField()
-    horario  = models.FileField(null=True, blank=True)
+    horario = models.FileField(null=True, blank=True)
     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
     es_coordinador = models.BooleanField(default=True)
     es_tutor = models.BooleanField(default=False)
     tutor_tutorias = models.BooleanField(default=True)
 
+    # Relación uno a uno con Tutor
+    tutor_relacion = models.OneToOneField(
+        'Tutor',  # Relación con la tabla Tutor
+        null=True, blank=True,  # Puede estar vacío si no es tutor
+        on_delete=models.SET_NULL,
+        related_name='cordinador_relacion'
+    )
+
     class Meta:
         verbose_name = 'Cordinador'
         verbose_name_plural = 'Cordinadores'
 
-    def save(self, commit=True) -> None:
+    def save(self, *args, **kwargs):
         self.rol = COORDINADOR
-        return super(Cordinador, self).save()
+
+        # Si el Cordinador es tutor, asegurarse de que tenga una relación con Tutor
+        if self.es_tutor:
+            if not self.tutor_relacion:  # Si aún no tiene tutor, crearlo
+                tutor = Tutor.objects.create(
+                    email=self.email,  # Mantener el mismo email
+                    matricula=self.matricula,
+                    first_name=self.first_name,
+                    last_name=self.last_name,
+                    cubiculo=self.cubiculo,
+                    horario=self.horario,
+                    coordinacion=self.coordinacion,
+                    es_coordinador=True,  # Para reflejar la relación
+                    es_tutor=True
+                )
+                self.tutor_relacion = tutor
+            else:
+                # Si ya tiene un Tutor, actualizar los datos para mantener sincronización
+                tutor = self.tutor_relacion
+                tutor.cubiculo = self.cubiculo
+                tutor.horario = self.horario
+                tutor.coordinacion = self.coordinacion
+                tutor.es_coordinador = True
+                tutor.save()
+
+        super().save(*args, **kwargs)  # Guardar el Cordinador después de gestionar el Tutor
 
 def alumno_trayectoria_path(instance, filename):
     return f'Usuarios/trayectorias/alumno_{instance.user.matricula}/{filename}'
