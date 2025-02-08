@@ -104,7 +104,7 @@ class Coda(Usuario):
 
 class Cordinador(Usuario):
     cubiculo = models.IntegerField()
-    horario  = models.FileField(null=True, blank=True)
+    horario = models.FileField(null=True, blank=True)
     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
     es_coordinador = models.BooleanField(default=True)
     es_tutor = models.BooleanField(default=False)
@@ -115,16 +115,19 @@ class Cordinador(Usuario):
         verbose_name_plural = 'Cordinadores'
 
     def save(self, *args, **kwargs):
-        self.rol = COORDINADOR
-        super().save(*args, **kwargs)
+        self.rol = COORDINADOR  # Se asegura que el rol principal sea COORDINADOR
+        super().save(*args, **kwargs)  # Guarda la instancia como Cordinador
 
-        # Si el coordinador también es tutor, solo actualizamos sus atributos en la base de datos
+        # Si el Coordinador también es Tutor, creamos un Tutor con la MISMA instancia
         if self.es_tutor:
-            Usuario.objects.filter(id=self.id).update(
-                es_tutor=True,
-                es_coordinador=True  # Ya que es ambos
+            Tutor.objects.get_or_create(
+                id=self.id,  # Se usa el mismo ID del usuario para evitar duplicados
+                defaults={
+                    'cubiculo': self.cubiculo,
+                    'horario': self.horario,
+                    'coordinacion': self.coordinacion,
+                }
             )
-
 
 def alumno_trayectoria_path(instance, filename):
     return f'Usuarios/trayectorias/alumno_{instance.user.matricula}/{filename}'
