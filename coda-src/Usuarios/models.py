@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from django.db import models, transaction
+from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from .constants import ROLES, CARRERAS
@@ -109,57 +109,19 @@ class Coda(Usuario):
 
 class Cordinador(Usuario):
     cubiculo = models.IntegerField()
-    horario = models.FileField(null=True, blank=True)
+    horario  = models.FileField(null=True, blank=True)
     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
     es_coordinador = models.BooleanField(default=True)
     es_tutor = models.BooleanField(default=False)
     tutor_tutorias = models.BooleanField(default=True)
 
-    # Relación uno a uno con Tutor
-    tutor_relacion = models.OneToOneField(
-        'Tutor',  # Referencia al modelo Tutor
-        null=True, blank=True,  # Puede estar vacío si no es tutor
-        on_delete=models.SET_NULL,
-        related_name='cordinador_relacion'
-    )
-
     class Meta:
         verbose_name = 'Cordinador'
         verbose_name_plural = 'Cordinadores'
 
-    def save(self, *args, **kwargs):
+    def save(self, commit=True) -> None:
         self.rol = COORDINADOR
-
-        # Usamos una transacción para evitar problemas de consistencia en la base de datos
-        with transaction.atomic():
-            super().save(*args, **kwargs)  # Guardar el Cordinador primero para obtener un ID válido
-
-            if self.es_tutor:
-                if not self.tutor_relacion:  # Si no tiene tutor relacionado, crearlo
-                    tutor = Tutor.objects.create(
-                        email=self.email,
-                        matricula=self.matricula,
-                        first_name=self.first_name,
-                        last_name=self.last_name,
-                        cubiculo=self.cubiculo,
-                        horario=self.horario,
-                        coordinacion=self.coordinacion,
-                        es_coordinador=True,
-                        es_tutor=True
-                    )
-                    self.tutor_relacion = tutor
-                    super().save(update_fields=['tutor_relacion'])  # Actualizar tutor_relacion
-
-                else:
-                    # Si ya tiene un Tutor, actualizar sus datos
-                    tutor = self.tutor_relacion
-                    tutor.cubiculo = self.cubiculo
-                    tutor.horario = self.horario
-                    tutor.coordinacion = self.coordinacion
-                    tutor.es_coordinador = True
-                    tutor.save()
-
-
+        return super(Cordinador, self).save()
 
 def alumno_trayectoria_path(instance, filename):
     return f'Usuarios/trayectorias/alumno_{instance.user.matricula}/{filename}'
