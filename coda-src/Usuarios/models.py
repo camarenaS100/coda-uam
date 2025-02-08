@@ -106,28 +106,39 @@ class Cordinador(Usuario):
     cubiculo = models.IntegerField()
     horario = models.FileField(null=True, blank=True)
     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
+    tutor_tutorias = models.BooleanField(default=True)
     es_coordinador = models.BooleanField(default=True)
     es_tutor = models.BooleanField(default=False)
-    tutor_tutorias = models.BooleanField(default=True)
+    tutor = models.OneToOneField(Tutor, null=True, blank=True, on_delete=models.CASCADE)  # Relación uno a uno con Tutor
 
     class Meta:
         verbose_name = 'Cordinador'
         verbose_name_plural = 'Cordinadores'
 
     def save(self, *args, **kwargs):
-        self.rol = COORDINADOR  # Se asegura que el rol principal sea COORDINADOR
-        super().save(*args, **kwargs)  # Guarda la instancia como Cordinador
+        self.rol = COORDINADOR
+        super().save(*args, **kwargs)
 
-        # Si el Coordinador también es Tutor, creamos un Tutor con la MISMA instancia
+        # Si es_tutor es True y aún no tiene un Tutor asignado, lo creamos
         if self.es_tutor:
-            Tutor.objects.get_or_create(
-                id=self.id,  # Se usa el mismo ID del usuario para evitar duplicados
-                defaults={
-                    'cubiculo': self.cubiculo,
-                    'horario': self.horario,
-                    'coordinacion': self.coordinacion,
-                }
-            )
+            if not self.tutor:
+                tutor_instance, created = Tutor.objects.get_or_create(
+                    id=self.id,  # Usa el mismo ID para no duplicar usuarios
+                    defaults={
+                        'cubiculo': self.cubiculo,
+                        'horario': self.horario,
+                        'coordinacion': self.coordinacion,
+                    }
+                )
+                self.tutor = tutor_instance
+                super().save(*args, **kwargs)  # Guarda la relación con el Tutor
+
+        # Si es_tutor es False y ya tiene un Tutor asignado, lo eliminamos
+        elif self.tutor:
+            self.tutor.delete()
+            self.tutor = None
+            super().save(*args, **kwargs)  # Guarda la actualización
+
 
 def alumno_trayectoria_path(instance, filename):
     return f'Usuarios/trayectorias/alumno_{instance.user.matricula}/{filename}'
