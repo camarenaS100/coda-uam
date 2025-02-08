@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from .constants import ROLES, CARRERAS
 from Tutorias.constants import TEMAS, OTRO
@@ -106,11 +106,16 @@ class Cordinador(Usuario):
     cubiculo = models.IntegerField()
     horario = models.FileField(null=True, blank=True)
     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
-    tutor_tutorias = models.BooleanField(default=True)
     es_coordinador = models.BooleanField(default=True)
     es_tutor = models.BooleanField(default=False)
+    tutor_tutorias = models.BooleanField(default=True)
+
+    # Relación uno a uno con Tutor
     tutor_relacion = models.OneToOneField(
-        Tutor, null=True, blank=True, on_delete=models.CASCADE, related_name="cordinador"
+        'Tutor',  # Referencia al modelo Tutor
+        null=True, blank=True,  # Puede estar vacío si no es tutor
+        on_delete=models.SET_NULL,
+        related_name='cordinador_relacion'
     )
 
     class Meta:
@@ -119,27 +124,37 @@ class Cordinador(Usuario):
 
     def save(self, *args, **kwargs):
         self.rol = COORDINADOR
-        super().save(*args, **kwargs)
 
-        # Si es_tutor es True y aún no tiene un Tutor asignado, lo creamos
-        if self.es_tutor:
-            if not self.tutor:
-                tutor_instance, created = Tutor.objects.get_or_create(
-                    id=self.id,  # Usa el mismo ID para no duplicar usuarios
-                    defaults={
-                        'cubiculo': self.cubiculo,
-                        'horario': self.horario,
-                        'coordinacion': self.coordinacion,
-                    }
-                )
-                self.tutor = tutor_instance
-                super().save(*args, **kwargs)  # Guarda la relación con el Tutor
+        # Usamos una transacción para evitar problemas de consistencia en la base de datos
+        with transaction.atomic():
+            super().save(*args, **kwargs)  # Guardar el Cordinador primero para obtener un ID válido
 
-        # Si es_tutor es False y ya tiene un Tutor asignado, lo eliminamos
-        elif self.tutor:
-            self.tutor.delete()
-            self.tutor = None
-            super().save(*args, **kwargs)  # Guarda la actualización
+            if self.es_tutor:
+                if not self.tutor_relacion:  # Si no tiene tutor relacionado, crearlo
+                    tutor = Tutor.objects.create(
+                        email=self.email,
+                        matricula=self.matricula,
+                        first_name=self.first_name,
+                        last_name=self.last_name,
+                        cubiculo=self.cubiculo,
+                        horario=self.horario,
+                        coordinacion=self.coordinacion,
+                        es_coordinador=True,
+                        es_tutor=True
+                    )
+                    self.tutor_relacion = tutor
+                    super().save(update_fields=['tutor_relacion'])  # Actualizar tutor_relacion
+
+                else:
+                    # Si ya tiene un Tutor, actualizar sus datos
+                    tutor = self.tutor_relacion
+                    tutor.cubiculo = self.cubiculo
+                    tutor.horario = self.horario
+                    tutor.coordinacion = self.coordinacion
+                    tutor.es_coordinador = True
+                    tutor.save()
+
+
 
 
 def alumno_trayectoria_path(instance, filename):
