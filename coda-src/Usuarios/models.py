@@ -102,6 +102,8 @@ class Coda(Usuario):
     
 
 
+from django.db import models, transaction
+
 class Cordinador(Usuario):
     cubiculo = models.IntegerField()
     horario = models.FileField(null=True, blank=True)
@@ -125,34 +127,28 @@ class Cordinador(Usuario):
     def save(self, *args, **kwargs):
         self.rol = COORDINADOR
 
-        # Usamos una transacción para evitar problemas de consistencia en la base de datos
         with transaction.atomic():
-            super().save(*args, **kwargs)  # Guardar el Cordinador primero para obtener un ID válido
+            super().save(*args, **kwargs)  # Guardar primero el Cordinador para obtener su ID
 
             if self.es_tutor:
-                if not self.tutor_relacion:  # Si no tiene tutor relacionado, crearlo
-                    tutor = Tutor.objects.create(
-                        email=self.email,
-                        matricula=self.matricula,
-                        first_name=self.first_name,
-                        last_name=self.last_name,
-                        cubiculo=self.cubiculo,
-                        horario=self.horario,
-                        coordinacion=self.coordinacion,
-                        es_coordinador=True,
-                        es_tutor=True
-                    )
-                    self.tutor_relacion = tutor
-                    super().save(update_fields=['tutor_relacion'])  # Actualizar tutor_relacion
+                # Usar update_or_create para evitar duplicados
+                tutor, created = Tutor.objects.update_or_create(
+                    id=self.id,  # Se asegura de usar el mismo ID para no crear otro usuario
+                    defaults={
+                        "cubiculo": self.cubiculo,
+                        "horario": self.horario,
+                        "coordinacion": self.coordinacion,
+                        "es_coordinador": True,
+                        "es_tutor": True,
+                        "email": self.email,
+                        "matricula": self.matricula,
+                        "first_name": self.first_name,
+                        "last_name": self.last_name,
+                    },
+                )
+                self.tutor_relacion = tutor
+                super().save(update_fields=['tutor_relacion'])  # Solo actualizar tutor_relacion
 
-                else:
-                    # Si ya tiene un Tutor, actualizar sus datos
-                    tutor = self.tutor_relacion
-                    tutor.cubiculo = self.cubiculo
-                    tutor.horario = self.horario
-                    tutor.coordinacion = self.coordinacion
-                    tutor.es_coordinador = True
-                    tutor.save()
 
 
 
