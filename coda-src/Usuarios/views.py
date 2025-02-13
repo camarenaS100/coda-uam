@@ -13,16 +13,17 @@ from .models import Usuario, Tutor, Alumno, Coda, Cordinador
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
-
+from django.views.generic.edit import FormView
+from .forms import ImportAlumnosForm
 from django.views.generic.list import ListView
 from django.http import HttpResponseBadRequest
 from django.views.generic import View
-
 from django.http import HttpResponse
 #from .models import Tutoria
-
 from . import forms as userForms
 from .mixins import BaseAccessMixin, CodaViewMixin, AlumnoViewMixin, CordinadorViewMixin, TutorViewMixin
+from django.http import JsonResponse
+
 
 
 # TODO Remove test views
@@ -193,8 +194,13 @@ class CreateTutorView(CodaViewMixin, CreateView):
     form_class = userForms.FormTutor
 
 
+class ImportAlumnosView(CodaViewMixin, FormView):
+    template_name = 'Usuarios/importar_alumnos.html'
+    form_class = ImportAlumnosForm
+    success_url = reverse_lazy('Tutores-Coda')
 
-
+    def form_valid():
+        pass
 
 # class AceptarTutoriaView(View):
 #     def post(self, request, pk):

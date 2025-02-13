@@ -34,3 +34,7 @@ class FormAlumno(FormUsuario):
         model = Alumno
         fields = ['first_name', 'last_name', 'matricula', 'email', 'correo_personal', 'carrera', 'tutor_asignado', 'password1', 'password2']
     pass
+
+class ImportAlumnosForm(forms.Form):
+    archivo = forms.FileField(label="Selecciona el archivo que deseas subir (XSLX, XSL o CSV)")
+    pass
