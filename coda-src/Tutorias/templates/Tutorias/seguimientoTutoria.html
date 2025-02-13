@@ -1,0 +1,89 @@
+{% extends "Usuarios/HeaderAndFooterFachada.html"%}
+
+{% block title %} Seguimiento Tutoria {% endblock %}
+
+{% block body %}
+<section class="min-vh-100" style="background-color: #eee;">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-lg-8 col-xl-6">
+                <div class="card border-top border-bottom border-4" style="border-color: #f08200 !important;">
+                    
+                    {% load widget_tweaks %}
+                    <form method="POST" action="{% url 'save_seguimiento' tutoria.pk %}">
+                        {% csrf_token %}
+                        <div class="card-body p-5">
+                            <h3 class="fw-bold mb-5 text-primary">Formulario de Seguimiento</h3>
+
+                            <!-- Muestra información de tutoría seleccionada -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Alumno:</label>
+                                <input type="text" class="form-control" value="{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }}" readonly>
+
+                                <label class="form-label fw-bold mt-3">Fecha y Hora:</label>
+                                <input type="text" class="form-control" value="{{ tutoria.fecha|date:'d/m/Y H:i' }}" readonly>
+
+                                <label class="form-label fw-bold mt-3">Tema:</label>
+                                <input type="text" class="form-control" value="{{ tutoria.get_tema_display|join:', ' }}" readonly>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">¿El alumno asistió a la tutoría?:</label><br>
+                                <input type="radio" name="asistencia" value="True" required> Sí
+                                <input type="radio" name="asistencia" value="False"> No
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Duración de la tutoría:</label>
+                                {% render_field form.duracion class="form-select" %}
+                                <label class="form-label" for="id_duracion">Selecciona una opción</label>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">¿Se firmó algún formato de solicitud de beca?</label><br>
+                                <input type="radio" name="firma_documentos_beca" value="True" required> Sí
+                                <input type="radio" name="firma_documentos_beca" value="False"> No
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Nombre de la beca otorgada al alumno:</label>
+                                <input type="text" name="beca_otorgada" class="form-control" maxlength="255">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">¿Requirió asesoría especializada?:</label><br>
+                                <input type="radio" name="asesoria_especializada" value="True" required> Sí
+                                <input type="radio" name="asesoria_especializada" value="False"> No
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Aspectos tratados en la tutoría, acuerdos o acciones establecidas, canalizaciones</label>
+                                <textarea name="observaciones" class="form-control" maxlength="1000"></textarea>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">¿Nivel de impacto de la tutoría en el desempeño académico del alumno?:</label><br>
+                                <input type="radio" name="impacto_tutoria" value="1" required> 1
+                                <input type="radio" name="impacto_tutoria" value="2"> 2
+                                <input type="radio" name="impacto_tutoria" value="3"> 3
+                                <input type="radio" name="impacto_tutoria" value="4"> 4
+                                <input type="radio" name="impacto_tutoria" value="5"> 5
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Resultados de la tutoría:</label>
+                                <textarea name="resultados_tutoria" class="form-control" maxlength="1000"></textarea>
+                            </div>
+
+                            <div class="mb-4">
+                                <button type="submit" class="btn btn-primary">Guardar Seguimiento</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from .constants import ROLES, CARRERAS
 from Tutorias.constants import TEMAS, OTRO
@@ -72,20 +72,17 @@ class Tutor(Usuario):
     horario  = models.FileField(null=True, blank=True)
     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
     es_coordinador = models.BooleanField(default=False)
-    tema_tutorias = models.CharField(max_length=4,choices=TEMAS, default=OTRO) # Tema por defecto para las tutorias
+    es_tutor = models.BooleanField(default=True)
+    tema_tutorias = models.CharField(max_length=4, choices=TEMAS, default=OTRO)  # Tema por defecto para tutorías
 
     class Meta:
         verbose_name = 'Tutor'
         verbose_name_plural = 'Tutores'
 
-    def save(self, commit=True) -> None:
+    def save(self, *args, **kwargs):
         self.rol = TUTOR
+        super().save(*args, **kwargs)
 
-        # Deprecated
-        # if self.es_coordinador :
-        #     self.rol = "COR"
-            
-        return super(Tutor, self).save()
 
 
 class Coda(Usuario):
@@ -105,20 +102,56 @@ class Coda(Usuario):
     
 
 
+from django.db import models, transaction
+
 class Cordinador(Usuario):
     cubiculo = models.IntegerField()
-    horario  = models.FileField(null=True, blank=True)
+    horario = models.FileField(null=True, blank=True)
     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
     es_coordinador = models.BooleanField(default=True)
+    es_tutor = models.BooleanField(default=False)
     tutor_tutorias = models.BooleanField(default=True)
+
+    # Relación uno a uno con Tutor
+    tutor_relacion = models.OneToOneField(
+        'Tutor',  # Referencia al modelo Tutor
+        null=True, blank=True,  # Puede estar vacío si no es tutor
+        on_delete=models.SET_NULL,
+        related_name='cordinador_relacion'
+    )
 
     class Meta:
         verbose_name = 'Cordinador'
         verbose_name_plural = 'Cordinadores'
 
-    def save(self, commit=True) -> None:
+    def save(self, *args, **kwargs):
         self.rol = COORDINADOR
-        return super(Cordinador, self).save()
+
+        with transaction.atomic():
+            super().save(*args, **kwargs)  # Guardar primero el Cordinador para obtener su ID
+
+            if self.es_tutor:
+                # Usar update_or_create para evitar duplicados
+                tutor, created = Tutor.objects.update_or_create(
+                    id=self.id,  # Se asegura de usar el mismo ID para no crear otro usuario
+                    defaults={
+                        "cubiculo": self.cubiculo,
+                        "horario": self.horario,
+                        "coordinacion": self.coordinacion,
+                        "es_coordinador": True,
+                        "es_tutor": True,
+                        "email": self.email,
+                        "matricula": self.matricula,
+                        "first_name": self.first_name,
+                        "last_name": self.last_name,
+                    },
+                )
+                self.tutor_relacion = tutor
+                super().save(update_fields=['tutor_relacion'])  # Solo actualizar tutor_relacion
+
+
+
+
 
 def alumno_trayectoria_path(instance, filename):
     return f'Usuarios/trayectorias/alumno_{instance.user.matricula}/{filename}'
@@ -141,12 +174,3 @@ class Alumno(Usuario):
     #@property
     #def get_tutor_fullname(self) -> str:
     #    return f'{self.tutor_asignado.first_name} {self.tutor_asignado.last_name}'
-
-
-
-
-# class Coordinador(Usuario):
-#     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
-#     class Meta:
-#         verbose_name = 'Coordinador'
-#         verbose_name_plural = 'Coordinadores'

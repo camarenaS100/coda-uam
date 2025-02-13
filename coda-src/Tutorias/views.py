@@ -17,8 +17,9 @@ from django.core.mail import send_mail
 from datetime import datetime, timedelta
 
 from .models import Tutoria
-from .forms import FormTutorias
-from .constants import PENDIENTE, ACEPTADO, RECHAZADO
+from .forms import FormTutorias, FormSeguimiento
+# from .forms import FormSeguimiento # de nuevo, no estoy seguro
+from .constants import PENDIENTE, ACEPTADO, RECHAZADO, DURACION_ASESORIA # de nuevo, no estoy seguro
 from Usuarios.constants import TUTOR, ALUMNO, COORDINADOR, TEMPLATES, CORREO
 from Usuarios.views import BaseAccessMixin, CodaViewMixin, TutorViewMixin, AlumnoViewMixin, CordinadorViewMixin
 from Usuarios.models import Tutor, Alumno, Cordinador
@@ -565,4 +566,18 @@ class CrearTutoriaPorAlumnoView(TutorViewMixin, CreateView):
         slug = slugify(form.instance.tema)
         form.instance.slug = slug
 
+        return super().form_valid(form)
+
+
+class RealizarSeguimientoView(TutorViewMixin, UpdateView):
+    model = Tutoria
+    form_class = FormSeguimiento
+    template_name = 'Tutorias/seguimientoTutoria.html'
+    success_url =  reverse_lazy('Tutorias-historial')
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        tutor = Tutor.objects.get(pk=self.request.user)
+        recipient = Alumno.objects.filter(pk=self.get_object().alumno)
+
+        notify.send(tutor, recipient=recipient, verb='Seguimiento de tutoria realizado')
         return super().form_valid(form)

@@ -114,36 +114,42 @@ class PerfilCordinadorView(BaseAccessMixin, DetailView):
     
 
 class UsuarioLoginView(LoginView):
-
     redirect_authenticated_user = True
-
     template_name = "Usuarios/login.html"
-    
-    def form_invalid(self, form: AuthenticationForm) -> HttpResponse:
-        return self.render_to_response(self.get_context_data(form=form))
+
+    def form_valid(self, form):
+        """
+        If the form is valid, log in the user and store the selected role in session.
+        """
+        response = super().form_valid(form)  # Perform default login process
+        role = self.request.POST.get("role")  # Get selected role from the login form
+        if role:
+            self.request.session["role"] = role  # Store the role in session
+        return response  # Proceed with normal redirection
 
 @login_required
 def login_success(request):
     """
-    Redirecciona los usuarios a su view correspondiente
+    Redirects users to the appropriate view based on their role.
     """
+    user = request.user
+    selected_role = request.session.get("role")  # Retrieve stored role from session
 
+    if selected_role == "alumno" and Alumno.objects.filter(pk=user.pk).exists():
+        return redirect("Tutorias-alumno")
 
-    if Alumno.objects.filter(pk=request.user.pk).exists():
-        return redirect('Tutorias-alumno')
-    
-    if Tutor.objects.filter(pk=request.user.pk).exists():
-        return redirect('Tutorias-tutor')
-    if Cordinador.objects.filter(pk=request.user.pk).exists():
-        return redirect('Tutorias-Coordinacion')
-    if Coda.objects.filter(pk=request.user.pk).exists():
-        return redirect('Tutores-Coda')
-    
-    print('ERROR: Usuario no definido')
+    if selected_role == "tutor" and Tutor.objects.filter(pk=user.pk).exists():
+        return redirect("Tutorias-tutor")
+
+    if selected_role == "coordinador" and Cordinador.objects.filter(pk=user.pk).exists():
+        return redirect("Tutorias-Coordinacion")
+
+    if selected_role == "coda" and Coda.objects.filter(pk=user.pk).exists():
+        return redirect("Tutores-Coda")
+
+    print("ERROR: Usuario no definido o rol incorrecto")
     return HttpResponseBadRequest("ERROR. Tipo de usuario o rol no definido")
-    #return redirect()
-    # if Usuario.objects.filter(pk=request.user.pk).exists:
-    #     return redirect('Tutorias-coordinador')
+
 
 class ChangePasswordView(BaseAccessMixin, PasswordChangeView):
     template_name = 'Usuarios/change_password.html'  # Create a template for password change form
