@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 from django.db import models, transaction
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.postgres.fields import ArrayField
 from .constants import ROLES, CARRERAS
 from Tutorias.constants import TEMAS, OTRO
 from .constants import CODA, TUTOR, COORDINADOR, ALUMNO, SEXOS, ESTADOS_ALUMNO
@@ -24,12 +25,14 @@ class UserManager(BaseUserManager):
         """Create and save a regular User with the given email and password."""
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
+        extra_fields.setdefault('rol', ["USR"])  # Default role
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
         """Create and save a SuperUser with the given email and password."""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('rol', ["USR"])  # Ensure a role is set
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff=True.')
@@ -39,70 +42,63 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 def usr_pfp_path(instance, filename):
-    return f'Usuarios/fotos/usuario_{instance.user.matricula}/{filename}'
+    return f'Usuarios/fotos/usuario_{instance.matricula}/{filename}'
 
 class Usuario(AbstractUser):
-    
-
     username = None
-    matricula = models.CharField(max_length=11,unique=True)
+    matricula = models.CharField(max_length=11, unique=True)
     foto = models.ImageField(null=True, blank=True, upload_to=usr_pfp_path)
     email = models.EmailField(unique=True)
     correo_personal = models.EmailField(max_length=50, blank=True, null=True)
-    rol = models.CharField(max_length=8, choices=ROLES, default="USR")
+    rol = ArrayField(models.CharField(max_length=8, choices=ROLES), default=list)
     sexo = models.CharField(max_length=30, choices=SEXOS, null=True)
-    #nombre = models.CharField(max_length=150)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ['matricula']
 
+    objects = UserManager()
+
     def __str__(self) -> str:
         return str(self.matricula)
     
-    def get_rol(self) -> str:
-        return str(self.rol)
-    
-    
+    def get_roles(self) -> list:
+        return self.rol  # Returns a list of roles
 
-
-    objects = UserManager()
+    def has_role(self, role: str) -> bool:
+        return role in self.rol  # Check if user has a specific role
 
 class Tutor(Usuario):
     cubiculo = models.IntegerField()
-    horario  = models.FileField(null=True, blank=True)
+    horario = models.FileField(null=True, blank=True)
     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
     es_coordinador = models.BooleanField(default=False)
     es_tutor = models.BooleanField(default=True)
-    tema_tutorias = models.CharField(max_length=4, choices=TEMAS, default=OTRO)  # Tema por defecto para tutorías
+    tema_tutorias = models.CharField(max_length=4, choices=TEMAS, default=OTRO)
 
     class Meta:
         verbose_name = 'Tutor'
         verbose_name_plural = 'Tutores'
 
     def save(self, *args, **kwargs):
-        self.rol = TUTOR
+        if TUTOR not in self.rol:
+            self.rol.append(TUTOR)
         super().save(*args, **kwargs)
-
-
 
 class Coda(Usuario):
     cubiculo = models.IntegerField()
-    horario  = models.FileField(null=True, blank=True)
+    horario = models.FileField(null=True, blank=True)
     coordinacion = models.CharField(max_length=30, choices=CARRERAS)
     es_coordinador = models.BooleanField(default=False)
-    tema_tutorias = models.CharField(max_length=4,choices=TEMAS, default=OTRO) # Tema por defecto para las tutorias
+    tema_tutorias = models.CharField(max_length=4, choices=TEMAS, default=OTRO)
 
     class Meta:
         verbose_name = 'CODA'
         verbose_name_plural = 'CODAA'
 
-    def save(self, commit=True) -> None:
-        self.rol = CODA
-        return super(Coda, self).save()
-    
-
-
-from django.db import models, transaction
+    def save(self, *args, **kwargs):
+        if CODA not in self.rol:
+            self.rol.append(CODA)
+        super().save(*args, **kwargs)
 
 class Cordinador(Usuario):
     cubiculo = models.IntegerField()
@@ -112,10 +108,9 @@ class Cordinador(Usuario):
     es_tutor = models.BooleanField(default=False)
     tutor_tutorias = models.BooleanField(default=True)
 
-    # Relación uno a uno con Tutor
     tutor_relacion = models.OneToOneField(
-        'Tutor',  # Referencia al modelo Tutor
-        null=True, blank=True,  # Puede estar vacío si no es tutor
+        'Tutor',
+        null=True, blank=True,
         on_delete=models.SET_NULL,
         related_name='cordinador_relacion'
     )
@@ -125,15 +120,15 @@ class Cordinador(Usuario):
         verbose_name_plural = 'Cordinadores'
 
     def save(self, *args, **kwargs):
-        self.rol = COORDINADOR
+        if COORDINADOR not in self.rol:
+            self.rol.append(COORDINADOR)
 
         with transaction.atomic():
-            super().save(*args, **kwargs)  # Guardar primero el Cordinador para obtener su ID
+            super().save(*args, **kwargs)
 
             if self.es_tutor:
-                # Usar update_or_create para evitar duplicados
                 tutor, created = Tutor.objects.update_or_create(
-                    id=self.id,  # Se asegura de usar el mismo ID para no crear otro usuario
+                    id=self.id,
                     defaults={
                         "cubiculo": self.cubiculo,
                         "horario": self.horario,
@@ -144,33 +139,27 @@ class Cordinador(Usuario):
                         "matricula": self.matricula,
                         "first_name": self.first_name,
                         "last_name": self.last_name,
+                        "rol": self.rol,
+                        "password": self.password,
                     },
                 )
                 self.tutor_relacion = tutor
-                super().save(update_fields=['tutor_relacion'])  # Solo actualizar tutor_relacion
-
-
-
-
+                super().save(update_fields=['tutor_relacion'])
 
 def alumno_trayectoria_path(instance, filename):
-    return f'Usuarios/trayectorias/alumno_{instance.user.matricula}/{filename}'
+    return f'Usuarios/trayectorias/alumno_{instance.matricula}/{filename}'
 
 class Alumno(Usuario):
-    
     carrera = models.CharField(max_length=30, choices=CARRERAS)
     trayectoria = models.FileField(null=True, blank=True, upload_to=alumno_trayectoria_path)
     tutor_asignado = models.ForeignKey(Tutor, on_delete=models.PROTECT)
-    estado = models.IntegerField( choices=ESTADOS_ALUMNO, null=True)
+    estado = models.IntegerField(choices=ESTADOS_ALUMNO, null=True)
 
-    def save(self, commit=True) -> None:
-        self.rol = ALUMNO
-        return super(Alumno, self).save()
-    
     class Meta:
         verbose_name = 'Alumno'
         verbose_name_plural = 'Alumnos'
 
-    #@property
-    #def get_tutor_fullname(self) -> str:
-    #    return f'{self.tutor_asignado.first_name} {self.tutor_asignado.last_name}'
+    def save(self, *args, **kwargs):
+        if ALUMNO not in self.rol:
+            self.rol.append(ALUMNO)
+        super().save(*args, **kwargs)

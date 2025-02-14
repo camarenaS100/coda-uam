@@ -26,93 +26,93 @@ from django.http import JsonResponse
 
 
 
-# TODO Remove test views
+# Test Views (Remove for production)
 def login_view_test(request):
-
     return render(request, 'Usuarios/login.html')
 
 def perfil_view_test(request):
-
     return render(request, 'Usuarios/perfil.html')
 
 def recordarcontras_view_test(request):
-
     return render(request, 'Usuarios/recordarContrasenia.html')
 
 
-
+### Profile Views Updated for `Usuario`
 class PerfilAlumnoView(BaseAccessMixin, DetailView):
-
-    model = Alumno
+    model = Usuario
     template_name = 'Usuarios/perfil_alumno.html'
-    
 
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        
-        return context
+    def get_queryset(self) -> QuerySet[Any]:
+        return Usuario.objects.filter(roles__contains=["ALU"])  # Filter for Alumnos
+
 
 class PerfilTutorView(BaseAccessMixin, DetailView):
-
-    model = Tutor
+    model = Usuario
     template_name = 'Usuarios/perfil_tutor.html'
 
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        return super().get_context_data(**kwargs)
-
     def get_queryset(self) -> QuerySet[Any]:
-        return super().get_queryset()
+        return Usuario.objects.filter(roles__contains=["TUT"])  # Filter for Tutors
 
-@login_required
-def redirect_perfil(request):
-
-    if Tutor.objects.filter(pk=request.user.pk).exists():
-        return redirect('perfil-tutor', pk=request.user.pk)
-    
-    if Alumno.objects.filter(pk=request.user.pk).exists():
-        return redirect('perfil-alumno', pk=request.user.pk)
-    if Coda.objects.filter(pk=request.user.pk).exists():
-        return redirect('perfil-coda', pk=request.user.pk)
-    if Cordinador.objects.filter(pk=request.user.pk).exists():
-        return redirect('perfil-cordinador', pk=request.user.pk)
-    
-    return redirect('perfil-alumno', pk=request.user.pk)
 
 class PerfilCodaView(BaseAccessMixin, DetailView):
-
-    model = Coda
+    model = Usuario
     template_name = 'Usuarios/perfil_cooda.html'
 
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        return super().get_context_data(**kwargs)
-
     def get_queryset(self) -> QuerySet[Any]:
-        return super().get_queryset()
-    
+        return Usuario.objects.filter(roles__contains=["CODA"])  # Filter for Coda
+
 
 class PerfilCordinadorView(BaseAccessMixin, DetailView):
-
-    model = Cordinador
+    model = Usuario
     template_name = 'Usuarios/perfil_cordinador.html'
 
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        return super().get_context_data(**kwargs)
-
     def get_queryset(self) -> QuerySet[Any]:
-        return super().get_queryset()
+        return Usuario.objects.filter(roles__contains=["COR"])  # Filter for Coordinadores
 
-    
 
-# TODO Eliminar para prod
-# class DebugTutoriasView(LoginRequiredMixin, ListView):
+### Role-Based Profile Redirection
+@login_required
+def redirect_perfil(request):
+    user = request.user
 
-#     model = Tutor
-#     template_name='Tutorias/verTutorias_coordinador.html'
+    if user.has_role("TUT"):
+        return redirect('perfil-tutor', pk=user.pk)
 
-#     def get_queryset(self) -> QuerySet[Any]:
-#         return super().get_queryset()
-    
+    if user.has_role("ALU"):
+        return redirect('perfil-alumno', pk=user.pk)
 
+    if user.has_role("CODA"):
+        return redirect('perfil-coda', pk=user.pk)
+
+    if user.has_role("COR"):
+        return redirect('perfil-cordinador', pk=user.pk)
+
+    return redirect('perfil-alumno', pk=user.pk)  # Default case
+
+
+### Role-Based Login Success Redirection
+@login_required
+def login_success(request):
+    user = request.user
+    selected_role = request.session.get("role")  # Retrieve stored role from session
+
+    if selected_role == "alumno" and user.has_role("ALU"):
+        return redirect("Tutorias-alumno")
+
+    if selected_role == "tutor" and user.has_role("TUT"):
+        return redirect("Tutorias-tutor")
+
+    if selected_role == "coordinador" and user.has_role("COR"):
+        return redirect("Tutorias-Coordinacion")
+
+    if selected_role == "coda" and user.has_role("CODA"):
+        return redirect("Tutores-Coda")
+
+    print("ERROR: Usuario no definido o rol incorrecto")
+    return HttpResponseBadRequest("ERROR. Tipo de usuario o rol no definido")
+
+
+### User Authentication Views
 class UsuarioLoginView(LoginView):
     redirect_authenticated_user = True
     template_name = "Usuarios/login.html"
@@ -127,76 +127,44 @@ class UsuarioLoginView(LoginView):
             self.request.session["role"] = role  # Store the role in session
         return response  # Proceed with normal redirection
 
-@login_required
-def login_success(request):
-    """
-    Redirects users to the appropriate view based on their role.
-    """
-    user = request.user
-    selected_role = request.session.get("role")  # Retrieve stored role from session
-
-    if selected_role == "alumno" and Alumno.objects.filter(pk=user.pk).exists():
-        return redirect("Tutorias-alumno")
-
-    if selected_role == "tutor" and Tutor.objects.filter(pk=user.pk).exists():
-        return redirect("Tutorias-tutor")
-
-    if selected_role == "coordinador" and Cordinador.objects.filter(pk=user.pk).exists():
-        return redirect("Tutorias-Coordinacion")
-
-    if selected_role == "coda" and Coda.objects.filter(pk=user.pk).exists():
-        return redirect("Tutores-Coda")
-
-    print("ERROR: Usuario no definido o rol incorrecto")
-    return HttpResponseBadRequest("ERROR. Tipo de usuario o rol no definido")
-
 
 class ChangePasswordView(BaseAccessMixin, PasswordChangeView):
     template_name = 'Usuarios/change_password.html'  # Create a template for password change form
     success_url = reverse_lazy('password_change_done')  # Redirect to this URL after a successful password change
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        # Add any additional context data if needed
-        return context
+        return super().get_context_data(**kwargs)
+
 
 class PasswordChangeDoneView(TemplateView):
     template_name = 'Usuarios/password_change_done.html'
 
+
+### Notification Handling
 class BorrarNotificaciones(View):
     def post(self, request):
         usuario = Usuario.objects.get(pk=self.request.user.pk)
         notificaciones = usuario.notifications.unread()
         notificaciones.mark_all_as_read()
-
-
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
-# Conjunto de Views Para Agregar usuarios
-
-#PermissionRequiredMixin
+### Create User Views (Updated for `Usuario`)
 class CreateAlumnoView(CodaViewMixin, CreateView):
-
     template_name = 'Usuarios/agregar_alumno.html'
     success_url = reverse_lazy('Tutores-Coda')
-    #model = Alumno
     form_class = userForms.FormAlumno
 
-    
-#PermissionRequiredMixin
+
 class CreateCordinadorView(CodaViewMixin, CreateView):
     template_name = 'Usuarios/agregar_cordinador.html'
     success_url = reverse_lazy('Tutores-Coda')
-    #model = Cordinador
     form_class = userForms.FormCordinador
 
-    
-#PermissionRequiredMixin
+
 class CreateTutorView(CodaViewMixin, CreateView):
     template_name = 'Usuarios/agregar_tutor.html'
     success_url = reverse_lazy('Tutores-Coda')
-    #model = Tutor
     form_class = userForms.FormTutor
 
 
