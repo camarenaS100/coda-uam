@@ -36,5 +36,8 @@ class FormAlumno(FormUsuario):
     pass
 
 class ImportAlumnosForm(forms.Form):
-    archivo = forms.FileField(label="Selecciona el archivo que deseas subir (XSLX, XSL o CSV)")
-    pass
+    archivo = forms.FileField(
+        label="Seleccionar archivo",
+        required=True,
+        widget=forms.ClearableFileInput(attrs={"accept": ".xls,.xlsx,.csv"}),
+    )
