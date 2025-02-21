@@ -176,95 +176,113 @@ class CreateTutorView(CodaViewMixin, CreateView):
 class ImportAlumnosView(CodaViewMixin, FormView):
     template_name = "Usuarios/importar_alumnos.html"
     form_class = userForms.ImportAlumnosForm
-    success_url = reverse_lazy('Tutores-Coda')  # Adjust this to the correct redirect
+    success_url = reverse_lazy('Tutores-Coda')
 
     def form_valid(self, form):
-        # Retrieve the uploaded file
         uploaded_file = self.request.FILES.get('archivo')
-        
+
+        # Get default context (ensures user roles are included)
+        context = self.get_context_data(form=form)
+
         if not uploaded_file:
-            return render(self.request, self.template_name, {"form": form, "error": "No file uploaded."})
+            context["error"] = "No file uploaded."
+            return render(self.request, self.template_name, context)
+
+        warnings = []  # Stores students that couldn't be created
+        success_count = 0  # Tracks successful imports
 
         try:
-            # Read Excel file
             file_extension = uploaded_file.name.split(".")[-1]
             if file_extension in ["xls", "xlsx"]:
                 df = pd.read_excel(uploaded_file)
             elif file_extension == "csv":
                 df = pd.read_csv(uploaded_file)
             else:
-                return render(self.request, self.template_name, {"form": form, "error": "Invalid file format."})
+                context["error"] = "Invalid file format."
+                return render(self.request, self.template_name, context)
 
             # Check for required columns
             required_columns = ["Plan de estudios", "Matrícula", "Correo institucional", "Correo", "Apellido 1", "Apellido 2", "Nombres", "No. Económico", "Estado", "Sexo"]
-            for column in required_columns:
-                if column not in df.columns:
-                    context = self.get_context_data(form=form)
-                    context["error"] = f"Missing column: {column}"
-                    return render(self.request, self.template_name, context)
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                context["error"] = f"Missing columns: {', '.join(missing_columns)}"
+                return render(self.request, self.template_name, context)
 
             # Process data row by row
             for _, row in df.iterrows():
-                matricula = str(row["Matrícula"]).strip()
-                email = row["Correo institucional"].strip()
-                correo_personal = row["Correo"].strip()
-                last_name = f"{row['Apellido 1']} {row['Apellido 2']}".strip()
-                first_name = row["Nombres"].strip()
-                carrera = next((key for key, value in CARRERAS if value == row["Plan de estudios"]), None)
-                estado = next((key for key, value in ESTADOS_ALUMNO if value == row["Estado"]), None)
-                sexo = next((key for key, value in SEXOS if value == row["Sexo"]), None)
-                tutor_id = row["No. Económico"]
-
-                # Ensure required fields are valid
-                if not (matricula and email and first_name and last_name and carrera and estado and sexo):
-                    continue
-
-                # Assign tutor if found
-                tutor_asignado = Tutor.objects.filter(matricula=tutor_id).first()
-
-                if not tutor_asignado:
-                    return render(
-                        self.request, self.template_name, 
-                        {**self.get_context_data(), "form": form, "error": f"Tutor with ID {tutor_id} not found"}
-                    )
-
-                # Generate password (increment each digit of matricula by 1)
-                password = "".join(str(int(digit) + 1) if digit.isdigit() else digit for digit in matricula)
-                hashed_password = make_password(password)
-
-                # Create Usuario
-                # Create or get Usuario
-                usuario, created = Usuario.objects.get_or_create(
-                    matricula=matricula,
-                    defaults={
-                        "email": email,
-                        "correo_personal": correo_personal,
-                        "first_name": first_name,
-                        "last_name": last_name,
-                        "password": hashed_password,
-                        "rol": [ALUMNO],  # Assign 'Alumno' role at user level
-                    },
-                )
-
-                # Check if the user is already an Alumno
                 try:
-                    alumno = Alumno.objects.get(id=usuario.id)
-                except Alumno.DoesNotExist:
-                    # Convert the existing Usuario into an Alumno
-                    alumno = Alumno(
-                        id=usuario.id,  # Ensuring same primary key
-                        carrera=carrera,
-                        estado=estado,
-                        sexo=sexo,
-                        tutor_asignado=tutor_asignado,
-                    )
-                    alumno.__dict__.update(usuario.__dict__)  # Copy fields from Usuario
-                    alumno.save()
+                    matricula = str(row["Matrícula"]).strip()
+                    email = row["Correo institucional"].strip()
+                    correo_personal = row["Correo"].strip()
+                    last_name = f"{row['Apellido 1']} {row['Apellido 2']}".strip()
+                    first_name = row["Nombres"].strip()
+                    carrera = next((key for key, value in CARRERAS if value == row["Plan de estudios"]), None)
+                    estado = next((key for key, value in ESTADOS_ALUMNO if value == row["Estado"]), None)
+                    sexo = next((key for key, value in SEXOS if value == row["Sexo"]), None)
+                    tutor_id = row["No. Económico"]
 
-            return render(self.request, self.template_name, {**self.get_context_data(), "form": form, "success": "Alumnos imported successfully!"})
+                    # Ensure required fields are valid
+                    if not (matricula and email and first_name and last_name and carrera and estado and sexo):
+                        warnings.append(f"Alumno {matricula}: Datos obligatorios faltantes.")
+                        continue  # Skip to the next student
+
+                    # Find assigned tutor
+                    tutor_asignado = Tutor.objects.filter(matricula=tutor_id).first()
+                    if not tutor_asignado:
+                        warnings.append(f"Alumno {matricula}: Tutor con ID {tutor_id} no encontrado.")
+                        continue
+
+                    # Generate password (increment each digit of matricula by 1)
+                    password = "".join(str(int(digit) + 1) if digit.isdigit() else digit for digit in matricula)
+                    hashed_password = make_password(password)
+
+                    # Create Usuario
+                    usuario, created = Usuario.objects.get_or_create(
+                        matricula=matricula,
+                        defaults={
+                            "email": email,
+                            "correo_personal": correo_personal,
+                            "first_name": first_name,
+                            "last_name": last_name,
+                            "password": hashed_password,
+                            "rol": [ALUMNO],
+                        },
+                    )
+
+                    # Check if already an Alumno
+                    if not Alumno.objects.filter(id=usuario.id).exists():
+                        alumno = Alumno(
+                            id=usuario.id,
+                            carrera=carrera,
+                            estado=estado,
+                            sexo=sexo,
+                            tutor_asignado=tutor_asignado,
+                        )
+                        alumno.__dict__.update(usuario.__dict__)  # Copy fields
+                        alumno.save()
+
+                    success_count += 1  # Increment success counter
+
+                except Exception as e:
+                    warnings.append(f"Alumno {matricula}: {str(e)}")
+                    continue  # Skip to next student
+
+            # Update context
+            context.update({
+                "warnings": warnings if warnings else None,
+                "success": f"{success_count} alumnos importados exitosamente." if success_count > 0 else None,
+            })
+
+            return render(self.request, self.template_name, context)
 
         except Exception as e:
-            return render(self.request, self.template_name, {**self.get_context_data(), "form": form, "error": str(e)})
+            context.update({
+                "error": str(e),
+                "warnings": warnings if warnings else None,  # Ensure warnings are included
+            })
+            return render(self.request, self.template_name, context)
+
+
 
 # class AceptarTutoriaView(View):
 #     def post(self, request, pk):

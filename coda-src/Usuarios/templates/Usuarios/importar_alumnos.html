@@ -23,11 +23,28 @@
 
                     <!-- Display messages -->
                     {% if error %}
-                        <div class="alert alert-danger">{{ error }}</div>
+                    <div class="alert alert-danger">
+                        <strong>Error:</strong> {{ error }}
+                    </div>
                     {% endif %}
+                    
+                    {% if warnings %}
+                        <div class="alert alert-warning">
+                            <strong>Los siguientes alumnos no pudieron ser creados:</strong>
+                            <ul>
+                                {% for warning in warnings %}
+                                    <li>{{ warning }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
                     {% if success %}
-                        <div class="alert alert-success">{{ success }}</div>
+                        <div class="alert alert-success">
+                            {{ success }}
+                        </div>
                     {% endif %}
+                
 
                     <div class="border-bottom border-dark border-1 w-100 h-100 mb-2"></div>
 
