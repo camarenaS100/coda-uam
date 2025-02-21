@@ -264,7 +264,7 @@ class ImportAlumnosView(CodaViewMixin, FormView):
             return render(self.request, self.template_name, {**self.get_context_data(), "form": form, "success": "Alumnos imported successfully!"})
 
         except Exception as e:
-            return render(self.request, self.template_name, {"form": form, "error": str(e)})
+            return render(self.request, self.template_name, {**self.get_context_data(), "form": form, "error": str(e)})
 
 # class AceptarTutoriaView(View):
 #     def post(self, request, pk):
