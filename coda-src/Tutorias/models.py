@@ -29,8 +29,7 @@ class Tutoria(models.Model):
         choices = dict(TEMAS)
         # return choices
         return [choices.get(t, "Unknown") for t in self.tema]
-
-    
+  
 class Asesoria(models.Model):
 
     alumno = models.ForeignKey(Alumno, on_delete=models.CASCADE)
@@ -38,3 +37,8 @@ class Asesoria(models.Model):
     tema = models.CharField(max_length=120)
     fecha = models.DateTimeField()
     descripcion = models.CharField(max_length=255)
+
+class Plantilla(models.Model):
+    titulo = models.CharField(max_length=120)
+    archivo = models.FileField(null=True)
+    

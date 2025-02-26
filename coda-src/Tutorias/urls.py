@@ -10,6 +10,8 @@ urlpatterns = [
     path('tutorias/<int:pk>/', views.TutoriasDetailView.as_view(), name='Tutorias-detail'),
     path('editar-tutoria/<int:pk>', views.TutoriaUpdateView.as_view(), name='Tutorias-update'),
     path('crear-tutoria/', views.TutoriaCreateView.as_view(), name='Tutorias-create'),
+    path('crear-reporte-2/<int:pk>', views.Reporte2CreateView.as_view(), name='Reporte2-create'),
+    path('crear-reporte/<int:pk>', views.ReporteCreateView.as_view(), name='Reporte-create'),
     
     #path('reset-password/', views.DebugTutoriasView.as_view(), name='reset_password'),
     
@@ -35,11 +37,14 @@ urlpatterns = [
     
     # URLS CODA 
     path('tutores-coda/', views.VerTutoresListView.as_view(), name='Tutores-Coda'),
+    path('alumnos-coda/', views.VerAlumnosListView.as_view(), name='Alumnos-Coda'),
+    path('plantillas-coda/', views.VerPlantillasListView.as_view(), name='Plantillas-Coda'),
     path('tutorias-coda/<int:pk>', views.VerTutoriasCodaListView.as_view(), name='Tutorias-Coda'),
     path('tutorados-coda/<int:pk>', views.VerTutoradosCodaListView.as_view(), name='Tutorados-Coda'),
 
 
     path('ruta-pdf/', views.generar_pdf, name='generar_pdf'),
+    path('tutorados-pdf/', views.carta_tutorados_pdf, name='tutorados_pdf'),
     path('generar-txt/<int:pk>', views.generar_archivo_txt, name='generar_txt'),
     #path('debug-tutorias/', views.DebugTutoriasView.as_view(), name='debug-tutorias'),
     path('qr-code/', views.QRCodeView.as_view(), name='qr-code'),

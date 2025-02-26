@@ -1,5 +1,5 @@
 from django import forms
-from .models import Tutoria
+from .models import Tutoria, Plantilla
 from .constants import TEMAS, ESTADO, ACEPTADO, PENDIENTE
 
 class FormTutorias(forms.ModelForm):
@@ -17,3 +17,16 @@ class FormTutorias(forms.ModelForm):
     class Meta:
         model = Tutoria
         fields = ['tema', 'fecha', 'descripcion']
+
+class FormReporte(forms.ModelForm):
+    oficio = forms.CharField(required=False)
+    tutor_firma = forms.MultipleChoiceField(choices=TEMAS)
+    # tutor_firma = forms.CharField(widget=forms.Textarea, max_length=255, required=False)
+    fecha = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
+    plantilla = forms.ModelChoiceField(queryset=Plantilla.objects.values_list('titulo',flat=True))
+    tem = forms.CheckboxInput()
+
+    class Meta:
+        model = Plantilla
+        fields = ['oficio', 'tutor_firma', 'fecha']
+
