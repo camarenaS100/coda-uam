@@ -9,9 +9,9 @@ services:
       - POSTGRES_PASSWORD=postgres
   web:
     build: ./coda-src
-    command: ./docker-entrypoint.sh
     volumes:
       - ./coda-src:/app
+      - ./media:/app/media
     ports:
       - "8000:8000"
     environment:

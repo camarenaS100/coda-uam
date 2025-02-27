@@ -3,7 +3,7 @@ from django import forms
 from django.core.files.base import File
 from django.db.models.base import Model
 from django.forms.utils import ErrorList
-from .models import Tutor, Alumno, Cordinador, Usuario
+from .models import Tutor, Alumno, Cordinador, Usuario, Documento
 from .constants import CARRERAS
 from django.contrib.auth.forms import UserCreationForm
 
@@ -41,3 +41,18 @@ class ImportAlumnosForm(forms.Form):
         required=True,
         widget=forms.ClearableFileInput(attrs={"accept": ".xls,.xlsx,.csv"}),
     )
+
+class DocumentoForm(forms.ModelForm):
+    class Meta:
+        model = Documento
+        fields = ['nombre', 'archivo']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'archivo': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Hacemos que el campo "nombre" no sea obligatorio si ya existe un archivo
+        if self.instance and self.instance.archivo:
+            self.fields['nombre'].required = False
