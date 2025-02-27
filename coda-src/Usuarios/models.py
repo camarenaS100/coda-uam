@@ -138,12 +138,21 @@ class Alumno(Usuario):
         verbose_name = 'Alumno'
         verbose_name_plural = 'Alumnos'
 
+class Documento(models.Model):
+    nombre = models.CharField(max_length=255)  # Nombre del archivo
+    archivo = models.FileField(upload_to='documentos/')  # Ruta del archivo en el servidor
+    fecha_subida = models.DateTimeField(auto_now_add=True)  # Fecha de subida
+
+    def __str__(self):
+        return self.nombre
+    
+    @property
+    def nombre_archivo(self):
+        return self.archivo.name.split('/')[-1]  # Devuelve solo el nombre del archivo sin la ruta
+
     #@property
     #def get_tutor_fullname(self) -> str:
     #    return f'{self.tutor_asignado.first_name} {self.tutor_asignado.last_name}'
-
-
-
 
 # class Coordinador(Usuario):
 #     coordinacion = models.CharField(max_length=30, choices=CARRERAS)

@@ -1,3 +1,5 @@
+import os
+from django.conf import settings  # ✅ Asegurar que está importado
 from typing import Any, Dict
 from django.shortcuts import get_object_or_404
 from django.db.models.query import QuerySet
@@ -8,11 +10,12 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DeleteView, UpdateView
 from .models import Usuario, Tutor, Alumno, Coda, Cordinador
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404
 
 from django.views.generic.list import ListView
 from django.http import HttpResponseBadRequest
@@ -23,6 +26,8 @@ from django.http import HttpResponse
 
 from . import forms as userForms
 from .mixins import BaseAccessMixin, CodaViewMixin, AlumnoViewMixin, CordinadorViewMixin, TutorViewMixin
+from .models import Documento
+from .forms import DocumentoForm
 
 
 # TODO Remove test views
@@ -192,8 +197,28 @@ class CreateTutorView(CodaViewMixin, CreateView):
     #model = Tutor
     form_class = userForms.FormTutor
 
+#PermissionRequiredMixin
+class ajustes(CodaViewMixin, TemplateView):
+    template_name = 'Usuarios/ajustes.html'
+    success_url = reverse_lazy('Tutores-Coda')
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        documentos = Documento.objects.all()
+        context['documentos'] = documentos
+
+        return context
 
 
+
+#PermissionRequiredMixin
+class CargarPlantilla(CodaViewMixin, CreateView):
+    template_name = 'Usuarios/cargar_plantilla.html'
+    success_url = reverse_lazy('ajustes')
+    form_class = DocumentoForm  
+
+    def form_valid(self, form):
+        return super().form_valid(form)
 
 
 # class AceptarTutoriaView(View):
@@ -202,3 +227,30 @@ class CreateTutorView(CodaViewMixin, CreateView):
 #         tutoria.estado = ACEPTADO
 #         tutoria.save()
 #         return redirect('Tutorias-tutor')  
+    
+def eliminar_documento(request, pk):
+    documento = get_object_or_404(Documento, pk=pk)
+    archivo_path = os.path.join(settings.MEDIA_ROOT, str(documento.archivo))
+
+    if os.path.exists(archivo_path):
+        os.remove(archivo_path) 
+
+    documento.delete()
+    return redirect('ajustes')
+
+#PermissionRequiredMixin
+class VerPlantilla(CodaViewMixin, UpdateView):
+    model = Documento
+    form_class = DocumentoForm
+    template_name = 'Usuarios/ver_plantilla.html'
+    success_url = reverse_lazy('ajustes')
+
+    def get_object(self, queryset=None):
+        documento_id = self.kwargs.get('documento_id')
+        return get_object_or_404(Documento, id=documento_id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['nombre_fuente'] = self.object.nombre
+        context['archivo_url'] = self.object.archivo.url if self.object.archivo else None
+        return context

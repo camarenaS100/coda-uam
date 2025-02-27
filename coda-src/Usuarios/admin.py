@@ -5,9 +5,10 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 
-from .models import Usuario, Tutor, Alumno, Coda, Cordinador 
+from .models import Usuario, Tutor, Alumno, Coda, Cordinador, Documento
 
 #admin.site.register(Usuario, BaseUserAdmin)
+admin.site.register(Documento)
 
 class TutorResource(resources.ModelResource):
 

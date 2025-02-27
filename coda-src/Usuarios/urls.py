@@ -3,6 +3,8 @@ from django.contrib.auth import views as auth_views
 from django.contrib import admin
 from . import views
 import notifications.urls
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.UsuarioLoginView.as_view(), name='login'),
@@ -27,7 +29,11 @@ urlpatterns = [
     path('registrar-alumno/', views.CreateAlumnoView.as_view(), name='crear-alumno'),
     path('registrar-tutor/', views.CreateTutorView.as_view(), name='crear-tutor'),
     path('registrar-coordinador/', views.CreateCordinadorView.as_view(), name='crear-coordinador'),
+    path('ajustes/', views.ajustes.as_view(), name='ajustes'),
+    path('cargar_plantilla/', views.CargarPlantilla.as_view(), name='cargar_plantilla'),
+    path('eliminar-documento/<int:pk>/', views.eliminar_documento, name='eliminar_documento'),
+    path('ver_plantilla/<int:documento_id>/', views.VerPlantilla.as_view(), name='ver_plantilla'),
+] 
 
-
-    # ... (other existing URL patterns)
-]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
