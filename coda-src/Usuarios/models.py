@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from django.db import models, transaction
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.contrib.postgres.fields import ArrayField
 from .constants import ROLES, CARRERAS
