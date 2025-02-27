@@ -67,7 +67,7 @@
                         <span class="badge rounded-pill badge-notification bg-primary">{{ unread_count }}</span>
                         {% endif %}
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end overflow-auto" style="width: 18rem; height: 500px;" aria-labelledby="navbarDropdownMenuNotification">
+                    <ul class="dropdown-menu dropdown-menu-end overflow-auto pt-2 text-center" style="width: 18rem; height: auto;" aria-labelledby="navbarDropdownMenuNotification">
                         {% if notificaciones_list %}
                         {% for notificacion in notificaciones_list %}
                         <li>
@@ -106,7 +106,7 @@
 
                 
                 <!-- Avatar -->
-                <div class="dropdown">
+                <div class="dropdown p-3">
                     <a class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#"
                         id="navbarDropdownMenuAvatar" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
                         <img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" class="rounded-circle" height="30"
@@ -116,9 +116,9 @@
                         <li>
                             <a href="{% url 'perfil' %}"  class="dropdown-item" >Mi perfil</a>
                         </li>
-                        <li>
+                        {% comment %} <li>
                             <a class="dropdown-item" href="#">Configuraciones</a>
-                        </li>
+                        </li> {% endcomment %}
                         <li>
                             <a class="dropdown-item" href="{% url 'logout' %}">Cerrar Sesión</a>
                         </li>
