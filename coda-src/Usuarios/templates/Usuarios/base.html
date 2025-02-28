@@ -20,14 +20,14 @@
     
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg bg-secondary p-2">
+    <nav class="navbar navbar-expand-lg bg-secondary p-2 d-flex flex-row justify-content-center align-items-center">
         <!-- Container -->
-        <div class="container-fluid">
+        <div class="container-fluid d-flex flex-row align-items-center">
             <!--Boton Toggle-->
             <button class="navbar-toggler" type="button" data-mdb-toggle="collapse"
                 data-mdb-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation">
-                <i class="fas fa-bars"></i>
+                <i class="fas fa-bars text-primary"></i>
             </button>
 
             <!-- Collapsible wrapper -->
@@ -39,7 +39,7 @@
 
 
                 <!-- Izquierda links -->
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav me-auto mb-lg-0">
                 {% block navbar %}
 
                 {% endblock %}
@@ -60,9 +60,9 @@
 
                 
                 <div class="dropdown">
-                    <a class="fs-6 m-3 dropdown-toggle hidden-arrow" href="#" id="navbarDropdownMenuLink"
+                    <a class="fs-6 dropdown-toggle hidden-arrow" href="#" id="navbarDropdownMenuLink"
                         id="navbarDropdownMenuNotification" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
-                        <i class="far fa-bell text-primary h5"></i>
+                        <i class="far fa-bell text-primary h5 m-3"></i>
                         {% if unread_count %}
                         <span class="badge rounded-pill badge-notification bg-primary">{{ unread_count }}</span>
                         {% endif %}
