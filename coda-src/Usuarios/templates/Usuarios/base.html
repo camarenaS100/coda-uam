@@ -60,18 +60,18 @@
 
                 
                 <div class="dropdown">
-                    <a class="text-reset me-3 dropdown-toggle hidden-arrow" href="#" id="navbarDropdownMenuLink"
+                    <a class="fs-6 m-3 dropdown-toggle hidden-arrow" href="#" id="navbarDropdownMenuLink"
                         id="navbarDropdownMenuNotification" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
-                        <i class="far fa-bell text-primary"></i>
+                        <i class="far fa-bell text-primary h5"></i>
                         {% if unread_count %}
                         <span class="badge rounded-pill badge-notification bg-primary">{{ unread_count }}</span>
                         {% endif %}
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end overflow-auto pt-2 text-center" style="width: 18rem; height: auto;" aria-labelledby="navbarDropdownMenuNotification">
+                    <ul class="dropdown-menu dropdown-menu-end overflow-y-auto px-1 py-1 text-center" style="width: 18rem; height: auto;" aria-labelledby="navbarDropdownMenuNotification">
                         {% if notificaciones_list %}
                         {% for notificacion in notificaciones_list %}
                         <li>
-                            <div class="card border border-primary shadow-0 my-1" style="max-width: 18rem;">
+                            <div class="card border border-primary shadow-0 my-1 mx-1" style="max-width: 18rem;">
                                 <h5 class="card-header text-primary">{{notificacion.header}}</h5>
                                 <div class="card-body text-primary">
                                     <!-- <h6 class="card-title">{{notificacion.title}}</h5> -->
@@ -84,7 +84,7 @@
                         {% endfor %}
                         <!-- <a href="{% url 'remove-notifications'%}"><small>Eliminar todas</small></a> -->
                         <form method='post' action="{% url 'remove-notifications'%}">{% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-link">Eliminar notificaciones</button>
+                            <button type="submit" class="btn btn-sm btn-link my-1">Eliminar notificaciones</button>
                         </form>
                         {% else %}
                         <p>No hay notificaciones</p>
@@ -152,7 +152,7 @@
 
             <!-- Twitter -->
             <a class="btn btn-outline-primary btn-floating m-1" href="https://twitter.com/uamcuajimalpa" role="button"><i
-                    class="fab fa-twitter"></i></a>
+                    class="fab fa-x"></i></a>
 
             <!-- Youtube -->
             <a class="btn btn-outline-primary btn-floating m-1" href="https://www.youtube.com/channel/UCeqAccBtLAr-pOeOUoE4iDw" role="button"><i
@@ -176,7 +176,7 @@
 
     <!-- Copyright -->
     <div id = "copyright" class="text-center p-3">
-        © 2023 Copyright: 
+        © 2025 Copyright: 
         <a class="text-primary" href="">GCC</a>
     </div>
     <!-- Copyright -->
