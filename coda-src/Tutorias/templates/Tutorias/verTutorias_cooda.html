@@ -10,7 +10,7 @@
         <div class="col-lg-8 col-xl-12">
           <div class="card border-top border-bottom border-4" style="border-color: #F08200 !important;">
             <div class="card-body p-4">
-              <h3 class="fw-bold mb-4 text-primary">Tutorias dadas por: {{tutor.first_name}} {{tutor.last_name}}</h3>
+              <h3 class="fw-bold mb-4 text-primary">Tutorías dadas por <b>{{tutor.first_name}} {{tutor.last_name}}</b></h3>
 
               <div class="container">
                 <form action="{% url 'generar_txt' tutor.pk %}" method="get">

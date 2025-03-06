@@ -29187,6 +29187,13 @@ fieldset:disabled .btn-group-vertical>.btn {
   width: auto
 }
 
+.nav-item:hover{
+  opacity: 30%;
+  color:#0baccc;
+  transition: linear;
+  transition-duration: 10ms;
+}
+
 .navbar {
   --bs-navbar-box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
   --bs-navbar-padding-top: 0.5625rem;
@@ -30145,4 +30152,54 @@ fieldset:disabled .btn-group-vertical>.btn {
   font-family: "Font Awesome 6 Pro", "Font Awesome 6 Free"
 }
 
-/*# sourceMappingURL=main.css.map */
+/* # sourceMappingURL=main.css.map
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('/static/fonts/montserrat/Montserrat-Regular.ttf') format('truetype');
+} */
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('/static/Alumnos/fonts/montserrat/Montserrat-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montserrat-Bold';
+  src: url('/static/Alumnos/fonts/montserrat/Montserrat-Bold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('/static/Alumnos/fonts/roboto/Roboto-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto-Bold';
+  src: url('/static/Alumnos/fonts/roboto/Roboto-Bold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.text-title-bold {
+  font-family: 'Montserrat-Bold';
+  font-weight: bold;
+}
+
+.text-title {
+  font-family: 'Montserrat';
+}
+
+.text-body-bold{
+  font-family: 'Roboto-bold';
+}
+
+.text-body {
+  font-family: 'Roboto';
+}
