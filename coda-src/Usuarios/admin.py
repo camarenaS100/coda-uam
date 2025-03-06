@@ -5,9 +5,10 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 
-from .models import Usuario, Tutor, Alumno, Coda, Cordinador 
+from .models import Usuario, Tutor, Alumno, Coda, Cordinador, Documento
 
 #admin.site.register(Usuario, BaseUserAdmin)
+admin.site.register(Documento)
 
 class TutorResource(resources.ModelResource):
 
@@ -81,10 +82,10 @@ class TutorAdmin(ImportExportModelAdmin, UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email','matricula', 'cubiculo', 'password1', 'password2'),
+            'fields': ('first_name', 'last_name','email','matricula', 'coordinacion', 'cubiculo', 'password1', 'password2', 'es_coordinador'),
         }),
     )
-    list_display = ('pk', 'email', 'matricula', 'coordinacion', 'first_name', 'last_name', 'is_staff', 'es_coordinador')
+    list_display = ('pk', 'email', 'matricula', 'coordinacion', 'first_name', 'last_name', 'is_staff', 'es_coordinador', 'es_tutor')
     search_fields = ('pk', 'email', 'matricula', 'coordinacion', 'first_name', 'last_name')
     ordering = ('pk','coordinacion')
 
@@ -105,7 +106,7 @@ class CodaAdmin(ImportExportModelAdmin, UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email','matricula', 'cubiculo', 'password1', 'password2'),
+            'fields': ('first_name', 'last_name', 'email','matricula', 'coordinacion', 'cubiculo', 'password1', 'password2'),
         }),
     )
     list_display = ('pk', 'email', 'matricula', 'coordinacion', 'first_name', 'last_name', 'is_staff', 'es_coordinador')
@@ -128,10 +129,10 @@ class CordinadorAdmin(ImportExportModelAdmin, UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email','matricula', 'cubiculo', 'password1', 'password2'),
+            'fields': ('first_name', 'last_name','email','matricula', 'coordinacion', 'cubiculo', 'password1', 'password2', 'es_tutor'),
         }),
     )
-    list_display = ('pk', 'email', 'matricula', 'coordinacion', 'first_name', 'last_name', 'is_staff', 'es_coordinador')
+    list_display = ('pk', 'email', 'matricula', 'coordinacion', 'first_name', 'last_name', 'is_staff', 'es_coordinador', 'es_tutor')
     search_fields = ('pk', 'email', 'matricula', 'coordinacion', 'first_name', 'last_name')
     ordering = ('pk','coordinacion')
 
@@ -153,7 +154,7 @@ class AlumnoAdmin(ImportExportModelAdmin, UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email','matricula','tutor_asignado', 'password1', 'password2', 'sexo', 'estado'),
+            'fields': ('first_name', 'last_name', 'email', 'correo_personal','matricula','tutor_asignado', 'password1', 'password2', 'sexo', 'estado'),
         }),
     )
     list_display = ('pk', 'email', 'matricula', 'carrera', 'first_name', 'last_name','sexo','estado', 'is_staff')

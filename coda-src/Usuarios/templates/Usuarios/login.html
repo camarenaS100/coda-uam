@@ -80,29 +80,34 @@
                                 <div class="card-body p-1 p-lg-5 my-5 text-black">
                                     <form method="post"> {% csrf_token %}
                                         <h2 class="fw-normal mb-3 pb-3 text">Bienvenido</h2>
-                                        
+                                    
                                         <div class="form-outline mb-4">
-                                            <!-- <input type="email" id="form2Example17"
-                                                class="form-control form-control-lg" /> -->
                                             {% render_field form.username id="form2Example17" class="form-control form-control-lg" %}
                                             <label class="form-label" for="form2Example17">Email</label>
                                         </div>
-
+                                    
                                         <div class="form-outline mb-4">
-                                            <!-- <input type="password" id="form2Example27"
-                                                class="form-control form-control-lg" /> -->
                                             {% render_field form.password id="form2Example27" class="form-control form-control-lg" %}
                                             <label class="form-label" for="form2Example27">Contraseña</label>
                                         </div>
+                                    
+                                        <div class="form-outline mb-4">
+                                            <label class="form-label" for="role">Seleccionar Rol</label>
+                                            <select id="role" name="role" class="form-control form-control-lg" required>
+                                                <option value="alumno">Alumno</option>
+                                                <option value="tutor">Tutor</option>
+                                                <option value="coordinador">Coordinador</option>
+                                                <option value="coda">Coda</option>
+                                            </select>
+                                        </div>
+                                    
                                         <a class="small text-muted" href="{% url 'reset_password' %}">Olvidé mi contraseña</a>
-
-
+                                    
                                         <div class="pt-1 mb-4">
                                             <button class="btn btn-dark btn btn-block" type="submit" value="login">Iniciar Sesión</button>
                                         </div>
-
-                                        <!--<a class="small text-muted" href="#!">Forgot password?</a>-->
                                     </form>
+                                    
 
                                 </div>
                             </div>

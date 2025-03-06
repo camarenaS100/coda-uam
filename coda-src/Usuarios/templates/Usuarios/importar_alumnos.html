@@ -1,0 +1,191 @@
+{% extends "Usuarios/HeaderAndFooterFachada.html" %}
+
+{% block body %}
+    <section
+        style="background-color: #eee;"
+        class="d-flex flex-column justify-content-center align-items-center h-100 min-w-100"
+    >
+        <!-- Include xlsx library -->
+        <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+        <div class="d-flex flex-column justify-content-center w-100 h-100">
+            <div class="d-flex justify-content-center align-items-center h-100 w-100">
+                <div class="
+                        w-auto mw-75 h-auto
+                        border-top border-bottom border-4 rounded p-4 pl-4 d-flex flex-column
+                        justify-content-center my-5
+                        border-primary bg-white
+                        "
+                    style="max-width: 75%;">
+                    
+                    <h1><b class="text-primary fs-2">Importar Alumnos</b></h1>
+                    <span class="text-danger pb-1">Selecciona un archivo para subir</span>
+
+                    <!-- Display messages -->
+                    {% if error %}
+                    <div class="alert alert-danger">
+                        <strong>Error:</strong> {{ error }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if warnings %}
+                        <div class="alert alert-warning">
+                            <strong>Los siguientes alumnos no pudieron ser creados:</strong>
+                            <ul>
+                                {% for warning in warnings %}
+                                    <li>{{ warning }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    {% if success %}
+                        <div class="alert alert-success">
+                            {{ success }}
+                        </div>
+                    {% endif %}
+                
+
+                    <div class="border-bottom border-dark border-1 w-100 h-100 mb-2"></div>
+
+                    <div class="w-auto d-flex h-100">
+                        <div class="d-flex flex-column w-auto h-100 px-2">
+                            <!-- Form for file upload -->
+                            <form method="post" enctype="multipart/form-data" id="import-form">
+                                {% csrf_token %}
+                                
+                                <!-- Styled File Input -->
+                                <div class="custom-file-upload">
+                                    {{ form.archivo }}
+                                    <label for="{{ form.archivo.id_for_label }}" class="btn btn-outline-primary">
+                                        Seleccionar Archivo
+                                    </label>
+                                    <span id="file-name" class="text-muted">Ningún archivo seleccionado</span>
+                                </div>
+
+                                <!-- Separate button to start processing -->
+                                <div class="d-flex justify-content-around align-self-center mt-2">
+                                    <a href="{% url 'crear-alumno' %}">
+                                        <button type="button" class="btn btn-outline-primary m-2">Cancelar</button>
+                                    </a>
+                                    <button type="submit" id="process-button" class="btn btn-primary m-2" disabled>
+                                        Comenzar creación de usuarios
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Table Preview -->
+                        <div class="
+                                d-flex bg-white justify-content-start 
+                                align-items-start w-auto 
+                                overflow-scroll px-2
+                            " 
+                            style="max-height: 500px; max-width: 1000px;"
+                            id="excel_viewer">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript -->
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const fileInput = document.querySelector('input[type="file"]');
+                const fileNameSpan = document.getElementById("file-name");
+                const processButton = document.getElementById("process-button");
+                const excelViewer = document.getElementById("excel_viewer");
+
+                fileInput.addEventListener("change", (event) => {
+                    if (fileInput.files.length > 0) {
+                        fileNameSpan.textContent = fileInput.files[0].name;
+                        processButton.removeAttribute("disabled");  // Enable processing button
+                        previewFile(event.target.files[0]);  // Generate preview
+                    } else {
+                        fileNameSpan.textContent = "Ningún archivo seleccionado";
+                        processButton.setAttribute("disabled", "true");
+                        excelViewer.innerHTML = "";  // Clear preview
+                    }
+                });
+
+                function previewFile(file) {
+                    if(!['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'text/csv'].includes(file.type)) {
+                        excelViewer.innerHTML = '<div class="alert alert-danger">Solo se permiten archivos .xlsx, .xls o .csv</div>';
+                        fileInput.value = '';
+                        return false;
+                    }
+
+                    var reader = new FileReader();
+
+                    reader.onload = (event) => {
+                        var data = new Uint8Array(event.target.result);
+                        var work_book = XLSX.read(data, { type: 'array' });
+                        var sheet_name = work_book.SheetNames[0];
+                        var sheet_data = XLSX.utils.sheet_to_json(work_book.Sheets[sheet_name], { header: 1 });
+
+                        if (sheet_data.length > 0) {
+                            var table_output = '<table class="table table-striped table-bordered bg-white">';
+                            
+                            for (var row = 0; row < sheet_data.length; row++) {
+                                table_output += '<tr class="bg-white">';
+                                for (var cell = 0; cell < sheet_data[row].length; cell++) {
+                                    if (row == 0) {
+                                        table_output += '<th class="bg-white">' + sheet_data[row][cell] + '</th>';
+                                    } else {
+                                        table_output += '<td class="bg-white">' + sheet_data[row][cell] + '</td>';
+                                    }
+                                }
+                                table_output += '</tr>';
+                            }
+                            
+                            table_output += '</table>';
+                            excelViewer.innerHTML = table_output;
+                        } else {
+                            excelViewer.innerHTML = '<div class="alert alert-warning">El archivo está vacío o no se pudo leer correctamente.</div>';
+                        }
+                    };
+
+                    reader.readAsArrayBuffer(file);
+                }
+            });
+        </script>
+
+        <!-- Custom File Upload Styling -->
+        <style>
+            .custom-file-upload {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            /* Hide default file input */
+            .custom-file-upload input[type="file"] {
+                display: none;
+            }
+
+            /* Style the file label like a button */
+            .custom-file-upload label {
+                cursor: pointer;
+                padding: 10px 15px;
+                border-radius: 5px;
+                transition: background-color 0.2s ease-in-out;
+                border: 3px dashed #F08200;
+                text-align: center;
+                width: 500px;
+                height: 260px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                color: #F08200;
+            }
+
+            /* Optional: Change appearance on hover */
+            .custom-file-upload label:hover {
+                background-color: #F08200;
+                color: white;
+            }
+        </style>
+    </section>
+{% endblock %}
