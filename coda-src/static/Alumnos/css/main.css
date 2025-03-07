@@ -29188,13 +29188,6 @@ fieldset:disabled .btn-group-vertical>.btn {
   width: auto
 }
 
-.nav-item:hover{
-  opacity: 30%;
-  color:#0baccc;
-  transition: linear;
-  transition-duration: 10ms;
-}
-
 .navbar {
   --bs-navbar-box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
   --bs-navbar-padding-top: 0.5625rem;

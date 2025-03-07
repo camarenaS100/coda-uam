@@ -87,7 +87,7 @@
                             <button type="submit" class="btn btn-sm btn-link my-1">Eliminar notificaciones</button>
                         </form>
                         {% else %}
-                        <p class="text-primary mt-3">No hay notificaciones</p>
+                        <p class="text-primary mt-3 text-title h8">No hay notificaciones</p>
                         {% endif %}
                         
                         <!-- Example notification
@@ -114,13 +114,13 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
                         <li>
-                            <a href="{% url 'perfil' %}"  class="dropdown-item" >Mi perfil</a>
+                            <a href="{% url 'perfil' %}"  class="dropdown-item text-title h8" >Mi perfil</a>
                         </li>
                         {% comment %} <li>
                             <a class="dropdown-item" href="#">Configuraciones</a>
                         </li> {% endcomment %}
                         <li>
-                            <a class="dropdown-item" href="{% url 'logout' %}">Cerrar Sesión</a>
+                            <a class="dropdown-item text-title h8" href="{% url 'logout' %}">Cerrar Sesión</a>
                         </li>
                     </ul>
                 </div>
@@ -165,7 +165,7 @@
         <!-- Section: Social media -->
 
         <!-- Section: Text -->
-        <section class="mb-4">
+        <section class="mb-4 text-title">
             <h4>Universidad Autónoma Metropolitana Cuajimalpa</h4>
             <h5>División de Ciencias Naturales e Ingeniería</h5>
         </section>
@@ -175,7 +175,7 @@
     <!-- Grid container -->
 
     <!-- Copyright -->
-    <div id = "copyright" class="text-center p-3">
+    <div id = "copyright" class="text-center p-3 text-title">
         © 2025 Copyright: 
         <a class="text-primary" href="">GCC</a>
     </div>
