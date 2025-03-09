@@ -30197,3 +30197,7 @@ fieldset:disabled .btn-group-vertical>.btn {
 .text-body {
   font-family: 'Roboto';
 }
+
+a:hover {
+  opacity: 80%;
+}
