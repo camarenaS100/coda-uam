@@ -165,6 +165,11 @@ class CreateAlumnoView(CodaViewMixin, CreateView):
     success_url = reverse_lazy('Tutores-Coda')
     form_class = userForms.FormAlumno
 
+class ChangeAlumnoView(CodaViewMixin, CreateView):
+    template_name = 'Usuarios/modificar_alumno.html'
+    success_url = reverse_lazy('Tutores-Coda')
+    form_class = userForms.FormAlumno
+
 
 class CreateCordinadorView(CodaViewMixin, CreateView):
     template_name = 'Usuarios/agregar_cordinador.html'

@@ -81,19 +81,20 @@
                                     <form method="post"> {% csrf_token %}
                                         <h1 class="fw-normal mb-3 pb-3 text-title h-1">Bienvenido</h1>
                                     
-                                        <div class="form-outline mb-4">
+                                        <div class="form-outline mb-4 text-body">
                                             {% render_field form.username id="form2Example17" class="form-control form-control-lg" %}
                                             <label class="form-label" for="form2Example17">Email</label>
                                         </div>
                                     
-                                        <div class="form-outline mb-4">
+                                        <div class="form-outline mb-4 text-body">
                                             {% render_field form.password id="form2Example27" class="form-control form-control-lg" %}
                                             <label class="form-label" for="form2Example27">Contraseña</label>
                                         </div>
                                     
-                                        <div class="form-outline mb-4">
-                                            <label class="form-label" for="role">Seleccionar Rol</label>
-                                            <select id="role" name="role" class="form-control form-control-lg" required>
+                                        <div class="form-select mb-4">
+                                            <label class="form-label text-body" for="role">Seleccionar Rol</label>
+                                            {% render_field form.rol id="rol" class="form-control form-control-lg" %}
+                                            <select id="role" name="role" class="form-control form-control-lg text-body" required>
                                                 <option value="alumno">Alumno</option>
                                                 <option value="tutor">Tutor</option>
                                                 <option value="coordinador">Coordinador</option>

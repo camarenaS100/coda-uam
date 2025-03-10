@@ -8,16 +8,16 @@
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-lg-8 col-xl-6">
                     <div class="card border-top border-bottom border-4" style="border-color: #F08200 !important;">
-                        <div class="card-body p-5">
-                            <h3 class="fw-bold mb-5 text-primary">Agregar coordinador</h3>
+                        <div class="card-body p-5 py-4">
+                            <h3 class="fw-bold mb-4 text-primary text-title-bold">Registrar Coordinador</h3>
 
                             {% load widget_tweaks%}
 
                             
                             
-                            <form method="post">
+                            <form method="post" class="text-body">
                                 {% csrf_token %}
-                                <div class="row mb-4">
+                                <div class="row mb-3">
                                     <div class="col">
                                         <div class="form-outline">
                                             <!-- <input type="text" class="form-control" value="" /> -->
@@ -35,7 +35,7 @@
                                 </div>
     
                                 <!-- Select input -->
-                                <div class="mb-4 form-floating">
+                                <div class="mb-3 form-floating">
                                 
                                 {% render_field form.coordinacion class="form-select" id="coordinacion"%}
                                 <label class="form-label" for="coordinacion">Coordinacion</label>
@@ -43,7 +43,7 @@
                                 </div>
     
                                 <!-- Numero de cuenta input -->
-                                <div class="form-outline mb-4">
+                                <div class="form-outline mb-3">
                                     
                                     <!-- <input type="number" class="form-control" value="" /> -->
                                     {% render_field form.matricula type="number" class="form-control" id="matricula"%}
@@ -51,25 +51,25 @@
                                 </div>
     
                                 <!-- Tema de la tutoria input -->
-                                <div class="form-outline mb-4">
+                                <div class="form-outline mb-3">
                                     <!-- <input type="text" class="form-control" value=""/> -->
                                     {% render_field form.email type="text" class="form-control" id="email"%}
                                     <label class="form-label" for="email">Correo</label>
                                 </div>
 
-                                <div class="form-outline mb-4">
+                                <div class="form-outline mb-3">
                                     <!-- <input type="text" class="form-control" value=""/> -->
                                     {% render_field form.correo_personal type="text" class="form-control" id="correo_personal"%}
                                     <label class="form-label" for="correo_personal">Correo Personal</label>
                                 </div>
     
                                 <!-- Contraseña input-->
-                                <div class="form-outline mb-4">
+                                <div class="form-outline mb-3">
                                     <!-- <input type="text" class="form-control" value=""/> -->
                                     {% render_field form.password1 type="password" class="form-control" id="password"%}
                                     <label class="form-label" for="password">Contraseña</label>
                                 </div>
-                                <div class="form-outline mb-4">
+                                <div class="form-outline mb-3">
                                     <!-- <input type="text" class="form-control" value=""/> -->
                                     {% render_field form.password2 type="password" class="form-control" id="password2"%}
                                     <label class="form-label" for="password2">Vuelva a escribir la contraseña</label>
@@ -78,7 +78,7 @@
     
     
                                 <!-- Submit button -->
-                                <div class="d-grid gap-2 d-md-flex justify-content-center">
+                                <div class="d-grid gap-2 d-md-flex justify-content-center text-title">
                                     <a href="{% url 'login_success' %}"><button type="button" class="btn btn-outline-primary">Cancelar</button></a>
                                     <button type="submit" class="btn btn-primary">Guardar</button>
                                 </div>
