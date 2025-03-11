@@ -17,7 +17,7 @@ from django.core.mail import send_mail
 from datetime import datetime, timedelta
 
 from .models import Tutoria
-from .forms import FormTutorias, FormSeguimiento
+from .forms import FormTutorias, FormSeguimiento, FormReporte
 # from .forms import FormSeguimiento # de nuevo, no estoy seguro, FormReporte
 from .constants import PENDIENTE, ACEPTADO, RECHAZADO, DURACION_ASESORIA # de nuevo, no estoy seguro
 from Usuarios.constants import TUTOR, ALUMNO, COORDINADOR, TEMPLATES, CORREO
