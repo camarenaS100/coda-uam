@@ -1,0 +1,63 @@
+{% extends "Usuarios/HeaderAndFooterFachada.html"%}
+
+{% block title  %} Generar reporte de tutorados {% endblock %}
+
+{% block body %}
+
+    <!--Formulario Solicitud tutor_firmaia-->
+    <section class="min-vh-100" style="background-color: #eee;">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-lg-8 col-xl-6">
+                    <div class="card border-top border-bottom border-4" style="border-color: #F08200 !important;">
+                    
+                    {% load widget_tweaks%}
+                    <form method="post">{% csrf_token %}
+                        <div class="card-body p-5">
+                            <h3 class="fw-bold mb-5 text-primary">Reporte de tutorados</h3>
+
+                            <!-- oficio de la tutor_firmaia input -->
+                            <div class="row mb-4">
+                                <div class="col">
+                                    
+                                
+                                    {% render_field form.oficio id="oficio" rows="3"%}
+                                    <label class="form-label" for="oficio">Oficio</label>
+                                    
+                                </div>
+                            </div>
+
+                            <!-- oficio de la tutor_firmaia input -->
+                            <div class="row mb-4">
+                                <div class="col">
+                                    
+                                
+                                    {% render_field form.plantilla class="form-select" id="plantilla"%}
+                                    <label class="form-label" for="plantilla">Plantilla</label>
+                                    
+                                </div>
+                            </div>
+
+                            <!-- Hora y Dia imput-->
+                            <div class="row mb-4">
+                                <!-- Dia de tutor_firmaia  imput-->
+                                <div class="col">
+                                    <div class="form-outline">
+                                        <!-- <input type="text" class="form-control" /> -->
+                                        {% render_field form.fecha class="form-select" id="fecha"%}
+                                        <label class="form-label" for="fecha">Fecha y Hora</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit button -->
+                            <button type="submit" value="Save" class="btn btn-primary btn-block mb-4">Generar Reporte</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

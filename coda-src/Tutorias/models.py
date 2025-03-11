@@ -51,3 +51,8 @@ class Asesoria(models.Model):
     tema = models.CharField(max_length=120)
     fecha = models.DateTimeField()
     descripcion = models.CharField(max_length=255)
+
+class Plantilla(models.Model):
+    titulo = models.CharField(max_length=120)
+    archivo = models.FileField(null=True)
+    
