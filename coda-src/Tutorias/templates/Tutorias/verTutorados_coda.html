@@ -10,7 +10,17 @@
           <div class="col-lg-8 col-xl-10">
               <div class="card border-top border-bottom border-4" style="border-color: #F08200 !important;">
                   <div class="card-body p-4">
-                      <h3 class="fw-bold mb-5 text-primary">Tutorados de: {{tutor.first_name}} {{tutor.last_name}}</h3>
+                    div class="d-flex w-100 align-items-center">
+                    <h3 class="fw-bold mb-4 text-primary text-title-bold">Tutorados de </h3>
+                    <h4 class="mb-4 ms-3 text-title text-black ">
+                      {% if tutor.sexo is not None%}
+                      {% comment %} {% if tutor.sexo=='F' %}Dra. {% else %} Dr. {% endif %} {% endcomment %}
+                      {% else %}
+                        Dr. 
+                      {% endif %}  
+                      {{tutor.first_name}} {{tutor.last_name}}
+                    </h4>
+                  </div>
                       
                       <!-- Submit button -->
                       <a href="{% url 'Reporte-create' tutor.pk %}">Generar carta de notificación</a>
@@ -30,12 +40,14 @@
                           <thead>
                             <tr>
                               <th><input type="checkbox" name="sample" id="select-all"/></th>
-                              <th>Nombre</th>
-                              <th>Correo</th>
-                              <th>Correo personal</th>
-                              <th>Matrícula</th>
-                              <th>Carrera</th>
-                              
+                              <th class="text-title h6 text-center">Matrícula</th>
+                              <th class="text-title h6 text-center">Nombre</th>
+                              <th class="text-title h6 text-center">Correo</th>
+                              {% comment %} <th class="text-title h6 text-center">Correo personal</th> {% endcomment %}
+                              <th class="text-title h6 text-center">Carrera</th>
+                              <th class="text-title h6 text-center">Ingreso</th>
+                              <th class="text-title h6 text-center">Estado</th>
+                              <th class="text-title h6 text-center"></th>
                             </tr>
                           </thead>
                           <tbody>
@@ -43,12 +55,14 @@
                             {% for alumno in object_list %}
                             <tr>
                               <td><input type="checkbox" class="item-checkbox" value="{{alumno.pk}}"></td>
-                              <td>{{ alumno.first_name }} {{ alumno.last_name }}</td>
-                              <td>{{ alumno.email}} </td>
-                              <td>{{ alumno.correo_personal|default_if_none:"No registrado" }}</td>
-                              <td>{{ alumno.matricula }} </td>
-                              <td>{{ alumno.get_carrera_display }}</td>
-                              
+                              <td class="text-body text-center">{{ alumno.matricula }} </td>
+                              <td class="text-body text-center">{{ alumno.first_name }} {{ alumno.last_name }}</td>
+                              <td class="text-body text-center">{{ alumno.email}} </td>
+                              {% comment %} <td class="text-body text-center">{{ alumno.correo_personal|default_if_none:"No registrado" }}</td> {% endcomment %}
+                              <td class="text-body text-center">{{ alumno.get_carrera_display }}</td>
+                              <td class="text-body text-center">{{ alumno.trayectoria }}</td>
+                              <td class="text-body text-center">{{ alumno.estado }}</td>
+                              <td><a class="text-body-bold text-primary" href="{% url 'modificar-alumno' %}">Editar</a></td>
                             </tr>
                             {% endfor %}
                           </tbody>
