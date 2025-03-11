@@ -3,15 +3,15 @@
 {% block title %}Ajustes{% endblock %}
 
 {% block body %}
-    <section style="background-color: #eee;">
+    <section id="section" style="background-color: #eee;">
         <div class="container py-5 h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-lg-8 col-xl-10">
                     <div class="card border-top border-bottom border-4" style="border-color: #F08200 !important;">
                         <div class="card-body p-4">
-                            <h3 class="fw-bold mb-3 text-primary">Ver plantilla</h3>
+                            <h3 class="fw-bold mb-3 text-primary text-title-bold">Ver plantilla</h3>
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="mb-0 text-secondary">Puedes sustituir esta plantilla subiendo un nuevo documento.</h6>
+                                <h6 class="mb-0 text-secondary text-title">Puedes sustituir esta plantilla subiendo un nuevo documento.</h6>
                             </div>
                             {% load widget_tweaks %}
 
@@ -55,7 +55,7 @@
                                     </div>
 
                                     <!-- Columna derecha: Mostrar el archivo subido previamente -->
-                                    <div class="col-7">
+                                    <div class="col-7 text-body">
                                         {% if archivo_url %}
                                             {% if archivo_url|lower|slice:"-4:" == ".pdf" %}
                                                 <!-- Mostrar PDF -->
@@ -71,18 +71,18 @@
 
                                             {% else %}
                                                 <!-- Mostrar enlace para descargar -->
-                                                <a href="{{ archivo_url }}" class="btn btn-primary" download>
+                                                <a href="{{ archivo_url }}" class="btn btn-primary text-title" download>
                                                     <i class="fas fa-download"></i> Descargar documento
                                                 </a>
                                             {% endif %}
                                         {% else %}
-                                            <p>No hay un documento cargado actualmente.</p>
+                                            <p class="text-body">No hay un documento cargado actualmente.</p>
                                         {% endif %}
                                     </div>
 
                                 
                                 <!-- Botones -->
-                                <div class="d-grid gap-2 d-md-flex justify-content-center mt-4">
+                                <div class="d-grid gap-2 d-md-flex justify-content-center mt-4 text-title">
                                     <a href="{% url 'ajustes' %}"><button type="button" class="btn btn-outline-primary">Cancelar</button></a>
                                     <button type="submit" class="btn btn-primary">Guardar</button>
                                 </div>
