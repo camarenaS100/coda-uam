@@ -3,15 +3,15 @@
 {% block title %}Ajustes{% endblock %}
 
 {% block body %}
-    <section style="background-color: #eee;">
+    <section id="section" style="background-color: #eee;">
         <div class="container py-5 h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-lg-8 col-xl-10">
                     <div class="card border-top border-bottom border-4" style="border-color: #F08200 !important;">
                         <div class="card-body p-4">
-                            <h3 class="fw-bold mb-3 text-primary">Ver plantilla</h3>
+                            <h3 class="fw-bold mb-3 text-primary text-title-bold">Ver plantilla</h3>
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="mb-0 text-secondary">Puedes sustituir esta plantilla subiendo un nuevo documento.</h6>
+                                <h6 class="mb-0 text-secondary text-title">Puedes sustituir esta plantilla subiendo un nuevo documento.</h6>
                             </div>
                             {% load widget_tweaks %}
 
@@ -43,7 +43,7 @@
                                                 </div>
                                                 <label for="fileElem" style="cursor:pointer; color:#F08200; display: inline;">Link</label>
                                                 <p style="display: inline; margin-left: 5px;">or drag and drop</p>
-                                                <p style="font-size: 12px; color: #666;">SVG, PNG, JPG, GIF (max. 3MB)</p>
+                                                <p style="font-size: 12px; color: #666;">DOCX (max. 3MB)</p>
                                             </div>
 
                                             <!-- Mostrar el archivo adjunto -->
@@ -55,28 +55,34 @@
                                     </div>
 
                                     <!-- Columna derecha: Mostrar el archivo subido previamente -->
-                                    <div class="col-7">
+                                    <div class="col-7 text-body">
                                         {% if archivo_url %}
                                             {% if archivo_url|lower|slice:"-4:" == ".pdf" %}
                                                 <!-- Mostrar PDF -->
                                                 <iframe src="{{ archivo_url }}" width="100%" height="500px" style="border: none;"></iframe>
+
                                             {% elif archivo_url|lower|slice:"-4:" == ".png" or archivo_url|lower|slice:"-4:" == ".jpg" or archivo_url|lower|slice:"-5:" == ".jpeg" or archivo_url|lower|slice:"-4:" == ".gif" %}
                                                 <!-- Mostrar imagen -->
                                                 <img src="{{ archivo_url }}" alt="Documento actual" style="max-width: 100%; height: auto;">
+
+                                            {% elif archivo_url|lower|slice:"-5:" == ".docx" %}
+                                                <!-- Mostrar .DOCX con Google Docs Viewer -->
+                                                <iframe src="https://docs.google.com/gview?url={{ archivo_url }}&embedded=true" width="100%" height="500px" style="border: none;"></iframe>
+
                                             {% else %}
                                                 <!-- Mostrar enlace para descargar -->
-                                                <a href="{{ archivo_url }}" class="btn btn-primary" download>
+                                                <a href="{{ archivo_url }}" class="btn btn-primary text-title" download>
                                                     <i class="fas fa-download"></i> Descargar documento
                                                 </a>
                                             {% endif %}
                                         {% else %}
-                                            <p>No hay un documento cargado actualmente.</p>
+                                            <p class="text-body">No hay un documento cargado actualmente.</p>
                                         {% endif %}
                                     </div>
-                                </div>
+
                                 
                                 <!-- Botones -->
-                                <div class="d-grid gap-2 d-md-flex justify-content-center mt-4">
+                                <div class="d-grid gap-2 d-md-flex justify-content-center mt-4 text-title">
                                     <a href="{% url 'ajustes' %}"><button type="button" class="btn btn-outline-primary">Cancelar</button></a>
                                     <button type="submit" class="btn btn-primary">Guardar</button>
                                 </div>
