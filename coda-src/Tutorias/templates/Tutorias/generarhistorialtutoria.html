@@ -4,15 +4,15 @@
 
 {% block body %}
 <!--Ver Tutorias-->
-<section class="min-vh-100" style="background-color: #eee">
+<section id="section"  style="background-color: #eee">
     <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
             <div class="col-lg-5 col-xl-6">
                 <div class="card border-top border-bottom border-4" style="border-color: #f08200 !important">
                     <div class="card-body p-4">
-                        <h3 class="fw-bold mb-3 text-primary">Generar PDF Historial Tutorias</h3>
+                        <h3 class="fw-bold mb-4 text-primary text-title-bold">Generar PDF Historial Tutorias</h3>
 
-                        <div class="card-body">
+                        <div class="card-body text-body">
                             <form action="{% url 'generar_pdf' %}" method="get">
                                 <div class="mb-3">
                                     <label for="fecha_inicio" class="form-label">Fecha de inicio:</label>
@@ -39,7 +39,9 @@
                                     <input type="checkbox" class="" id="" name="notas"/>
                                     <label for="notas" class="">Notas</label>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Generar PDF</button>
+                                <div class="w-100 d-flex justify-content-center align-items-center my-3">
+                                    <button type="submit" class="btn btn-primary text-title">Generar PDF</button>
+                                </div>
                             </form>
                         </div>
                         
