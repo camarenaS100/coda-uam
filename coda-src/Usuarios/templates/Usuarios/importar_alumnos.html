@@ -3,7 +3,8 @@
 {% block body %}
     <section
         style="background-color: #eee;"
-        class="d-flex flex-column justify-content-center align-items-center h-100 min-w-100"
+        id="section"
+        class="d-flex flex-column justify-content-center align-items-center h-100"
     >
         <!-- Include xlsx library -->
         <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
@@ -11,15 +12,15 @@
         <div class="d-flex flex-column justify-content-center w-100 h-100">
             <div class="d-flex justify-content-center align-items-center h-100 w-100">
                 <div class="
-                        w-auto mw-75 h-auto
+                        w-auto w-100 h-auto
                         border-top border-bottom border-4 rounded p-4 pl-4 d-flex flex-column
                         justify-content-center my-5
                         border-primary bg-white
                         "
                     style="max-width: 75%;">
                     
-                    <h1><b class="text-primary fs-2">Importar Alumnos</b></h1>
-                    <span class="text-danger pb-1">Selecciona un archivo para subir</span>
+                    <h1><b class="text-primary fs-2 text-title-bold">Importar Alumnos</b></h1>
+                    <span class="text-danger pb-1 text-title" style="font-size:16px">Selecciona un archivo para subir</span>
 
                     <!-- Display messages -->
                     {% if error %}
@@ -64,7 +65,7 @@
                                 </div>
 
                                 <!-- Separate button to start processing -->
-                                <div class="d-flex justify-content-around align-self-center mt-2">
+                                <div class="d-flex justify-content-around align-self-center mt-2 text-title">
                                     <a href="{% url 'crear-alumno' %}">
                                         <button type="button" class="btn btn-outline-primary m-2">Cancelar</button>
                                     </a>
