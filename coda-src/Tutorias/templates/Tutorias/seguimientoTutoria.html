@@ -4,73 +4,95 @@
 
 {% block body %}
 <section id="section" style="background-color: #eee;">
-    <div class="container py-5 h-100">
-        <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="row d-flex justify-content-center align-items-center w-100">
             <div class="col-lg-8 col-xl-6">
-                <div class="card border-top border-bottom border-4 overflow-y-scroll" style="border-color: #f08200 !important; max-height: 600px;">
+                <div class="card border-top border-bottom border-4 overflow-y-scroll my-5" style="border-color: #f08200 !important; height: 720px;">
                     
                     {% load widget_tweaks %}
                     <form method="POST" action="{% url 'save_seguimiento' tutoria.pk %}">
                         {% csrf_token %}
-                        <div class="card-body px-5 py-4 text-body">
-                            <h3 class="fw-bold mb-4 text-primary text-title-bold">Formulario de Seguimiento</h3>
+                        <div class="card-body px-5 py-5 text-body">
+                            <h3 class="b-4 text-primary text-title-bold">Seguimiento de Tutoría</h3>
 
                             <!-- Muestra información de tutoría seleccionada -->
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Alumno:</label>
-                                <input type="text" class="form-control" value="{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }}" readonly>
-
-                                <label class="form-label fw-bold mt-3">Fecha y Hora:</label>
-                                <input type="text" class="form-control" value="{{ tutoria.fecha|date:'d/m/Y H:i' }}" readonly>
-
-                                <label class="form-label fw-bold mt-3">Tema:</label>
-                                <input type="text" class="form-control" value="{{ tutoria.get_tema_display|join:', ' }}" readonly>
+                            <div class="d-flex w-100 justify-content-evenly align-items-center">
+                                <div class="w-50 me-2 d-flex flex-row align-items-center">
+                                    <label class=" me-1">Alumno:</label>
+                                    <input type="text" class="form-control" value="{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }}" readonly>
+                                </div>
+                                <div class="w-50 ms-2 d-flex align-items-center">
+                                    <label class="form-label fw-bold mt-3">Fecha y Hora:</label>
+                                    <input type="text" class="form-control" value="{{ tutoria.fecha|date:'d/m/Y H:i' }}" readonly>
+                                </div>
                             </div>
 
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">¿El alumno asistió a la tutoría?:</label><br>
-                                <input type="radio" name="asistencia" value="True" required> Sí
-                                <input type="radio" name="asistencia" value="False"> No
+                            <div class="w-100 d-flex flex-row align-items-center justify-content-evenly mb-3">
+                                <label class="text-body-bold form-label me-2">Tema:</label>
+                                <input type="text" class="form-control ms-2" value="{{ tutoria.get_tema_display|join:', ' }}" readonly>
                             </div>
 
-                            <div class="mb-4">
+                            <div class="w-100 d-flex flex-row align-items-center mb-3">
+                                <label class="form-label fw-bold w-50">¿El alumno asistió a la tutoría?:</label><br>
+                                <div class="w-50 d-flex align-items-center">
+                                    <input type="radio" name="asistencia" value="True" class="" required class="me-1" > Sí</input>
+                                    <input type="radio" name="asistencia" value="False" class="ms-5 me-1"> No </input>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
                                 <label class="form-label fw-bold">Duración de la tutoría:</label>
                                 {% render_field form.duracion class="form-select" %}
                                 <label class="form-label" for="id_duracion">Selecciona una opción</label>
                             </div>
 
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">¿Se firmó algún formato de solicitud de beca?</label><br>
-                                <input type="radio" name="firma_documentos_beca" value="True" required> Sí
-                                <input type="radio" name="firma_documentos_beca" value="False"> No
+                            <div class="w-100 d-flex flex-row align-items-center mb-3">
+                                <label class="form-label fw-bold w-50">¿Se firmó algún formato de solicitud de beca?</label><br>
+                                <div class="w-50 d-flex align-items-center">
+                                    <input type="radio" name="firma_documentos_beca" value="True" required class="me-1" > Sí
+                                    <input type="radio" name="firma_documentos_beca" value="False" class="ms-5 me-1" > No
+                                </div>
                             </div>
 
-                            <div class="mb-4">
+                            <div class="mb-3">
                                 <label class="form-label fw-bold">Nombre de la beca otorgada al alumno:</label>
                                 <input type="text" name="beca_otorgada" class="form-control" maxlength="255">
                             </div>
 
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">¿Requirió asesoría especializada?:</label><br>
-                                <input type="radio" name="asesoria_especializada" value="True" required> Sí
-                                <input type="radio" name="asesoria_especializada" value="False"> No
+                            <div class="w-100 d-flex flex-row align-items-center mb-3">
+                                <label class="form-label fw-bold w-50">¿Requirió asesoría especializada?:</label><br>
+                                <div class="w-50 d-flex align-items-center">
+                                    <input type="radio" name="asesoria_especializada" value="True" required class="me-1"> Sí
+                                    <input type="radio" name="asesoria_especializada" value="False"  class="ms-5 me-1" > No
+                                </div>
                             </div>
 
-                            <div class="mb-4">
+                            <div class="mb-3">
                                 <label class="form-label fw-bold">Aspectos tratados en la tutoría, acuerdos o acciones establecidas, canalizaciones</label>
                                 <textarea name="observaciones" class="form-control" maxlength="1000"></textarea>
                             </div>
 
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">¿Nivel de impacto de la tutoría en el desempeño académico del alumno?:</label><br>
-                                <input type="radio" name="impacto_tutoria" value="1" required> 1
-                                <input type="radio" name="impacto_tutoria" value="2"> 2
-                                <input type="radio" name="impacto_tutoria" value="3"> 3
-                                <input type="radio" name="impacto_tutoria" value="4"> 4
-                                <input type="radio" name="impacto_tutoria" value="5"> 5
+                            <div class="w-100 d-flex flex-row align-items-center mb-3">
+                                <label class="form-label fw-bold w-50">¿Nivel de impacto de la tutoría en el desempeño académico del alumno?:</label><br>
+                                <div class="w-50 d-flex align-items-center">
+                                    <div class="d-flex align-items-center me-3">
+                                        <input type="radio" name="impacto_tutoria" value="1" class="me-1" required> 1</input>
+                                    </div>
+                                    <div class="d-flex align-items-center me-3">
+                                        <input type="radio" name="impacto_tutoria" value="2" class="me-1"> 2 </input>
+                                    </div>
+                                    <div class="d-flex align-items-center me-3">
+                                        <input type="radio" name="impacto_tutoria" value="3" class="me-1"> 3 </input>
+                                    </div>
+                                    <div class="d-flex align-items-center me-3">
+                                        <input type="radio" name="impacto_tutoria" value="4" class="me-1"> 4 </input>
+                                    </div>
+                                    <div class="d-flex align-items-center me-3">
+                                        <input type="radio" name="impacto_tutoria" value="5" class="me-1"> 5 </input>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="mb-4">
+                            <div class="mb-3">
                                 <label class="form-label fw-bold">Resultados de la tutoría:</label>
                                 <textarea name="resultados_tutoria" class="form-control" maxlength="1000"></textarea>
                             </div>
@@ -83,7 +105,6 @@
 
                 </div>
             </div>
-        </div>
     </div>
 </section>
 {% endblock %}
