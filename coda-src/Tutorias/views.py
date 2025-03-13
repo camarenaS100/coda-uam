@@ -212,8 +212,8 @@ class TutoriaUpdateView(BaseAccessMixin, UpdateView):
     template_name = 'Tutorias/editarTutoria.html'
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
-        rol = self.request.user.get_rol()
-        if rol == TUTOR:
+        # rol = self.request.user.get_rol()
+        if self.request.user.has_role("TUT"):
             tutor = Tutor.objects.get(pk=self.request.user)
         recipient = Alumno.objects.filter(pk=self.get_object().alumno)
 
@@ -237,8 +237,8 @@ class TutoriaCreateView(AlumnoViewMixin, CreateView):
         form.instance.alumno = alumno
         form.instance.tutor = alumno.tutor_asignado
 
-        rol = self.request.user.get_rol()
-        if rol == ALUMNO:
+        # rol = self.request.user.has_role("ALU")
+        if self.request.user.has_role("ALU"):
             recipient = Tutor.objects.get(pk=alumno.tutor_asignado)
 
         # notify.send(alumno, recipient=recipient, verb='Nueva solicitud de tutoria', description=f'{form.instance.get_tema_display()}')
@@ -474,8 +474,8 @@ class QuickCreateTutoriaView(AlumnoViewMixin, CreateView):
         form.instance.estado = ACEPTADO
         
         
-        rol = self.request.user.get_rol()
-        if rol == ALUMNO:
+        # rol = self.request.user.get_rol()
+        if self.request.user.has_role("ALU"):
             recipient = alumno.tutor_asignado   # No sé que hace este bloque, pero no lo voy a quitar para que no se rompa. -Alfredo
         else:
             recipient = Alumno.objects.filter(pk=self.get_object().alumno)

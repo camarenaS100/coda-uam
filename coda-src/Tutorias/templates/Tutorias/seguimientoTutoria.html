@@ -27,52 +27,58 @@
                                 <input type="text" class="form-control" value="{{ tutoria.get_tema_display|join:', ' }}" readonly>
                             </div>
 
+                            <!-- Pregunta de asistencia -->
                             <div class="mb-4">
                                 <label class="form-label fw-bold">¿El alumno asistió a la tutoría?:</label><br>
                                 <input type="radio" name="asistencia" value="True" required> Sí
                                 <input type="radio" name="asistencia" value="False"> No
                             </div>
 
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Duración de la tutoría:</label>
-                                {% render_field form.duracion class="form-select" %}
-                                <label class="form-label" for="id_duracion">Selecciona una opción</label>
-                            </div>
+                            <!-- Agrupamos las preguntas adicionales en un contenedor -->
+                            <div id="extra-fields">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Duración de la tutoría:</label>
+                                    {% render_field form.duracion class="form-select" %}
+                                    <label class="form-label" for="id_duracion">Selecciona una opción</label>
+                                </div>
 
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">¿Se firmó algún formato de solicitud de beca?</label><br>
-                                <input type="radio" name="firma_documentos_beca" value="True" required> Sí
-                                <input type="radio" name="firma_documentos_beca" value="False"> No
-                            </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">¿Se firmó algún formato de solicitud de beca?</label><br>
+                                    <input type="radio" name="firma_documentos_beca" value="True" required> Sí
+                                    <input type="radio" name="firma_documentos_beca" value="False"> No
+                                </div>
 
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Nombre de la beca otorgada al alumno:</label>
-                                <input type="text" name="beca_otorgada" class="form-control" maxlength="255">
-                            </div>
+                                <!-- Nombre de la beca otorgada (se oculta si "No" en beca) -->
+                                <div class="mb-4" id="beca-field">
+                                    <label class="form-label fw-bold">Nombre de la beca otorgada al alumno:</label>
+                                    <input type="text" name="beca_otorgada" class="form-control" maxlength="255">
+                                </div>
 
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">¿Requirió asesoría especializada?:</label><br>
-                                <input type="radio" name="asesoria_especializada" value="True" required> Sí
-                                <input type="radio" name="asesoria_especializada" value="False"> No
-                            </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">¿Requirió asesoría especializada?:</label><br>
+                                    <input type="radio" name="asesoria_especializada" value="True" required> Sí
+                                    <input type="radio" name="asesoria_especializada" value="False"> No
+                                </div>
 
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Aspectos tratados en la tutoría, acuerdos o acciones establecidas, canalizaciones</label>
-                                <textarea name="observaciones" class="form-control" maxlength="1000"></textarea>
-                            </div>
+                                <!-- Aspectos tratados (se oculta si "No" en asesoría) -->
+                                <div class="mb-4" id="aspectos-field">
+                                    <label class="form-label fw-bold">Aspectos tratados en la tutoría, acuerdos o acciones establecidas, canalizaciones</label>
+                                    <textarea name="observaciones" class="form-control" maxlength="1000"></textarea>
+                                </div>
 
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">¿Nivel de impacto de la tutoría en el desempeño académico del alumno?:</label><br>
-                                <input type="radio" name="impacto_tutoria" value="1" required> 1
-                                <input type="radio" name="impacto_tutoria" value="2"> 2
-                                <input type="radio" name="impacto_tutoria" value="3"> 3
-                                <input type="radio" name="impacto_tutoria" value="4"> 4
-                                <input type="radio" name="impacto_tutoria" value="5"> 5
-                            </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">¿Nivel de impacto de la tutoría en el desempeño académico del alumno?:</label><br>
+                                    <input type="radio" name="impacto_tutoria" value="1" required> 1
+                                    <input type="radio" name="impacto_tutoria" value="2"> 2
+                                    <input type="radio" name="impacto_tutoria" value="3"> 3
+                                    <input type="radio" name="impacto_tutoria" value="4"> 4
+                                    <input type="radio" name="impacto_tutoria" value="5"> 5
+                                </div>
 
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Resultados de la tutoría:</label>
-                                <textarea name="resultados_tutoria" class="form-control" maxlength="1000"></textarea>
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Resultados de la tutoría:</label>
+                                    <textarea name="resultados_tutoria" class="form-control" maxlength="1000"></textarea>
+                                </div>
                             </div>
 
                             <div class="mb-4">
@@ -86,4 +92,42 @@
         </div>
     </div>
 </section>
+
+<!-- JavaScript para ocultar/mostrar los campos -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        function toggleFields() {
+            // Ocultar todo si el alumno no asistió
+            if ($("input[name='asistencia']:checked").val() === "False") {
+                $("#extra-fields").hide();
+            } else {
+                $("#extra-fields").show();
+            }
+
+            // Ocultar nombre de la beca si no se firmó un documento de beca
+            if ($("input[name='firma_documentos_beca']:checked").val() === "False") {
+                $("#beca-field").hide();
+            } else {
+                $("#beca-field").show();
+            }
+
+            // Ocultar aspectos tratados si no requirió asesoría
+            if ($("input[name='asesoria_especializada']:checked").val() === "False") {
+                $("#aspectos-field").hide();
+            } else {
+                $("#aspectos-field").show();
+            }
+        }
+
+        // Llamar a la función al cambiar las opciones
+        $("input[name='asistencia'], input[name='firma_documentos_beca'], input[name='asesoria_especializada']").change(function () {
+            toggleFields();
+        });
+
+        // Asegurar que el estado inicial es correcto en caso de recargar la página
+        toggleFields();
+    });
+</script>
+
 {% endblock %}

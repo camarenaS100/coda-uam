@@ -6,6 +6,7 @@ from django.db.models.query import QuerySet
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, HttpResponse
 from django.contrib.auth.views import LoginView, PasswordChangeView
+from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic.detail import DetailView
@@ -14,7 +15,7 @@ from django.views.generic import TemplateView, DeleteView, UpdateView
 from .models import Usuario, Tutor, Alumno, Coda, Cordinador
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic.edit import FormView
 from .forms import ImportAlumnosForm
 from django.shortcuts import get_object_or_404
@@ -30,6 +31,7 @@ from .forms import ImportAlumnosForm
 from .models import Alumno, Usuario, Tutor
 from .constants import CARRERAS, ESTADOS_ALUMNO, SEXOS, ALUMNO
 from django.contrib.auth.hashers import make_password
+from django.contrib import messages
 import io
 import pandas as pd
 from .models import Documento
@@ -53,7 +55,7 @@ class PerfilAlumnoView(BaseAccessMixin, DetailView):
     template_name = 'Usuarios/perfil_alumno.html'
 
     def get_queryset(self) -> QuerySet[Any]:
-        return Usuario.objects.filter(roles__contains=["ALU"])  # Filter for Alumnos
+        return Usuario.objects.filter(rol__contains=["ALU"])  # Filter for Alumnos
 
 
 class PerfilTutorView(BaseAccessMixin, DetailView):
@@ -61,7 +63,7 @@ class PerfilTutorView(BaseAccessMixin, DetailView):
     template_name = 'Usuarios/perfil_tutor.html'
 
     def get_queryset(self) -> QuerySet[Any]:
-        return Usuario.objects.filter(roles__contains=["TUT"])  # Filter for Tutors
+        return Usuario.objects.filter(rol__contains=["TUT"])  # Filter for Tutors
 
 
 class PerfilCodaView(BaseAccessMixin, DetailView):
@@ -69,15 +71,15 @@ class PerfilCodaView(BaseAccessMixin, DetailView):
     template_name = 'Usuarios/perfil_cooda.html'
 
     def get_queryset(self) -> QuerySet[Any]:
-        return Usuario.objects.filter(roles__contains=["CODA"])  # Filter for Coda
+        return Usuario.objects.filter(rol__contains=["CODA"])  # Filter for Coda
 
 
 class PerfilCordinadorView(BaseAccessMixin, DetailView):
     model = Usuario
-    template_name = 'Usuarios/perfil_cordinador.html'
+    template_name = 'Usuarios/perfil_coordinador.html'
 
     def get_queryset(self) -> QuerySet[Any]:
-        return Usuario.objects.filter(roles__contains=["COR"])  # Filter for Coordinadores
+        return Usuario.objects.filter(rol__contains=["COR"])  # Filter for Coordinadores
 
 
 ### Role-Based Profile Redirection
@@ -95,7 +97,7 @@ def redirect_perfil(request):
         return redirect('perfil-coda', pk=user.pk)
 
     if user.has_role("COR"):
-        return redirect('perfil-cordinador', pk=user.pk)
+        return redirect('perfil-coordinador', pk=user.pk)
 
     return redirect('perfil-alumno', pk=user.pk)  # Default case
 
@@ -128,14 +130,42 @@ class UsuarioLoginView(LoginView):
     template_name = "Usuarios/login.html"
 
     def form_valid(self, form):
-        """
-        If the form is valid, log in the user and store the selected role in session.
-        """
-        response = super().form_valid(form)  # Perform default login process
-        role = self.request.POST.get("role")  # Get selected role from the login form
-        if role:
-            self.request.session["role"] = role  # Store the role in session
-        return response  # Proceed with normal redirection
+        user = form.get_user()
+        selected_role = self.request.POST.get("role")  # Get role from form input
+
+        if user is not None:
+            # Retrieve user as correct subclass BEFORE login
+            if selected_role == "coordinador" and Cordinador.objects.filter(pk=user.pk).exists():
+                user = Cordinador.objects.get(pk=user.pk)
+            elif selected_role == "tutor" and Tutor.objects.filter(pk=user.pk).exists():
+                user = Tutor.objects.get(pk=user.pk)
+            elif selected_role == "alumno" and Alumno.objects.filter(pk=user.pk).exists():
+                user = Alumno.objects.get(pk=user.pk)
+            elif selected_role == "coda" and Coda.objects.filter(pk=user.pk).exists():
+                user = Coda.objects.get(pk=user.pk)
+            else:
+                messages.error(self.request, "Rol no válido para este usuario.")
+                return redirect("login")
+
+            # Now login as the correct role
+            login(self.request, user)
+
+            # Ensure request.user updates correctly
+            self.request.user = user  # <--- This is crucial
+
+            # Store selected role in session
+            self.request.session["role"] = selected_role
+            self.request.session.modified = True  # Force session update
+
+            # Debugging
+            print(f"User logged in as {selected_role} - PK: {user.pk}")
+
+            # Redirect to correct profile
+            return redirect(reverse_lazy(f"perfil-{selected_role}", kwargs={"pk": user.pk}))
+
+        messages.error(self.request, "Inicio de sesión fallido.")
+        return redirect("login")
+
 
 
 class ChangePasswordView(BaseAccessMixin, PasswordChangeView):
@@ -238,7 +268,7 @@ class ImportAlumnosView(CodaViewMixin, FormView):
                         continue
 
                     # Generate password (increment each digit of matricula by 1)
-                    password = "".join(str(int(digit) + 1) if digit.isdigit() else digit for digit in matricula)
+                    password = matricula
                     hashed_password = make_password(password)
 
                     # Create Usuario
@@ -299,8 +329,6 @@ class ajustes(CodaViewMixin, TemplateView):
 
         return context
 
-
-
 #PermissionRequiredMixin
 class CargarPlantilla(CodaViewMixin, CreateView):
     template_name = 'Usuarios/cargar_plantilla.html'
@@ -309,14 +337,6 @@ class CargarPlantilla(CodaViewMixin, CreateView):
 
     def form_valid(self, form):
         return super().form_valid(form)
-
-
-# class AceptarTutoriaView(View):
-#     def post(self, request, pk):
-#         tutoria = get_object_or_404(Tutoria, pk=pk)
-#         tutoria.estado = ACEPTADO
-#         tutoria.save()
-#         return redirect('Tutorias-tutor')  
     
 def eliminar_documento(request, pk):
     documento = get_object_or_404(Documento, pk=pk)

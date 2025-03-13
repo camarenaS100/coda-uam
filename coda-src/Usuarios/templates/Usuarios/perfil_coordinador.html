@@ -11,9 +11,9 @@
             {% load static %}
             <img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" alt="" class="img-fluid shadow-2-strong mt-4 mb-2"
                 style="width: 150px; height: 150px; object-fit: cover; z-index: 1" />
-            <h5 class="text-black">{{ alumno.first_name }}</h5>
-            <h5 class="text-black">{{ alumno.last_name }}</h5>
-            <p class="text-primary">{{ alumno.get_carrera_display }}</p>
+            <h5 class="text-black">{{ cordinador.first_name }}</h5>
+            <h5 class="text-black">{{ cordinador.last_name }}</h5>
+            <p class="text-primary">{{ cordinador.get_carrera_display }}</p>
             <a href="#"><i class="far fa-edit fa-lg"></i></a>
         </div>
         <div class="col-md-8">
@@ -23,15 +23,15 @@
                 <div class="row pt-1">
                     <div class="col-6 mb-3">
                         <h6>Correo institucional</h6>
-                        <p class="text-muted">{{alumno.email}}</p>
+                        <p class="text-muted">{{cordinador.email}}</p>
                     </div>
                     <div class="col-6 mb-3">
                         <h6>Correo personal</h6>
-                        <p class="text-muted">{{alumno.correo_personal}}</p>
+                        <p class="text-muted">{{cordinador.correo_personal}}</p>
                     </div>
                     <div class="col-6 mb-3">
                         <h6>Número económico</h6>
-                        <p class="text-muted">{{ alumno.matricula }}</p>
+                        <p class="text-muted">{{ cordinador.matricula }}</p>
                     </div>
                 </div>
             </div>
