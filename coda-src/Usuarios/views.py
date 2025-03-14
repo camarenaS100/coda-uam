@@ -124,7 +124,6 @@ def login_success(request):
     return HttpResponseBadRequest("ERROR. Tipo de usuario o rol no definido")
 
 
-### User Authentication Views
 class UsuarioLoginView(LoginView):
     redirect_authenticated_user = True
     template_name = "Usuarios/login.html"
@@ -134,7 +133,7 @@ class UsuarioLoginView(LoginView):
         selected_role = self.request.POST.get("role")  # Get role from form input
 
         if user is not None:
-            # Retrieve user as correct subclass BEFORE login
+            # Retrieve correct user subclass
             if selected_role == "coordinador" and Cordinador.objects.filter(pk=user.pk).exists():
                 user = Cordinador.objects.get(pk=user.pk)
             elif selected_role == "tutor" and Tutor.objects.filter(pk=user.pk).exists():
@@ -147,24 +146,22 @@ class UsuarioLoginView(LoginView):
                 messages.error(self.request, "Rol no válido para este usuario.")
                 return redirect("login")
 
-            # Now login as the correct role
+            # Log in user
             login(self.request, user)
-
-            # Ensure request.user updates correctly
-            self.request.user = user  # <--- This is crucial
-
-            # Store selected role in session
+            self.request.user = user  # Ensure request.user updates
             self.request.session["role"] = selected_role
             self.request.session.modified = True  # Force session update
 
-            # Debugging
-            print(f"User logged in as {selected_role} - PK: {user.pk}")
-
-            # Redirect to correct profile
+            # Redirect to appropriate profile
             return redirect(reverse_lazy(f"perfil-{selected_role}", kwargs={"pk": user.pk}))
 
         messages.error(self.request, "Inicio de sesión fallido.")
         return redirect("login")
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Usuario o contraseña incorrectos.")
+        return self.render_to_response(self.get_context_data(form=form))
+
 
 
 
@@ -255,16 +252,17 @@ class ImportAlumnosView(CodaViewMixin, FormView):
                     estado = next((key for key, value in ESTADOS_ALUMNO if value == row["Estado"]), None)
                     sexo = next((key for key, value in SEXOS if value == row["Sexo"]), None)
                     tutor_id = row["No. Económico"]
+                    trimestre_ingreso = row["Trimestre de ingreso"].strip()
 
                     # Ensure required fields are valid
-                    if not (matricula and email and first_name and last_name and carrera and estado and sexo):
-                        warnings.append(f"Alumno {matricula}: Datos obligatorios faltantes.")
+                    if not (matricula and email and first_name and last_name and carrera and estado and sexo and tutor_id):
+                        warnings.append(f"Alumno {matricula}: Datos obligatorios faltantes. Asegúrese de que todos los campos obligatorios de información estén presentes.")
                         continue  # Skip to the next student
 
                     # Find assigned tutor
                     tutor_asignado = Tutor.objects.filter(matricula=tutor_id).first()
                     if not tutor_asignado:
-                        warnings.append(f"Alumno {matricula}: Tutor con ID {tutor_id} no encontrado.")
+                        warnings.append(f"Alumno {matricula}: Tutor con número económico {tutor_id} no encontrado. Aseegúrese de que el tutor esté registrado en el sistema.")
                         continue
 
                     # Generate password (increment each digit of matricula by 1)
@@ -292,6 +290,7 @@ class ImportAlumnosView(CodaViewMixin, FormView):
                             estado=estado,
                             sexo=sexo,
                             tutor_asignado=tutor_asignado,
+                            trimestre_ingreso=trimestre_ingreso,
                         )
                         alumno.__dict__.update(usuario.__dict__)  # Copy fields
                         alumno.save()
