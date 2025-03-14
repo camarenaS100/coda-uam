@@ -19,23 +19,16 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
     {% load static %}
-    <div class="area">
-        <!--BackGround Animacion-->
-        <!-- <ul class="circles">
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-        </ul> -->
-        <!--End BackGround Animacion-->
+    <div
+        style="
+            display: flex;
+            flex-direction: column;
+            flex:1;
+            flex-grow: 1;
+        "
+    >
 
         <!-- NavBar -->
         <nav class="navbar navbar-expand-lg bg-secondary p-2">
@@ -64,7 +57,7 @@
                 Usuario o Contraseña incorrectos
             </div>
         {% endif %}
-        <section class="vh-75">
+        <section>
             <div class="container py-5 h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col col-xl-10">
@@ -123,7 +116,11 @@
 
 
     <!-- Footer -->
-    <footer class="bg-secondary text-center text-primary">
+    <footer class="bg-secondary text-center text-primary d-flex w-100 h-100 flex-column align-self-end"
+        style="
+           
+        "
+    >
         <!-- Grid container -->
         <div class="container p-4">
             <!-- Section: Social media -->
