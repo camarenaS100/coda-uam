@@ -37,6 +37,8 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from django.shortcuts import get_object_or_404, get_list_or_404
 
 import re, docx, os
+from zipfile import ZipFile
+from io import BytesIO
 
 #Funcion para descargar pdf
 def carta_tutorados_pdf(request):
@@ -364,7 +366,6 @@ class ReporteCreateView(CodaViewMixin, CreateView):
         return super().form_valid(form)
     
     def paragraph_replace_text(self,paragraph, regex, replace_str):
-        print("3rd party function")
         while True:
             text = paragraph.text
             match = regex.search(text)
@@ -411,7 +412,6 @@ class ReporteCreateView(CodaViewMixin, CreateView):
         return paragraph
 
     def post(self, request,pk):
-        print("--------Beginning of post funct---------------")
         form = request.POST
         oficio_form = form.get('oficio')
         plantilla_form = form.get('plantilla')
@@ -426,8 +426,9 @@ class ReporteCreateView(CodaViewMixin, CreateView):
         #Creación de las expresiones regulares que se buscaran en el doc
         reg_placeh = re.compile(r'\{.*?\}') #Placeholder "{}"
         reg_gen = re.compile(r'\{(a|o|e)\}') #Género
-        reg_tut = re.compile(r'\{(Dr\.|Dra\.|Doctor|Doctora)\s+(.)*\}')
+        # reg_tut = re.compile(r'\{(Dr\.|Dra\.|Doctor|Doctora)\s+(.)*\}')
         # reg_tut = re.compile(r'\{(((d|D)[a-zA-Z]+)(\.*))+(\s[A-Z][a-zA-Z]*)*(\s[A-Z][a-zA-Z]*)+(\s[A-Z][a-zA-Z]*)*\}') #Tutor ex. Dr/doctor Algo
+        reg_tut = re.compile(r'\{(((d|D)[a-zA-Z]+)(\.*))+\s+(.)*\}') #Tutor ex. Dr/doctor Algo
         reg_fech =re.compile( r'\{[0-9]+.*[a-zA-Z0-9]+.*[0-9]+\}') #Fecha
         reg_ofi = re.compile(r'\{[a-zA-Z0-9\-]*(_[a-zA-Z0-9]*)+\}') #Número de oficio
 
@@ -481,11 +482,15 @@ class ReporteCreateView(CodaViewMixin, CreateView):
 
         # Populate the new table with filtered data
         for obj in tut_alums:
+            # apellidos = re.findall(r'[A-Z][a-z]*', obj.last_name)
+            # apellidos = re.findall(r'[A-Z][a-z]*', obj.last_name)
+            apellidos = re.findall(r'[A-Z][a-z]*', obj.last_name) + [''] * (2 - len(re.findall(r'[A-Z][a-z]*', obj.last_name)))
             row_cells = new_table.add_row().cells
             row_cells[0].text = str(obj.trayectoria)  # Replace with actual fields
             row_cells[1].text = str(obj.matricula)  # Replace with actual fields
-            row_cells[2].text = str(obj.last_name)
-            row_cells[3].text = str("NULL") #Si el modelo tiene un campo para segundo apellido, agregar
+            # row_cells[2].text = str(obj.last_name)
+            row_cells[2].text = str(apellidos[0]) #Si el modelo tiene un campo para segundo apellido, agregar
+            row_cells[3].text = str(apellidos[1]) #Si el modelo tiene un campo para segundo apellido, agregar
             row_cells[4].text = str(obj.first_name)  # Replace with actual fields
         
         # Ensure data rows inherit cell formatting from old table
@@ -505,16 +510,18 @@ class ReporteCreateView(CodaViewMixin, CreateView):
             line = p.text
             result = []
             line_matches = [] if (result := re.findall(reg_placeh,line)) is None else result
-            print(f'Before cycle: {(line_matches)}') if line_matches else None 
+            # print(f'Before cycle: {(line_matches)}') if line_matches else None 
             
             for match in line_matches:
-                print(match)
                 if re.search(reg_ofi,match):
                     self.paragraph_replace_text(p, reg_ofi, f"{oficio_form}").text
                 if re.match(reg_fech,match):
                     self.paragraph_replace_text(p, reg_fech, f"{fecha_form}").text
                 if re.match(reg_tut,match):
-                    self.paragraph_replace_text(p, reg_tut, f"Doctor {tutor.last_name}").text
+                    if tutor.sexo == "M":
+                        self.paragraph_replace_text(p, reg_tut, f"Dr. {tutor.last_name}").text
+                    if tutor.sexo == "F":
+                        self.paragraph_replace_text(p, reg_tut, f"Dra. {tutor.last_name}").text
                 if re.match(reg_gen,match):
                     if tutor.sexo == "M":
                         self.paragraph_replace_text(p, reg_gen, f"o").text
@@ -566,7 +573,6 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
         return super().form_valid(form)
     
     def paragraph_replace_text(self,paragraph, regex, replace_str):
-        print("3rd party function")
         while True:
             text = paragraph.text
             match = regex.search(text)
@@ -613,7 +619,6 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
         return paragraph
 
     def post (self, request, pk):
-        print("---------------POST______________")
         selected_ids = self.request.GET.getlist('selected_alumnos')
 
         form = request.POST
@@ -624,17 +629,14 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
         tutor_pk = self.kwargs.get('pk')
         alumnos = get_list_or_404(Alumno, pk__in=selected_ids)
         plantilla = get_object_or_404(Plantilla, titulo=plantilla_form)
-        open_plantilla = docx.Document(plantilla.archivo)
         tutor = get_object_or_404(Tutor, pk=tutor_pk)
         
-        print(alumnos)
-        print(tutor)
-        print(plantilla)
-
         #Creación de las expresiones regulares que se buscaran en el doc
         reg_placeh = re.compile(r'\{.*?\}') #Placeholder "{}"
         reg_gen = re.compile(r'\{(a|o|e)\}') #Género
-        reg_tut = re.compile(r'\{(Dr\.|Dra\.|Doctor|Doctora)\s+(.)*\}')
+        # reg_tut = re.compile(r'\{(Dr\.|Dra\.|Doctor|Doctora)\s+(.)*\}')
+        # reg_tut = re.compile(r'\{(((d|D)[a-zA-Z]+)(\.*))+(\s[A-Z][a-zA-Z]*)*(\s[A-Z][a-zA-Z]*)+(\s[A-Z][a-zA-Z]*)*\}') #Tutor ex. Dr/doctor Algo
+        reg_tut = re.compile(r'\{(((d|D)[a-zA-Z]+)(\.*))+\s+(.)*\}') #Tutor ex. Dr/doctor Algo
         reg_fech =re.compile( r'\{[0-9]+.*[a-zA-Z0-9]+.*[0-9]+\}') #Fecha
         reg_ofi = re.compile(r'\{[a-zA-Z0-9\-]*(_[a-zA-Z0-9]*)+\}') #Número de oficio
         reg_alu = re.compile(r'\{(?!LICENCIATURA|LIC.|Licenciatura|Lic.)(?:[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*\.?|[A-ZÁÉÍÓÚÑ]+\.?)(?:\s+(?:de|del|la|y|los|las|san|santa|C|Dr|Dra|Lic|Ing|Sr|Sra)\.?|[A-ZÁÉÍÓÚÑ]+\.?)*\s+(?:[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*|[A-ZÁÉÍÓÚÑ]+)\b(?:\s+(?:[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*|[A-ZÁÉÍÓÚÑ]+))*\}')
@@ -642,50 +644,57 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
         reg_det = re.compile(r'\{(la|el|él)\}')
 
         ##EDICIÓN DE LOS PLACEHOLDERS
-        c=0
-        for p in open_plantilla.paragraphs:
-            c = c+1
-            # print(c)
-            line = p.text
-            result = []
-            line_matches = [] if (result := re.findall(reg_placeh,line)) is None else result
-            print(f'Before cycle: {(line_matches)}') if line_matches else None 
-            
-            for match in line_matches:
-                if re.search(reg_ofi,match):
-                    print(f"Oficio IF")
-                    self.paragraph_replace_text(p, reg_ofi, f"{oficio_form}").text
-                if re.match(reg_fech,match):
-                    print(f"Fecha IF")
-                    self.paragraph_replace_text(p, reg_fech, f"{fecha_form}").text
-                if re.match(reg_tut,match):
-                    print(f"Tutor IF")
-                    self.paragraph_replace_text(p, reg_tut, f"Doctor {tutor.last_name}").text
-                if re.match(reg_alu,match):
-                    print(f"Alumno IF")
-                    self.paragraph_replace_text(p, reg_alu, f"{alumnos[0].first_name} {alumnos[0].last_name}").text
-                if re.match(reg_carr,match):
-                    print(f"Carrera IF")
-                    self.paragraph_replace_text(p, reg_carr, f"{alumnos[0].carrera}").text
-                if re.match(reg_det,match):
-                    print(f"Determ IF")
-                    if tutor.sexo == "M":
-                        self.paragraph_replace_text(p, reg_det, f"él").text
-                    if tutor.sexo == "F":
-                        self.paragraph_replace_text(p, reg_det, f"la").text
-                if re.match(reg_gen,match):
-                    print(f"Genero IF")
-                    if tutor.sexo == "M":
-                        self.paragraph_replace_text(p, reg_gen, f"").text
-                    if tutor.sexo == "F":
-                        self.paragraph_replace_text(p, reg_gen, f"a").text
+        zip_buffer = BytesIO()
+        with ZipFile(zip_buffer, 'w') as zip_file:
+            for alumno in alumnos:
+                open_plantilla = docx.Document(plantilla.archivo)
+                c=0
+                for p in open_plantilla.paragraphs:
+                    c = c+1
+                    # print(c)
+                    line = p.text
+                    result = []
+                    line_matches = [] if (result := re.findall(reg_placeh,line)) is None else result
 
-        response = HttpResponse(content_type='application')
-        response['Content-Disposition'] = f'attachment; filename={alumnos[0].first_name} {alumnos[0].last_name}_TUTOR_.docx'
-        
-        open_plantilla.save(response)
+                    for match in line_matches:
+                        if re.search(reg_ofi,match):
+                            self.paragraph_replace_text(p, reg_ofi, f"{oficio_form}").text
+                        if re.match(reg_fech,match):
+                            self.paragraph_replace_text(p, reg_fech, f"{fecha_form}").text
+                        # if re.match(reg_tut,match):
+                        #     print(f"Tutor IF")
+                        #     self.paragraph_replace_text(p, reg_tut, f"Doctor {tutor.last_name}").text
+                        if re.match(reg_tut,match):
+                            if tutor.sexo == "M":
+                                self.paragraph_replace_text(p, reg_tut, f"Dr. {tutor.last_name}").text
+                            if tutor.sexo == "F":
+                                self.paragraph_replace_text(p, reg_tut, f"Dra. {tutor.last_name}").text
+                        if re.match(reg_alu,match):
+                            self.paragraph_replace_text(p, reg_alu, f"{alumno.first_name} {alumno.last_name}").text
+                        if re.match(reg_carr,match):
+                            self.paragraph_replace_text(p, reg_carr, f"{alumno.get_carrera_display()}").text
+                        if re.match(reg_det,match):
+                            if tutor.sexo == "M":
+                                self.paragraph_replace_text(p, reg_det, f"él").text
+                            if tutor.sexo == "F":
+                                self.paragraph_replace_text(p, reg_det, f"la").text
+                        if re.match(reg_gen,match):
+                            if tutor.sexo == "M":
+                                self.paragraph_replace_text(p, reg_gen, f"o").text
+                            if tutor.sexo == "F":
+                                self.paragraph_replace_text(p, reg_gen, f"a").text
 
-        # response['Content-Disposition'] = f'attachment; filename={tutor.last_name}_TUTORES_ATENDIDOS.docx'
+                # Save each document to ZIP
+                temp_buffer = BytesIO()
+                open_plantilla.save(temp_buffer)
+                temp_buffer.seek(0)
+                zip_file.writestr(f"{alumno.first_name}_{alumno.last_name}_TUTOR.docx", temp_buffer.getvalue())
+
+        # Return ZIP file
+        zip_buffer.seek(0)
+        response = HttpResponse(zip_buffer.getvalue(), content_type='application/zip')
+        response['Content-Disposition'] = 'attachment; filename="Documentos_Alumnos.zip"'
+
         return response
 
 

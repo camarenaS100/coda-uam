@@ -16,7 +16,6 @@ class ContextConRolesMixin:
             context["header_footer"] = TEMPLATES[COORDINADOR]
         elif user_rol == CODA:
             context["header_footer"] = TEMPLATES[CODA]
-        print(context)
         return context
 
 class ContextNotificationsMixin:
