@@ -30,7 +30,7 @@
                             <tr>
                             {% for tutor in object_list %}
                             <tr>
-                              <td>{{ tutor.first_name }} {{ tutor.last_name }}</td>
+                              <td>{{ tutor.first_name }} {{ tutor.last_name }} {{ tutor.second_last_name }}</td>
                               <td>{{ tutor.email}} </td>
                               <td>{{ tutor.matricula }} </td>
                               <td>{{ tutor.get_coordinacion_display }}</td>

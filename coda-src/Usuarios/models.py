@@ -53,6 +53,11 @@ class Usuario(AbstractUser):
     correo_personal = models.EmailField(max_length=50, blank=True, null=True)
     rol = ArrayField(models.CharField(max_length=8, choices=ROLES), default=list)
     sexo = models.CharField(max_length=30, choices=SEXOS, null=True)
+    # first_name y last_name vienen por defecto en el modelo AbstractUser,
+    # declaramos second_last_name para tener en cuenta el "apellido materno"
+    # por lo tanto: last_name = apellido paterno,
+    # second_last_name = apellido materno
+    second_last_name = models.CharField(max_length=150, null=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ['matricula']

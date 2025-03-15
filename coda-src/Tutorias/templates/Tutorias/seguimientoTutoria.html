@@ -18,7 +18,7 @@
                             <!-- Muestra información de tutoría seleccionada -->
                             <div class="mb-4">
                                 <label class="form-label fw-bold">Alumno:</label>
-                                <input type="text" class="form-control" value="{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }}" readonly>
+                                <input type="text" class="form-control" value="{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }} {{ tutoria.alumno.second_last_name }}" readonly>
 
                                 <label class="form-label fw-bold mt-3">Fecha y Hora:</label>
                                 <input type="text" class="form-control" value="{{ tutoria.fecha|date:'d/m/Y H:i' }}" readonly>

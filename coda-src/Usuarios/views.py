@@ -29,7 +29,7 @@ from .mixins import BaseAccessMixin, CodaViewMixin, AlumnoViewMixin, CordinadorV
 from django.http import JsonResponse
 from .forms import ImportAlumnosForm
 from .models import Alumno, Usuario, Tutor
-from .constants import CARRERAS, ESTADOS_ALUMNO, SEXOS, ALUMNO
+from .constants import CARRERAS, ESTADOS_ALUMNO, SEXOS, ALUMNO, CODA, COORDINADOR, TUTOR
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 import io
@@ -133,34 +133,37 @@ class UsuarioLoginView(LoginView):
         selected_role = self.request.POST.get("role")  # Get role from form input
 
         if user is not None:
-            # Retrieve correct user subclass
-            if selected_role == "coordinador" and Cordinador.objects.filter(pk=user.pk).exists():
+            # Fetch user's roles from the database
+            user_roles = user.get_roles()
+
+            # Check if the selected role exists in the user's roles
+            if selected_role == "coordinador" and COORDINADOR in user_roles:
                 user = Cordinador.objects.get(pk=user.pk)
-            elif selected_role == "tutor" and Tutor.objects.filter(pk=user.pk).exists():
-                user = Tutor.objects.get(pk=user.pk)
-            elif selected_role == "alumno" and Alumno.objects.filter(pk=user.pk).exists():
+            elif selected_role == "tutor" and TUTOR in user_roles:
+                # Ensure we log in as Tutor only if Coordinador is NOT the selected role
+                if not (COORDINADOR in user_roles and selected_role == "tutor"):
+                    user = Tutor.objects.get(pk=user.pk)
+            elif selected_role == "alumno" and ALUMNO in user_roles:
                 user = Alumno.objects.get(pk=user.pk)
-            elif selected_role == "coda" and Coda.objects.filter(pk=user.pk).exists():
+            elif selected_role == "coda" and CODA in user_roles:
                 user = Coda.objects.get(pk=user.pk)
             else:
                 messages.error(self.request, "Rol no válido para este usuario.")
                 return redirect("login")
 
-            # Log in user
+            # Log in user with the correct role
             login(self.request, user)
-            self.request.user = user  # Ensure request.user updates
             self.request.session["role"] = selected_role
-            self.request.session.modified = True  # Force session update
+            self.request.session.modified = True  # Ensure session updates
 
-            # Redirect to appropriate profile
+            # Redirect to the appropriate profile page
             return redirect(reverse_lazy(f"perfil-{selected_role}", kwargs={"pk": user.pk}))
 
         messages.error(self.request, "Inicio de sesión fallido.")
         return redirect("login")
 
-    def form_invalid(self, form):
-        messages.error(self.request, "Usuario o contraseña incorrectos.")
-        return self.render_to_response(self.get_context_data(form=form))
+
+
 
 
 
@@ -246,7 +249,8 @@ class ImportAlumnosView(CodaViewMixin, FormView):
                     matricula = str(row["Matrícula"]).strip()
                     email = row["Correo institucional"].strip()
                     correo_personal = row["Correo"].strip()
-                    last_name = f"{row['Apellido 1']} {row['Apellido 2']}".strip()
+                    last_name = row["Apellido 1"].strip()
+                    second_last_name = row["Apellido 2"].strip()
                     first_name = row["Nombres"].strip()
                     carrera = next((key for key, value in CARRERAS if value == row["Plan de estudios"]), None)
                     estado = next((key for key, value in ESTADOS_ALUMNO if value == row["Estado"]), None)
@@ -277,6 +281,7 @@ class ImportAlumnosView(CodaViewMixin, FormView):
                             "correo_personal": correo_personal,
                             "first_name": first_name,
                             "last_name": last_name,
+                            "second_last_name": second_last_name,
                             "password": hashed_password,
                             "rol": [ALUMNO],
                         },

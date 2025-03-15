@@ -75,7 +75,7 @@ def generar_pdf(request):
     elements.append(header_paragraph)
 
     # Agregar nombre del tutor
-    tutor_name = f'Nombre Tutor: {tutor_loggeado.first_name} {tutor_loggeado.last_name}'
+    tutor_name = f'Nombre Tutor: {tutor_loggeado.first_name} {tutor_loggeado.last_name} {tutor_loggeado.second_last_name}'
     tutor_name_paragraph = Paragraph(tutor_name, header_style)
     elements.append(tutor_name_paragraph)
 
@@ -87,7 +87,7 @@ def generar_pdf(request):
 
     for tutoria in tutorias_tutor:
         data.append([
-            f"{tutoria.alumno.first_name} {tutoria.alumno.last_name}",
+            f"{tutoria.alumno.first_name} {tutoria.alumno.last_name} {tutoria.alumno.second_last_name}",
             tutoria.fecha.strftime('%Y-%m-%d'),
             tutoria.fecha.strftime('%I:%M %p'),
             # tutoria.get_tema_display(),
@@ -168,8 +168,8 @@ def generar_archivo_txt(request,pk):
     
     contenido = "Tutorias \n"
     for tutoria in tutorias:
-        contenido += f"Alumno: {tutoria.alumno.first_name} {tutoria.alumno.last_name}\n"
-        contenido += f"Tutor: {tutoria.tutor.first_name} {tutoria.tutor.last_name}\n"
+        contenido += f"Alumno: {tutoria.alumno.first_name} {tutoria.alumno.last_name} {tutoria.alumno.second_last_name}\n"
+        contenido += f"Tutor: {tutoria.tutor.first_name} {tutoria.tutor.last_name} {tutoria.tutor.second_last_name}\n"
         contenido += f"Fecha: {tutoria.fecha}\n"
         contenido += f"Tema: {tutoria.get_tema_display()}\n"
         contenido += f"Notas: {tutoria.descripcion}\n\n"
