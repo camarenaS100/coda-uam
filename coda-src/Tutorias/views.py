@@ -160,7 +160,7 @@ def generar_pdf(request):
     elements.append(header_paragraph)
 
     # Agregar nombre del tutor
-    tutor_name = f'Nombre Tutor: {tutor_loggeado.first_name} {tutor_loggeado.last_name}'
+    tutor_name = f'Nombre Tutor: {tutor_loggeado.first_name} {tutor_loggeado.last_name} {tutor_loggeado.second_last_name}'
     tutor_name_paragraph = Paragraph(tutor_name, header_style)
     elements.append(tutor_name_paragraph)
 
@@ -172,7 +172,7 @@ def generar_pdf(request):
 
     for tutoria in tutorias_tutor:
         data.append([
-            f"{tutoria.alumno.first_name} {tutoria.alumno.last_name}",
+            f"{tutoria.alumno.first_name} {tutoria.alumno.last_name} {tutoria.alumno.second_last_name}",
             tutoria.fecha.strftime('%Y-%m-%d'),
             tutoria.fecha.strftime('%I:%M %p'),
             # tutoria.get_tema_display(),
@@ -253,8 +253,8 @@ def generar_archivo_txt(request,pk):
     
     contenido = "Tutorias \n"
     for tutoria in tutorias:
-        contenido += f"Alumno: {tutoria.alumno.first_name} {tutoria.alumno.last_name}\n"
-        contenido += f"Tutor: {tutoria.tutor.first_name} {tutoria.tutor.last_name}\n"
+        contenido += f"Alumno: {tutoria.alumno.first_name} {tutoria.alumno.last_name} {tutoria.alumno.second_last_name}\n"
+        contenido += f"Tutor: {tutoria.tutor.first_name} {tutoria.tutor.last_name} {tutoria.tutor.second_last_name}\n"
         contenido += f"Fecha: {tutoria.fecha}\n"
         contenido += f"Tema: {tutoria.get_tema_display()}\n"
         contenido += f"Notas: {tutoria.descripcion}\n\n"
@@ -297,8 +297,8 @@ class TutoriaUpdateView(BaseAccessMixin, UpdateView):
     template_name = 'Tutorias/editarTutoria.html'
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
-        rol = self.request.user.get_rol()
-        if rol == TUTOR:
+        # rol = self.request.user.get_rol()
+        if self.request.user.has_role("TUT"):
             tutor = Tutor.objects.get(pk=self.request.user)
         recipient = Alumno.objects.filter(pk=self.get_object().alumno)
 
@@ -322,8 +322,8 @@ class TutoriaCreateView(AlumnoViewMixin, CreateView):
         form.instance.alumno = alumno
         form.instance.tutor = alumno.tutor_asignado
 
-        rol = self.request.user.get_rol()
-        if rol == ALUMNO:
+        # rol = self.request.user.has_role("ALU")
+        if self.request.user.has_role("ALU"):
             recipient = Tutor.objects.get(pk=alumno.tutor_asignado)
 
         # notify.send(alumno, recipient=recipient, verb='Nueva solicitud de tutoria', description=f'{form.instance.get_tema_display()}')
@@ -911,8 +911,8 @@ class QuickCreateTutoriaView(AlumnoViewMixin, CreateView):
         form.instance.estado = ACEPTADO
         
         
-        rol = self.request.user.get_rol()
-        if rol == ALUMNO:
+        # rol = self.request.user.get_rol()
+        if self.request.user.has_role("ALU"):
             recipient = alumno.tutor_asignado   # No sé que hace este bloque, pero no lo voy a quitar para que no se rompa. -Alfredo
         else:
             recipient = Alumno.objects.filter(pk=self.get_object().alumno)

@@ -31,27 +31,38 @@
                                 <tbody>
                                     {% for tutoria in object_list %}
                                     <tr>
-                                        <td>{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }}</td>
+                                        <td>{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }} {{ tutoria.alumno.second_last_name }}</td>
                                         <td>{{ tutoria.fecha|date:"Y-m-d" }}</td>
                                         <td>{{ tutoria.fecha|date:"H:i" }}</td>
                                         <td>{{ tutoria.get_tema_display |join:", " }}</td>
                                         <td>{{ tutoria.descripcion }}</td>
                                         <!--Boolean-->
                                         <td class="text-center">{{ tutoria.asistencia|yesno:"Sí,No" }}</td>
-                                        <td>{{ tutoria.get_duracion_display }}</td>
-                                        <!--Boolean-->
-                                        <td class="text-center">{{ tutoria.firma_documentos_beca|yesno:"Sí,No" }}</td>
-                                        <td>{{ tutoria.beca_otorgada }}</td>
-                                        <!--Boolean-->
-                                        <td class="text-center">{{ tutoria.asesoria_especializada|yesno:"Sí,No" }}</td>
-                                        <td>{{ tutoria.observaciones }}</td>
-                                        <td>{{ tutoria.impacto_tutoria }}</td>
-                                        <td>{{ tutoria.resultados_tutoria }}</td>
-                                        <td>
-                                            <!-- Se supone que la llave primaria se pasa como parte del url a la página de seguimiento... -->
-                                            <a href="{% url 'save_seguimiento' pk=tutoria.pk %}" class="btn btn-primary text-title">Realizar</a>
-                                            </a>
-                                        </td>
+                                        <!--If asistencia is no, don't display the rest of the column's values-->
+                                        {% if tutoria.asistencia == False %}
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        {% else %}
+                                            <td>{{ tutoria.get_duracion_display }}</td>
+                                            <!--Boolean-->
+                                            <td class="text-center">{{ tutoria.firma_documentos_beca|yesno:"Sí,No" }}</td>
+                                            <td>{{ tutoria.beca_otorgada }}</td>
+                                            <!--Boolean-->
+                                            <td class="text-center">{{ tutoria.asesoria_especializada|yesno:"Sí,No" }}</td>
+                                            <td>{{ tutoria.observaciones }}</td>
+                                            <td>{{ tutoria.impacto_tutoria }}</td>
+                                            <td>{{ tutoria.resultados_tutoria }}</td>
+                                            <td>
+                                                <!-- Se supone que la llave primaria se pasa como parte del url a la página de seguimiento... -->
+                                                <a href="{% url 'save_seguimiento' pk=tutoria.pk %}" class="btn btn-primary text-title">Realizar</a>
+                                                </a>
+                                            </td>
+                                        {% endif %}
                                     </tr>
                                     {% endfor %}
                                 </tbody>

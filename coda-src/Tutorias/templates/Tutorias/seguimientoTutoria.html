@@ -18,7 +18,7 @@
                             <div class="d-flex w-100 justify-content-evenly align-items-center">
                                 <div class="w-50 me-2 d-flex flex-row align-items-center">
                                     <label class=" me-1">Alumno:</label>
-                                    <input type="text" class="form-control" value="{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }}" readonly>
+                                    <input type="text" class="form-control" value="{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }}  {{ tutoria.alumno.second_last_name }}" readonly>
                                 </div>
                                 <div class="w-50 ms-2 d-flex align-items-center">
                                     <label class="form-label fw-bold mt-3">Fecha y Hora:</label>
@@ -39,11 +39,13 @@
                                 </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Duración de la tutoría:</label>
-                                {% render_field form.duracion class="form-select" %}
-                                <label class="form-label" for="id_duracion">Selecciona una opción</label>
-                            </div>
+                            <!-- Agrupamos las preguntas adicionales en un contenedor -->
+                            <div id="extra-fields">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Duración de la tutoría:</label>
+                                    {% render_field form.duracion class="form-select" %}
+                                    <label class="form-label" for="id_duracion">Selecciona una opción</label>
+                                </div>
 
                             <div class="w-100 d-flex flex-row align-items-center mb-3">
                                 <label class="form-label fw-bold w-50">¿Se firmó algún formato de solicitud de beca?</label><br>
@@ -53,7 +55,7 @@
                                 </div>
                             </div>
 
-                            <div class="mb-3">
+                            <div class="mb-3" id="beca-field">
                                 <label class="form-label fw-bold">Nombre de la beca otorgada al alumno:</label>
                                 <input type="text" name="beca_otorgada" class="form-control" maxlength="255">
                             </div>
@@ -66,7 +68,8 @@
                                 </div>
                             </div>
 
-                            <div class="mb-3">
+                            <!-- Aspectos tratados (se oculta si "No" en asesoría) -->
+                            <div class="mb-3"  id="aspectos-field">
                                 <label class="form-label fw-bold">Aspectos tratados en la tutoría, acuerdos o acciones establecidas, canalizaciones</label>
                                 <textarea name="observaciones" class="form-control" maxlength="1000"></textarea>
                             </div>
@@ -107,4 +110,42 @@
             </div>
     </div>
 </section>
+
+<!-- JavaScript para ocultar/mostrar los campos -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        function toggleFields() {
+            // Ocultar todo si el alumno no asistió
+            if ($("input[name='asistencia']:checked").val() === "False") {
+                $("#extra-fields").hide();
+            } else {
+                $("#extra-fields").show();
+            }
+
+            // Ocultar nombre de la beca si no se firmó un documento de beca
+            if ($("input[name='firma_documentos_beca']:checked").val() === "False") {
+                $("#beca-field").hide();
+            } else {
+                $("#beca-field").show();
+            }
+
+            // Ocultar aspectos tratados si no requirió asesoría
+            if ($("input[name='asesoria_especializada']:checked").val() === "False") {
+                $("#aspectos-field").hide();
+            } else {
+                $("#aspectos-field").show();
+            }
+        }
+
+        // Llamar a la función al cambiar las opciones
+        $("input[name='asistencia'], input[name='firma_documentos_beca'], input[name='asesoria_especializada']").change(function () {
+            toggleFields();
+        });
+
+        // Asegurar que el estado inicial es correcto en caso de recargar la página
+        toggleFields();
+    });
+</script>
+
 {% endblock %}

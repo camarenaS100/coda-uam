@@ -6,6 +6,7 @@ from django.db.models.query import QuerySet
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, HttpResponse
 from django.contrib.auth.views import LoginView, PasswordChangeView
+from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic.detail import DetailView
@@ -14,7 +15,7 @@ from django.views.generic import TemplateView, DeleteView, UpdateView
 from .models import Usuario, Tutor, Alumno, Coda, Cordinador
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic.edit import FormView
 from .forms import ImportAlumnosForm
 from django.shortcuts import get_object_or_404
@@ -28,8 +29,9 @@ from .mixins import BaseAccessMixin, CodaViewMixin, AlumnoViewMixin, CordinadorV
 from django.http import JsonResponse
 from .forms import ImportAlumnosForm
 from .models import Alumno, Usuario, Tutor
-from .constants import CARRERAS, ESTADOS_ALUMNO, SEXOS, ALUMNO
+from .constants import CARRERAS, ESTADOS_ALUMNO, SEXOS, ALUMNO, CODA, COORDINADOR, TUTOR
 from django.contrib.auth.hashers import make_password
+from django.contrib import messages
 import io
 import pandas as pd
 from .models import Documento
@@ -53,7 +55,7 @@ class PerfilAlumnoView(BaseAccessMixin, DetailView):
     template_name = 'Usuarios/perfil_alumno.html'
 
     def get_queryset(self) -> QuerySet[Any]:
-        return Usuario.objects.filter(roles__contains=["ALU"])  # Filter for Alumnos
+        return Usuario.objects.filter(rol__contains=["ALU"])  # Filter for Alumnos
 
 
 class PerfilTutorView(BaseAccessMixin, DetailView):
@@ -61,7 +63,7 @@ class PerfilTutorView(BaseAccessMixin, DetailView):
     template_name = 'Usuarios/perfil_tutor.html'
 
     def get_queryset(self) -> QuerySet[Any]:
-        return Usuario.objects.filter(roles__contains=["TUT"])  # Filter for Tutors
+        return Usuario.objects.filter(rol__contains=["TUT"])  # Filter for Tutors
 
 
 class PerfilCodaView(BaseAccessMixin, DetailView):
@@ -69,15 +71,15 @@ class PerfilCodaView(BaseAccessMixin, DetailView):
     template_name = 'Usuarios/perfil_cooda.html'
 
     def get_queryset(self) -> QuerySet[Any]:
-        return Usuario.objects.filter(roles__contains=["CODA"])  # Filter for Coda
+        return Usuario.objects.filter(rol__contains=["CODA"])  # Filter for Coda
 
 
 class PerfilCordinadorView(BaseAccessMixin, DetailView):
     model = Usuario
-    template_name = 'Usuarios/perfil_cordinador.html'
+    template_name = 'Usuarios/perfil_coordinador.html'
 
     def get_queryset(self) -> QuerySet[Any]:
-        return Usuario.objects.filter(roles__contains=["COR"])  # Filter for Coordinadores
+        return Usuario.objects.filter(rol__contains=["COR"])  # Filter for Coordinadores
 
 
 ### Role-Based Profile Redirection
@@ -95,7 +97,7 @@ def redirect_perfil(request):
         return redirect('perfil-coda', pk=user.pk)
 
     if user.has_role("COR"):
-        return redirect('perfil-cordinador', pk=user.pk)
+        return redirect('perfil-coordinador', pk=user.pk)
 
     return redirect('perfil-alumno', pk=user.pk)  # Default case
 
@@ -122,20 +124,48 @@ def login_success(request):
     return HttpResponseBadRequest("ERROR. Tipo de usuario o rol no definido")
 
 
-### User Authentication Views
 class UsuarioLoginView(LoginView):
     redirect_authenticated_user = True
     template_name = "Usuarios/login.html"
 
     def form_valid(self, form):
-        """
-        If the form is valid, log in the user and store the selected role in session.
-        """
-        response = super().form_valid(form)  # Perform default login process
-        role = self.request.POST.get("role")  # Get selected role from the login form
-        if role:
-            self.request.session["role"] = role  # Store the role in session
-        return response  # Proceed with normal redirection
+        user = form.get_user()
+        selected_role = self.request.POST.get("role")  # Get role from form input
+
+        if user is not None:
+            # Fetch user's roles from the database
+            user_roles = user.get_roles()
+
+            # Check if the selected role exists in the user's roles
+            if selected_role == "coordinador" and COORDINADOR in user_roles:
+                user = Cordinador.objects.get(pk=user.pk)
+            elif selected_role == "tutor" and TUTOR in user_roles:
+                # Ensure we log in as Tutor only if Coordinador is NOT the selected role
+                if not (COORDINADOR in user_roles and selected_role == "tutor"):
+                    user = Tutor.objects.get(pk=user.pk)
+            elif selected_role == "alumno" and ALUMNO in user_roles:
+                user = Alumno.objects.get(pk=user.pk)
+            elif selected_role == "coda" and CODA in user_roles:
+                user = Coda.objects.get(pk=user.pk)
+            else:
+                messages.error(self.request, "Rol no válido para este usuario.")
+                return redirect("login")
+
+            # Log in user with the correct role
+            login(self.request, user)
+            self.request.session["role"] = selected_role
+            self.request.session.modified = True  # Ensure session updates
+
+            # Redirect to the appropriate profile page
+            return redirect(reverse_lazy(f"perfil-{selected_role}", kwargs={"pk": user.pk}))
+
+        messages.error(self.request, "Inicio de sesión fallido.")
+        return redirect("login")
+
+
+
+
+
 
 
 class ChangePasswordView(BaseAccessMixin, PasswordChangeView):
@@ -224,26 +254,28 @@ class ImportAlumnosView(CodaViewMixin, FormView):
                     matricula = str(row["Matrícula"]).strip()
                     email = row["Correo institucional"].strip()
                     correo_personal = row["Correo"].strip()
-                    last_name = f"{row['Apellido 1']} {row['Apellido 2']}".strip()
+                    last_name = row["Apellido 1"].strip()
+                    second_last_name = row["Apellido 2"].strip()
                     first_name = row["Nombres"].strip()
                     carrera = next((key for key, value in CARRERAS if value == row["Plan de estudios"]), None)
                     estado = next((key for key, value in ESTADOS_ALUMNO if value == row["Estado"]), None)
                     sexo = next((key for key, value in SEXOS if value == row["Sexo"]), None)
                     tutor_id = row["No. Económico"]
+                    trimestre_ingreso = row["Trimestre de ingreso"].strip()
 
                     # Ensure required fields are valid
-                    if not (matricula and email and first_name and last_name and carrera and estado and sexo):
-                        warnings.append(f"Alumno {matricula}: Datos obligatorios faltantes.")
+                    if not (matricula and email and first_name and last_name and carrera and estado and sexo and tutor_id):
+                        warnings.append(f"Alumno {matricula}: Datos obligatorios faltantes. Asegúrese de que todos los campos obligatorios de información estén presentes.")
                         continue  # Skip to the next student
 
                     # Find assigned tutor
                     tutor_asignado = Tutor.objects.filter(matricula=tutor_id).first()
                     if not tutor_asignado:
-                        warnings.append(f"Alumno {matricula}: Tutor con ID {tutor_id} no encontrado.")
+                        warnings.append(f"Alumno {matricula}: Tutor con número económico {tutor_id} no encontrado. Aseegúrese de que el tutor esté registrado en el sistema.")
                         continue
 
                     # Generate password (increment each digit of matricula by 1)
-                    password = "".join(str(int(digit) + 1) if digit.isdigit() else digit for digit in matricula)
+                    password = matricula
                     hashed_password = make_password(password)
 
                     # Create Usuario
@@ -254,6 +286,7 @@ class ImportAlumnosView(CodaViewMixin, FormView):
                             "correo_personal": correo_personal,
                             "first_name": first_name,
                             "last_name": last_name,
+                            "second_last_name": second_last_name,
                             "password": hashed_password,
                             "rol": [ALUMNO],
                         },
@@ -267,6 +300,7 @@ class ImportAlumnosView(CodaViewMixin, FormView):
                             estado=estado,
                             sexo=sexo,
                             tutor_asignado=tutor_asignado,
+                            trimestre_ingreso=trimestre_ingreso,
                         )
                         alumno.__dict__.update(usuario.__dict__)  # Copy fields
                         alumno.save()
@@ -304,8 +338,6 @@ class ajustes(CodaViewMixin, TemplateView):
 
         return context
 
-
-
 #PermissionRequiredMixin
 class CargarPlantilla(CodaViewMixin, CreateView):
     template_name = 'Usuarios/cargar_plantilla.html'
@@ -314,14 +346,6 @@ class CargarPlantilla(CodaViewMixin, CreateView):
 
     def form_valid(self, form):
         return super().form_valid(form)
-
-
-# class AceptarTutoriaView(View):
-#     def post(self, request, pk):
-#         tutoria = get_object_or_404(Tutoria, pk=pk)
-#         tutoria.estado = ACEPTADO
-#         tutoria.save()
-#         return redirect('Tutorias-tutor')  
     
 def eliminar_documento(request, pk):
     documento = get_object_or_404(Documento, pk=pk)

@@ -18,8 +18,8 @@
               <select id="alumno-filter">
                 <option value="todos">Todos</option>
                 {% for alumno in tutorados %}
-                <option value="{{alumno.first_name}} {{alumno.last_name}}">
-                  {{alumno.first_name}} {{alumno.last_name}}</option>
+                <option value="{{alumno.first_name}} {{alumno.last_name}} {{ alumno.second_last_name }}">
+                  {{alumno.first_name}} {{alumno.last_name}} {{ alumno.second_last_name }}</option>
                 {% endfor %}
                 <!-- Agrega más opciones de alumnos según sea necesario -->
               </select>
@@ -41,8 +41,8 @@
                 </thead>
                 <tbody id="data" class="text-body">
                   {% for tutoria in object_list %}
-                  <tr data-alumno="{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }}">
-                    <td>{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }}</td>
+                  <tr data-alumno="{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }} {{ tutoria.alumno.second_last_name }}">
+                    <td>{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }} {{ tutoria.alumno.second_last_name }}</td>
                     <td>{{ tutoria.fecha|date }}</td>
                     <td>{{ tutoria.fecha|date:"P" }}</td>
                     <td>{{ tutoria.get_tema_display|join:", " }} </td>

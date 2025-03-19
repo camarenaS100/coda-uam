@@ -23,6 +23,7 @@
                               <th>Correo personal</th>
                               <th>Matrícula</th>
                               <th>Carrera</th>
+                              <th>Trimestre de Ingreso</th>
                               
                             </tr>
                           </thead>
@@ -30,11 +31,12 @@
                             <tr>
                             {% for alumno in object_list %}
                             <tr>
-                              <td>{{ alumno.first_name }} {{ alumno.last_name }}</td>
+                              <td>{{ alumno.first_name }} {{ alumno.last_name }} {{ alumno.second_last_name }}</td>
                               <td>{{ alumno.email}} </td>
                               <td>{{ alumno.correo_personal|default_if_none:"No registrado" }}</td>
                               <td>{{ alumno.matricula }} </td>
                               <td>{{ alumno.get_carrera_display }}</td>
+                              <td>{{ alumno.trimestre_ingreso }}</td>
                               
                             </tr>
                             {% endfor %}

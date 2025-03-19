@@ -12,7 +12,7 @@
             <div class="card-body p-4">
               <h3 class=" mb-4 text-title-bold text-primary">Tutorías dadas por
                 {% comment %} {% if tutor.sexo=='F' %} Dra. {% else %} Dra. {% endif %}   {% endcomment %}
-                {{tutor.first_name}} {{tutor.last_name}}
+                {{tutor.first_name}} {{tutor.last_name}} {{tutor.second_last_name}}
               </h3>
               <!--Inicio de table-->
               <div class="table-responsive text-body">
@@ -28,8 +28,8 @@
                   </thead>
                   <tbody>
                     {% for tutoria in object_list %}
-                    <tr data-alumno="{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }}">
-                      <td>{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }}</td>
+                    <tr data-alumno="{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }} {{ tutoria.alumno.second_last_name }}">
+                      <td>{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }} {{ tutoria.alumno.second_last_name }}</td>
                       <td>{{ tutoria.fecha|date }}</td>
                       <td>{{ tutoria.fecha|date:"P" }}</td>
                       <td>{{ tutoria.get_tema_display|join:", " }} </td>

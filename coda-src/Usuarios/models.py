@@ -53,6 +53,11 @@ class Usuario(AbstractUser):
     correo_personal = models.EmailField(max_length=50, blank=True, null=True)
     rol = ArrayField(models.CharField(max_length=8, choices=ROLES), default=list)
     sexo = models.CharField(max_length=30, choices=SEXOS, null=True)
+    # first_name y last_name vienen por defecto en el modelo AbstractUser,
+    # declaramos second_last_name para tener en cuenta el "apellido materno"
+    # por lo tanto: last_name = apellido paterno,
+    # second_last_name = apellido materno
+    second_last_name = models.CharField(max_length=150, null=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ['matricula']
@@ -155,6 +160,7 @@ class Alumno(Usuario):
     trayectoria = models.FileField(null=True, blank=True, upload_to=alumno_trayectoria_path)
     tutor_asignado = models.ForeignKey(Tutor, on_delete=models.PROTECT)
     estado = models.IntegerField(choices=ESTADOS_ALUMNO, null=True)
+    trimestre_ingreso = models.CharField(max_length=30, null=True)
 
     def save(self, *args, **kwargs):
         if ALUMNO not in self.rol:
