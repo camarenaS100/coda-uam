@@ -129,6 +129,7 @@ class UsuarioLoginView(LoginView):
     template_name = "Usuarios/login.html"
 
     def form_valid(self, form):
+        # Authenticate the user
         user = form.get_user()
         selected_role = self.request.POST.get("role")  # Get role from form input
 
@@ -148,6 +149,7 @@ class UsuarioLoginView(LoginView):
             elif selected_role == "coda" and CODA in user_roles:
                 user = Coda.objects.get(pk=user.pk)
             else:
+                # If the selected role is invalid, show an error
                 messages.error(self.request, "Rol no válido para este usuario.")
                 return redirect("login")
 
@@ -159,13 +161,9 @@ class UsuarioLoginView(LoginView):
             # Redirect to the appropriate profile page
             return redirect(reverse_lazy(f"perfil-{selected_role}", kwargs={"pk": user.pk}))
 
-        messages.error(self.request, "Inicio de sesión fallido.")
+        # If the user does not exist, show an error
+        messages.error(self.request, "El usuario no existe. Verifique sus credenciales.")
         return redirect("login")
-
-
-
-
-
 
 
 class ChangePasswordView(BaseAccessMixin, PasswordChangeView):
