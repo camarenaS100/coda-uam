@@ -3,7 +3,7 @@ from typing import Any, Dict
 from django.shortcuts import get_object_or_404, redirect
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpRequest, HttpResponse
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
@@ -13,7 +13,7 @@ from django.urls import reverse_lazy
 from django.utils.text import slugify
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
-
+from django.contrib import messages
 from datetime import datetime, timedelta
 
 from .models import Tutoria
@@ -23,7 +23,7 @@ from .constants import PENDIENTE, ACEPTADO, RECHAZADO, DURACION_ASESORIA # de nu
 from Usuarios.constants import TUTOR, ALUMNO, COORDINADOR, TEMPLATES, CORREO
 from Usuarios.views import BaseAccessMixin, CodaViewMixin, TutorViewMixin, AlumnoViewMixin, CordinadorViewMixin
 from Usuarios.models import Tutor, Alumno, Cordinador, Coda
-from Tutorias.models import Plantilla
+from Usuarios.models import Documento
 from notifications.signals import notify
 from smtplib import SMTPException
 
@@ -415,14 +415,19 @@ class ReporteCreateView(CodaViewMixin, CreateView):
     def post(self, request,pk):
         form = request.POST
         oficio_form = form.get('oficio')
-        plantilla_form = form.get('plantilla')
+        plantilla_nombre = form.get('plantilla')
         fecha_form = form.get('fecha')
         fecha_form = datetime.strptime(fecha_form,'%Y-%m-%dT%H:%M').date()
         tutor_pk = self.kwargs.get('pk')
         
-        plantilla = get_object_or_404(Plantilla, titulo=plantilla_form)
+        plantilla = get_object_or_404(Documento, nombre=plantilla_nombre)
         tutor = get_object_or_404(Tutor, pk=tutor_pk)
-        open_plantilla = docx.Document(plantilla.archivo)
+        open_plantilla = docx.Document(plantilla.archivo)   
+
+        # Verifica si el archivo tiene tablas
+        if not open_plantilla.tables:
+            messages.error(request, "Este archivo no es compatible con el tipo de carta que deseas generar")
+            return redirect('Reporte-create', pk=pk)
 
         #Creación de las expresiones regulares que se buscaran en el doc
         reg_placeh = re.compile(r'\{.*?\}') #Placeholder "{}"
@@ -624,12 +629,12 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
 
         form = request.POST
         oficio_form = form.get('oficio')
-        plantilla_form = form.get('plantilla')
+        plantilla_nombre = form.get('plantilla')
         fecha_form = form.get('fecha')
         fecha_form = datetime.strptime(fecha_form,'%Y-%m-%dT%H:%M').date()
         tutor_pk = self.kwargs.get('pk')
         alumnos = get_list_or_404(Alumno, pk__in=selected_ids)
-        plantilla = get_object_or_404(Plantilla, titulo=plantilla_form)
+        plantilla = get_object_or_404(Documento, nombre=plantilla_nombre)
         tutor = get_object_or_404(Tutor, pk=tutor_pk)
         
         #Creación de las expresiones regulares que se buscaran en el doc
@@ -812,10 +817,6 @@ class VerTutoresListView(CodaViewMixin, ListView):
 class VerAlumnosListView(CodaViewMixin, ListView):
     model = Alumno
     template_name = 'Tutorias/verAlumnos_coda.html'
-
-class VerPlantillasListView(CodaViewMixin, ListView):
-    model = Alumno
-    template_name = 'Tutorias/verPlantillas_coda.html'
 
 class VerTutoresCoordListView(CordinadorViewMixin, ListView):
     model = Tutor

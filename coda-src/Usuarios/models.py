@@ -166,7 +166,7 @@ class Alumno(Usuario):
         verbose_name_plural = 'Alumnos'
 
 class Documento(models.Model):
-    nombre = models.CharField(max_length=255)  # Nombre del archivo
+    nombre = models.CharField(max_length=255, unique=True)  # Nombre del archivo
     archivo = models.FileField(upload_to='documentos/')  # Ruta del archivo en el servidor
     fecha_subida = models.DateTimeField(auto_now_add=True)  # Fecha de subida
 
