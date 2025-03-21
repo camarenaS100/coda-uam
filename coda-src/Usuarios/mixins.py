@@ -4,21 +4,30 @@ from .models import Usuario
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 class ContextConRolesMixin:
-
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        user_roles = self.request.user.get_roles()  # Get list of roles
 
-        if ALUMNO in user_roles:
+        # Get the selected role from the session
+        selected_role = self.request.session.get("role")
+
+        # Debug: Print selected role and user roles
+        print(f"Debug: Selected Role = {selected_role}, User Roles = {self.request.user.get_roles()}")
+
+        # Determine the header_footer template based on the selected role
+        if selected_role == "alumno":
             context["header_footer"] = TEMPLATES[ALUMNO]
-        elif TUTOR in user_roles:
+        elif selected_role == "tutor":
             context["header_footer"] = TEMPLATES[TUTOR]
-        elif COORDINADOR in user_roles:
+        elif selected_role == "coordinador":
             context["header_footer"] = TEMPLATES[COORDINADOR]
-        elif CODA in user_roles:
+        elif selected_role == "coda":
             context["header_footer"] = TEMPLATES[CODA]
+        else:
+            # Default template if no role is selected
+            context["header_footer"] = "Usuarios/HeaderAndFooterDefault.html"
 
-        print(context)
+        # Debug: Print the final context
+        print(f"Debug: Context = {context}")
         return context
 
 class ContextNotificationsMixin:
