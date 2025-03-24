@@ -198,7 +198,18 @@ class ChangeAlumnoView(CodaViewMixin, CreateView):
     success_url = reverse_lazy('Tutores-Coda')
     form_class = userForms.FormAlumno
 
+    def post(self, request):
+        form = userForms.FormAlumno(request.POST)
+        print(request)
+        print(request.POST.get('tutor_asignado'))
+        print("Info del form")
+        print(form)
+        if form.is_valid():
+            print("Y es válida")
+            form.save()
+        return HttpResponseRedirect(request.path_info)
 
+#PermissionRequiredMixin
 class CreateCordinadorView(CodaViewMixin, CreateView):
     template_name = 'Usuarios/agregar_cordinador.html'
     success_url = reverse_lazy('Tutores-Coda')

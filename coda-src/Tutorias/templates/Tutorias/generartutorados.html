@@ -4,6 +4,16 @@
 
 {% block body %}
 
+    {% if messages %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+
     <!--Formulario Solicitud tutor_firmaia-->
     <section class="min-vh-100" style="background-color: #eee;">
         <div class="container py-5 h-100">

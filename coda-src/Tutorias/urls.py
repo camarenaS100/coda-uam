@@ -41,7 +41,6 @@ urlpatterns = [
     # URLS CODA 
     path('tutores-coda/', views.VerTutoresListView.as_view(), name='Tutores-Coda'),
     path('alumnos-coda/', views.VerAlumnosListView.as_view(), name='Alumnos-Coda'),
-    path('plantillas-coda/', views.VerPlantillasListView.as_view(), name='Plantillas-Coda'),
     path('tutorias-coda/<int:pk>', views.VerTutoriasCodaListView.as_view(), name='Tutorias-Coda'),
     path('tutorados-coda/<int:pk>', views.VerTutoradosCodaListView.as_view(), name='Tutorados-Coda'),
 

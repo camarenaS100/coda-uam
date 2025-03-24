@@ -23,19 +23,19 @@
                   </div>
                       
                       <!-- Submit button -->
-                      <a href="{% url 'Reporte-create' tutor.pk %}">Generar carta de notificación</a>
+                      <a href="{% url 'Reporte-create' tutor.pk %}" class="btn btn-primary">Generar carta de notificación</a>
                       <br>
                       <!-- Borrar esta parte y todo lo relacionado a esta vista/url, etc-->
-                      <div class="d-grid gap-2 d-md-flex justify-content-center">
+                      {% comment %} <div class="d-grid gap-2 d-md-flex justify-content-center">
                         <form action="{% url 'tutorados_pdf' %}" method="get">
                           <input type="hidden" value="{{tutor.matricula}}" name="tutor-id">
                           <button type="submit" class="btn btn-primary">Generar carta</button>
                         </form>
-                      </div>
+                      </div> {% endcomment %}
                       
                       <!--Inicio de table-->
                       <div class = "table-responsive">
-                        <a onclick="submitSelected()" href="#">Generar carta de notificación de tutor</a>
+                        <a onclick="submitSelected()" href="#" class="btn btn-primary">Generar carta de notificación de tutor</a>
                         <table class="table table-striped table-hover">
                           <thead>
                             <tr>

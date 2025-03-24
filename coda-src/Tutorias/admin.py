@@ -1,5 +1,5 @@
 from django.contrib import admin
-from.models import Tutoria, Plantilla
+from.models import Tutoria
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin
 from import_export.widgets import CharWidget
@@ -66,4 +66,3 @@ class PlantillasAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 
 admin.site.register(Tutoria, TutoriasAdmin)
-admin.site.register(Plantilla, PlantillasAdmin)
