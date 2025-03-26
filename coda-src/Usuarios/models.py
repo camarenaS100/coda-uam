@@ -57,7 +57,7 @@ class Usuario(AbstractUser):
     # declaramos second_last_name para tener en cuenta el "apellido materno"
     # por lo tanto: last_name = apellido paterno,
     # second_last_name = apellido materno
-    second_last_name = models.CharField(max_length=150, null=True)
+    second_last_name = models.CharField(max_length=150, blank=True,null=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ['matricula']
@@ -93,7 +93,6 @@ class Tutor(Usuario):
 class Coda(Usuario):
     cubiculo = models.IntegerField()
     horario = models.FileField(null=True, blank=True)
-    coordinacion = models.CharField(max_length=30, choices=CARRERAS)
     es_coordinador = models.BooleanField(default=False)
     tema_tutorias = models.CharField(max_length=4, choices=TEMAS, default=OTRO)
 

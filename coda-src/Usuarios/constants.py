@@ -8,17 +8,21 @@ ROLES = [
     (TUTOR, "Tutor"),
     (COORDINADOR, "Coordinador"),
     (ALUMNO, "Alumno"),
-    (CODA, "Coda"),
+    (CODA, "CODDAA"),
 ]
 
 
 MATEMATICAS = "MAT"
 COMPUTACION = "COM"
+IBIOLOGICA = "IB"
+BMOLECULAR = "BM"
 
 CARRERAS = [
         ('', "Seleccione una"),
         (MATEMATICAS, "Matemáticas Aplicadas"),
         (COMPUTACION, "Ingeniería en Computación"),
+        (IBIOLOGICA, "Ingeniería Biológica"),
+        (BMOLECULAR, "Biología Molecular")
     ]
 
 TEMPLATES = {

@@ -20,7 +20,7 @@ class CodaResource(resources.ModelResource):
 
     class Meta:
         model = Coda
-        fields = ('id', 'password', 'email', 'coordinacion', 'carrera', 'first_name', 'last_name', 'second_last_name')
+        fields = ('id', 'password', 'email', 'carrera', 'first_name', 'last_name', 'second_last_name')
 
 class CordinadorResource(resources.ModelResource):
 
@@ -94,26 +94,29 @@ class TutorAdmin(ImportExportModelAdmin, UserAdmin):
 
 @admin.register(Coda)
 class CodaAdmin(ImportExportModelAdmin, UserAdmin):
-    """Define admin model for custom User model with no email field."""
+    """Define admin model for Coda sin el campo 'coordinacion'."""
 
     fieldsets = (
         (None, {'fields': ('email', 'password', 'matricula')}),
-        (('Información Personal'), {'fields': ('first_name', 'last_name', 'second_last_name', 'cubiculo', 'coordinacion', 'foto',)}),
+        (('Información Personal'), {'fields': ('first_name', 'last_name', 'second_last_name', 'cubiculo', 'foto')}),
         (('Permisos'), {'fields': ('is_active', 'is_staff', 'is_superuser',
-                                       'groups', 'user_permissions')}),
+                                   'groups', 'user_permissions')}),
         (('Fechas importantes'), {'fields': ('last_login', 'date_joined')}),
     )
+
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('first_name', 'last_name', 'second_last_name', 'email','matricula', 'coordinacion', 'cubiculo', 'password1', 'password2'),
+            'fields': ('first_name', 'last_name', 'second_last_name', 'email', 'matricula', 'cubiculo', 'password1', 'password2'),
         }),
     )
-    list_display = ('pk', 'email', 'matricula', 'coordinacion', 'first_name', 'last_name', 'second_last_name', 'is_staff', 'es_coordinador')
-    search_fields = ('pk', 'email', 'matricula', 'coordinacion', 'first_name', 'last_name')
-    ordering = ('pk','coordinacion')
+
+    list_display = ('pk', 'email', 'matricula', 'first_name', 'last_name', 'second_last_name', 'is_staff', 'es_coordinador')
+    search_fields = ('pk', 'email', 'matricula', 'first_name', 'last_name')
+    ordering = ('pk',)
 
     actions = [actualizar_usuarios]
+
 
 @admin.register(Cordinador)
 class CordinadorAdmin(ImportExportModelAdmin, UserAdmin):
