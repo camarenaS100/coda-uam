@@ -490,13 +490,13 @@ class ReporteCreateView(CodaViewMixin, CreateView):
         for obj in tut_alums:
             # apellidos = re.findall(r'[A-Z][a-z]*', obj.last_name)
             # apellidos = re.findall(r'[A-Z][a-z]*', obj.last_name)
-            apellidos = re.findall(r'[A-Z][a-z]*', obj.last_name) + [''] * (2 - len(re.findall(r'[A-Z][a-z]*', obj.last_name)))
+            # apellidos = re.findall(r'[A-Z][a-z]*', obj.last_name) + [''] * (2 - len(re.findall(r'[A-Z][a-z]*', obj.last_name)))
             row_cells = new_table.add_row().cells
-            row_cells[0].text = str(obj.trayectoria)  # Replace with actual fields
+            row_cells[0].text = str(obj.trimestre_ingreso)  # Replace with actual fields
             row_cells[1].text = str(obj.matricula)  # Replace with actual fields
             # row_cells[2].text = str(obj.last_name)
-            row_cells[2].text = str(apellidos[0]) #Si el modelo tiene un campo para segundo apellido, agregar
-            row_cells[3].text = str(apellidos[1]) #Si el modelo tiene un campo para segundo apellido, agregar
+            row_cells[2].text = str(obj.last_name) #Si el modelo tiene un campo para segundo apellido, agregar
+            row_cells[3].text = str(obj.second_last_name) #Si el modelo tiene un campo para segundo apellido, agregar
             row_cells[4].text = str(obj.first_name)  # Replace with actual fields
         
         # Ensure data rows inherit cell formatting from old table
@@ -519,12 +519,16 @@ class ReporteCreateView(CodaViewMixin, CreateView):
             # print(f'Before cycle: {(line_matches)}') if line_matches else None 
             
             for match in line_matches:
+                print(f'Esta linea: {match} hizo match')
                 if re.search(reg_ofi,match):
                     self.paragraph_replace_text(p, reg_ofi, f"{oficio_form}").text
                 if re.match(reg_fech,match):
                     self.paragraph_replace_text(p, reg_fech, f"{fecha_form}").text
                 if re.match(reg_tut,match):
+                    print(f'IF de tutor')
+                    print(f'Sexo: {tutor.sexo}')
                     if tutor.sexo == "M":
+                        print(f'Masculino')
                         self.paragraph_replace_text(p, reg_tut, f"Dr. {tutor.last_name}").text
                     if tutor.sexo == "F":
                         self.paragraph_replace_text(p, reg_tut, f"Dra. {tutor.last_name}").text
@@ -642,6 +646,7 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
         reg_gen = re.compile(r'\{(a|o|e)\}') #Género
         # reg_tut = re.compile(r'\{(Dr\.|Dra\.|Doctor|Doctora)\s+(.)*\}')
         # reg_tut = re.compile(r'\{(((d|D)[a-zA-Z]+)(\.*))+(\s[A-Z][a-zA-Z]*)*(\s[A-Z][a-zA-Z]*)+(\s[A-Z][a-zA-Z]*)*\}') #Tutor ex. Dr/doctor Algo
+        reg_palab_tutor = re.compile(r'\{(T|t)utor(a)*\}')
         reg_tut = re.compile(r'\{(((d|D)[a-zA-Z]+)(\.*))+\s+(.)*\}') #Tutor ex. Dr/doctor Algo
         reg_fech =re.compile( r'\{[0-9]+.*[a-zA-Z0-9]+.*[0-9]+\}') #Fecha
         reg_ofi = re.compile(r'\{[a-zA-Z0-9\-]*(_[a-zA-Z0-9]*)+\}') #Número de oficio
@@ -661,7 +666,6 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
                     line = p.text
                     result = []
                     line_matches = [] if (result := re.findall(reg_placeh,line)) is None else result
-
                     for match in line_matches:
                         if re.search(reg_ofi,match):
                             self.paragraph_replace_text(p, reg_ofi, f"{oficio_form}").text
@@ -670,6 +674,11 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
                         # if re.match(reg_tut,match):
                         #     print(f"Tutor IF")
                         #     self.paragraph_replace_text(p, reg_tut, f"Doctor {tutor.last_name}").text
+                        if re.match(reg_palab_tutor,match):
+                            if tutor.sexo == "M":
+                                self.paragraph_replace_text(p, reg_palab_tutor, f"tutor").text
+                            if tutor.sexo == "F":
+                                self.paragraph_replace_text(p, reg_palab_tutor, f"tutora").text
                         if re.match(reg_tut,match):
                             if tutor.sexo == "M":
                                 self.paragraph_replace_text(p, reg_tut, f"Dr. {tutor.last_name}").text
