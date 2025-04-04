@@ -74,7 +74,7 @@ class TutorAdmin(ImportExportModelAdmin, UserAdmin):
 
     fieldsets = (
         (None, {'fields': ('email', 'password', 'matricula')}),
-        (('Información Personal'), {'fields': ('first_name', 'last_name', 'second_last_name', 'cubiculo', 'coordinacion', 'foto',)}),
+        (('Información Personal'), {'fields': ('first_name', 'last_name', 'second_last_name', 'sexo','cubiculo', 'coordinacion', 'foto',)}),
         (('Permisos'), {'fields': ('is_active', 'is_staff', 'is_superuser',
                                        'groups', 'user_permissions')}),
         (('Fechas importantes'), {'fields': ('last_login', 'date_joined')}),
@@ -85,7 +85,7 @@ class TutorAdmin(ImportExportModelAdmin, UserAdmin):
             'fields': ('first_name', 'last_name','second_last_name', 'email','matricula', 'coordinacion', 'cubiculo', 'password1', 'password2', 'es_coordinador'),
         }),
     )
-    list_display = ('pk', 'email', 'matricula', 'coordinacion', 'first_name', 'last_name', 'second_last_name', 'is_staff', 'es_coordinador', 'es_tutor')
+    list_display = ('pk', 'email', 'matricula', 'coordinacion', 'first_name', 'last_name', 'second_last_name', 'sexo','is_staff', 'es_coordinador', 'es_tutor')
     search_fields = ('pk', 'email', 'matricula', 'coordinacion', 'first_name', 'last_name')
     ordering = ('pk','coordinacion')
 
