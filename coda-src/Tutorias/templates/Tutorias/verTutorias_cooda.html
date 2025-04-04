@@ -12,13 +12,13 @@
             <div class="card-body p-4">
               <div class="d-flex w-100 align-items-center">
                 <h3 class="fw-bold mb-4 text-primary text-title-bold">Tutorías dadas por </h3>
-                <h4 class="mb-4 ms-3 text-title text-black "> 
-                  {% if tutor.sexo is not None%}
-                    {% comment %} {% if tutor.sexo=='F' %}Dra. {% else %} Dr. {% endif %} {% endcomment %}
+                <h4 class="mb-4 ms-3 text-title text-black"> 
+                  {% if tutor.sexo == 'F' %}
+                  Dra.
                   {% else %}
-                    Dr. 
-                  {% endif %}  
-                  {{tutor.first_name}} {{tutor.last_name}} {{ tutor.second_last_name }}
+                  Dr.
+                  {% endif %}
+                  {{ tutor.first_name }} {{ tutor.last_name }} {{ tutor.second_last_name }}
                 </h4>
               </div>
 

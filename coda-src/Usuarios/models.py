@@ -144,6 +144,8 @@ class Cordinador(Usuario):
                         "matricula": self.matricula,
                         "first_name": self.first_name,
                         "last_name": self.last_name,
+                        "second_last_name":self.second_last_name,
+                        "sexo":self.sexo,
                         "rol": self.rol,
                         "password": self.password,
                     },
@@ -160,6 +162,7 @@ class Alumno(Usuario):
     tutor_asignado = models.ForeignKey(Tutor, on_delete=models.PROTECT)
     estado = models.IntegerField(choices=ESTADOS_ALUMNO, null=True)
     trimestre_ingreso = models.CharField(max_length=30, null=True)
+    rfc = models.CharField(max_length=30, null=True)
 
     def save(self, *args, **kwargs):
         if ALUMNO not in self.rol:
