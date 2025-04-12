@@ -47,6 +47,11 @@
                                             <td>-</td>
                                             <td>-</td>
                                             <td>-</td>
+                                            <td>
+                                                <!-- Se supone que la llave primaria se pasa como parte del url a la página de seguimiento... -->
+                                                <a href="{% url 'save_seguimiento' pk=tutoria.pk %}" class="btn btn-primary text-title">Realizar</a>
+                                                </a>
+                                            </td>
                                         {% else %}
                                             <td>{{ tutoria.get_duracion_display }}</td>
                                             <!--Boolean-->

@@ -3,6 +3,9 @@
 {% block navbar %}
 
 <li class="nav-item">
+    <a class="nav-link text-primary" href="{% url 'Tutorias-tutor' %}">Tutorías asignadas</a>
+</li>
+<li class="nav-item">
     <a class="nav-link text-primary" href="{% url 'Tutorias-historial' %}" >Historial de tutorías</a>
 </li>
 {% comment %} <li class="nav-item">
@@ -10,9 +13,6 @@
 </li> {% endcomment %}
 <li class="nav-item">
     <a class="nav-link text-primary" href="{% url 'Tutorados-tutor' %}">Lista de tutorados</a>
-</li>
-<li class="nav-item">
-    <a class="nav-link text-primary" href="{% url 'Tutorias-tutor' %}">Tutorías asignadas</a>
 </li>
 
 {% endblock %}
