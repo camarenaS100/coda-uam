@@ -1,6 +1,7 @@
 {% extends "Usuarios/HeaderAndFooterFachada.html" %}
 
 {% block title  %}  Agregar Alumno {% endblock %}
+{% load custom_filters %}
 
 {% block body %}
     <section style="background-color: #eee;">
@@ -108,10 +109,23 @@
 
                                 <!-- Tutor Imput -->
                                 <div class="form-floating mb-3">
-                                    <!-- <input type="text" class="form-control" value=""/> -->
-                                    {% render_field form.tutor_asignado class="form-select" id="tutor"%}
-                                    <label class="form-label" for="tutor">Tutor asignado</label>
-                                </div>
+                                    <select name="tutor_asignado" class="form-select" id="tutor">
+                                      {% regroup form.tutor_asignado.field.queryset by coordinacion as tutor_list %}
+                                      {% for group in tutor_list %}
+                                        <optgroup label="{{ coordinacion_dict|get_item:group.grouper }}">
+                                          {% for tutor in group.list %}
+                                            <option value="{{ tutor.pk }}">{{ tutor.matricula }} - {{ tutor.first_name }} {{ tutor.last_name }} 
+                                                {% if tutor.second_last_name %}
+                                                    {{ tutor.second_last_name }}
+                                                {% endif %}
+                                            </option>
+                                          {% endfor %}
+                                        </optgroup>
+                                      {% endfor %}
+                                    </select>
+                                    <label for="tutor">Tutor asignado</label>
+                                  </div>
+                                  
 
                                 {% comment %} Información de trayectoria académica {% endcomment %}
                                 <div class="d-flex w-100 mb-4">

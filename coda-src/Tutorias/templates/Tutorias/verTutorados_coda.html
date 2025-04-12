@@ -29,12 +29,13 @@
                       <a href="{% url 'Reporte-create' tutor.pk %}" class="btn btn-primary">Generar carta de notificación</a>
                       <br>
                       <!-- Borrar esta parte y todo lo relacionado a esta vista/url, etc-->
-                      {% comment %} <div class="d-grid gap-2 d-md-flex justify-content-center">
-                        <form action="{% url 'tutorados_pdf' %}" method="get">
+                      {% comment %} 
+                      <!-- <form action="{% url 'tutorados_pdf' %}" method="get">
                           <input type="hidden" value="{{tutor.matricula}}" name="tutor-id">
                           <button type="submit" class="btn btn-primary">Generar carta</button>
                         </form>
-                      </div> {% endcomment %}
+                      </div>  -->
+                      {% endcomment %}
                       
                       <!--Inicio de table-->
                       <div class = "table-responsive">
@@ -59,7 +60,9 @@
                             <tr>
                               <td><input type="checkbox" class="item-checkbox" value="{{alumno.pk}}"></td>
                               <td class="text-body text-center">{{ alumno.matricula }} </td>
-                              <td class="text-body text-center">{{ alumno.first_name }} {{ alumno.last_name }}</td>
+                              <td class="text-body text-center">
+                                {{ alumno.first_name }} {{ alumno.last_name }} {{ alumno.second_last_name }}
+                              </td>
                               <td class="text-body text-center">{{ alumno.email}} </td>
                               {% comment %} <td class="text-body text-center">{{ alumno.correo_personal|default_if_none:"No registrado" }}</td> {% endcomment %}
                               <td class="text-body text-center">{{ alumno.get_carrera_display }}</td>

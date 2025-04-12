@@ -53,7 +53,7 @@ class FormCordinador(FormUsuario):
 
 class FormAlumno(FormUsuario):
     carrera = forms.ChoiceField(choices=CARRERAS)
-    tutor_asignado = forms.ModelChoiceField(queryset=Tutor.objects.all(), empty_label="Seleccione tutor")
+    tutor_asignado = forms.ModelChoiceField(queryset=Tutor.objects.all().order_by('coordinacion', 'matricula'), empty_label="Seleccione tutor", )
     estado = forms.ChoiceField(choices=ESTADOS_ALUMNO)
     trimestre_ingreso = forms.CharField(max_length=30)
     rfc = forms.CharField(max_length=30)
@@ -64,6 +64,15 @@ class FormAlumno(FormUsuario):
         fields = ['first_name', 'last_name', 'matricula', 'email', 'correo_personal', 'carrera', 'tutor_asignado', 'password1', 'password2',
                   'second_last_name', 'rfc', 'sexo', 'trimestre_ingreso', 'estado']
     pass
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # se crea un dict para lookup
+        coordinacion_dict = dict(CARRERAS);
+
+        # muestra el nombre completo del tutor en lugar de la matricula.
+        self.fields['tutor_asignado'].label_from_instance =  lambda obj: f"{obj.matricula} - {obj.first_name} {obj.last_name} | {obj.coordinacion}";
 
     def save(self, commit=True):
         user = super().save(commit=False)

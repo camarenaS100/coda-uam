@@ -33,7 +33,13 @@
                             <tr class="text-center text-body">
                               <td><input type="checkbox" class="item-checkbox"></td>
                               <td>{{ tutor.matricula }} </td>
-                              <td>{{ tutor.first_name }} {{ tutor.last_name }}  {{ tutor.second_last_name }} </td>
+                              <td>{{ tutor.first_name }} {{ tutor.last_name }}
+
+                                {%if tutor.second_last_name %}
+                                {{ tutor.second_last_name }}
+                                {%endif%}
+
+                              </td>
                               <td>{{ tutor.email}} </td>
                               <td>{{ tutor.get_coordinacion_display }}</td>
                               <td><a class="text-body-bold" href="{% url 'Tutorias-Coda' tutor.pk%}">Ver Tutorias</a></td>

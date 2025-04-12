@@ -347,7 +347,7 @@ class TutoriaCreateView(AlumnoViewMixin, CreateView):
     def get_initial(self) -> dict[str, Any]:
         return super().get_initial()
     
-# Carta de tutorados (para el tutor)
+# Carta de notificación de tutorados (para el tutor)
 class ReporteCreateView(CodaViewMixin, CreateView):
     model = Coda
     form_class = FormReporte
@@ -431,12 +431,11 @@ class ReporteCreateView(CodaViewMixin, CreateView):
 
         #Creación de las expresiones regulares que se buscaran en el doc
         reg_placeh = re.compile(r'\{.*?\}') #Placeholder "{}"
-        reg_gen = re.compile(r'\{(a|o|e)\}') #Género
-        # reg_tut = re.compile(r'\{(Dr\.|Dra\.|Doctor|Doctora)\s+(.)*\}')
-        # reg_tut = re.compile(r'\{(((d|D)[a-zA-Z]+)(\.*))+(\s[A-Z][a-zA-Z]*)*(\s[A-Z][a-zA-Z]*)+(\s[A-Z][a-zA-Z]*)*\}') #Tutor ex. Dr/doctor Algo
-        reg_tut = re.compile(r'\{(((d|D)[a-zA-Z]+)(\.*))+\s+(.)*\}') #Tutor ex. Dr/doctor Algo
-        reg_fech =re.compile( r'\{[0-9]+.*[a-zA-Z0-9]+.*[0-9]+\}') #Fecha
-        reg_ofi = re.compile(r'\{[a-zA-Z0-9\-]*(_[a-zA-Z0-9]*)+\}') #Número de oficio
+        reg_ofi = re.compile(r'\{no_oficio\}') #Número de oficio
+        reg_fech =re.compile( r'\{fecha\}') #Fecha
+        reg_tut = re.compile(r'\{nombre_mayus_tutor\}') #Nombre de tutor en mayusculas
+        reg_est = re.compile(r'\{estimado\}') # indentificamos el articulo en minusculas
+        reg_tut_min = re.compile(r'\{nombre_tutor\}')
 
         tut_alums = Alumno.objects.filter(tutor_asignado=tutor_pk)
         
@@ -507,6 +506,20 @@ class ReporteCreateView(CodaViewMixin, CreateView):
                 cell.paragraphs[0].style = old_cell.paragraphs[0].style
                 cell._element.get_or_add_tcPr().extend(old_cell._element.get_or_add_tcPr())
 
+        # Antes del ciclo for p in open_plantilla.paragraphs:
+        self.est = ""
+        self.dr = ""
+        self.name = ""
+        self.name = f"{tutor.first_name} {tutor.last_name}"
+        if tutor.sexo == "M":
+            # print(f'Masculino')
+            self.est = "Estimado"
+            self.dr = "Dr."
+        if tutor.sexo == "F":
+            self.est = "Estimada"
+            self.dr = "Dra."
+        if tutor.second_last_name:
+            self.name = self.name + f" {tutor.second_last_name}"
 
         ##EDICIÓN DE LOS PLACEHOLDERS
         c=0
@@ -517,7 +530,7 @@ class ReporteCreateView(CodaViewMixin, CreateView):
             result = []
             line_matches = [] if (result := re.findall(reg_placeh,line)) is None else result
             # print(f'Before cycle: {(line_matches)}') if line_matches else None 
-            
+
             for match in line_matches:
                 print(f'Esta linea: {match} hizo match')
                 if re.search(reg_ofi,match):
@@ -527,16 +540,11 @@ class ReporteCreateView(CodaViewMixin, CreateView):
                 if re.match(reg_tut,match):
                     print(f'IF de tutor')
                     print(f'Sexo: {tutor.sexo}')
-                    if tutor.sexo == "M":
-                        print(f'Masculino')
-                        self.paragraph_replace_text(p, reg_tut, f"Dr. {tutor.last_name}").text
-                    if tutor.sexo == "F":
-                        self.paragraph_replace_text(p, reg_tut, f"Dra. {tutor.last_name}").text
-                if re.match(reg_gen,match):
-                    if tutor.sexo == "M":
-                        self.paragraph_replace_text(p, reg_gen, f"o").text
-                    if tutor.sexo == "F":
-                        self.paragraph_replace_text(p, reg_gen, f"a").text
+                    self.paragraph_replace_text(p, reg_tut,(self.dr+" "+self.name).upper()).text
+                if re.match(reg_est,match):
+                    self.paragraph_replace_text(p, reg_est, self.est)
+                if re.match(reg_tut_min,match):
+                    self.paragraph_replace_text(p, reg_tut_min, self.dr+" "+self.name)
 
         response = HttpResponse(content_type='application')
         response['Content-Disposition'] = f'attachment; filename={tutor.last_name}_TUTORES_ATENDIDOS.docx'
@@ -547,7 +555,7 @@ class ReporteCreateView(CodaViewMixin, CreateView):
         # return FileResponse(buffer, as_attachment=True, filename=f'{tutor.last_name.upper()}_TUTORES_ATENDIDOS_21-24.pdf')
         # return super().post(request)
 
-# Carta de tutor (para el alumno)
+# Carta de asignación tutor para alumno (para el alumno)
 class Reporte2CreateView(CodaViewMixin, CreateView):
     model = Coda
     form_class = FormReporte

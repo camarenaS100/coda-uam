@@ -189,9 +189,18 @@ class BorrarNotificaciones(View):
 
 ### Create User Views (Updated for `Usuario`)
 class CreateAlumnoView(CodaViewMixin, CreateView):
+    model = Alumno
     template_name = 'Usuarios/agregar_alumno.html'
-    success_url = reverse_lazy('Tutores-Coda')
+    success_url = reverse_lazy('login_success')
     form_class = userForms.FormAlumno
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Convierte CARRERAS en diccionario {'MAT': 'Matemáticas Aplicadas', ...}
+        context['coordinacion_dict'] = {clave: nombre for clave, nombre in CARRERAS if clave}
+        
+        return context
+
 
 class ChangeAlumnoView(CodaViewMixin, CreateView):
     template_name = 'Usuarios/modificar_alumno.html'
