@@ -24,40 +24,38 @@
                     {% load widget_tweaks%}
                     <form method="post">{% csrf_token %}
                         <div class="card-body p-5">
-                            <h3 class="fw-bold mb-5 text-primary">Reporte de tutorados</h3>
+                            <h3 class="fw-bold mb-4 text-primary text-title-bold">Generar reporte de tutorados</h3>
 
-                            <!-- oficio de la tutor_firmaia input -->
-                            <div class="row mb-4">
-                                <div class="col">
-                                    
-                                
-                                    {% render_field form.oficio id="oficio" rows="3"%}
-                                    <label class="form-label" for="oficio">Oficio</label>
-                                    
-                                </div>
+                            <div class="form-outline mb-4 disabled">                              
+                                    {% render_field form.tutor type="text" class="form-control" id="tutor"%}
+                                    <label class="form-label" for="tutor">Tutor</label>
                             </div>
 
-                            <!-- oficio de la tutor_firmaia input -->
-                            <div class="row mb-4">
-                                <div class="col">
-                                    
-                                
-                                    {% render_field form.plantilla class="form-select" id="plantilla"%}
-                                    <label class="form-label" for="plantilla">Plantilla</label>
-                                    
-                                </div>
+                            <!-- Carrera -->
+                            <div class="form-outline mb-4 disabled">
+                                {% render_field form.carrera type="text" class="form-control" id="carrera" %}
+                                <label class="form-label" for="carrera">Licenciatura</label>
                             </div>
 
                             <!-- Hora y Dia imput-->
-                            <div class="row mb-4">
-                                <!-- Dia de tutor_firmaia  imput-->
-                                <div class="col">
-                                    <div class="form-outline">
-                                        <!-- <input type="text" class="form-control" /> -->
-                                        {% render_field form.fecha class="form-select" id="fecha"%}
-                                        <label class="form-label" for="fecha">Fecha y Hora</label>
-                                    </div>
+                            <div class="form-floating mb-4">
+                                {% render_field form.fecha class="form-control" id="fecha" placeholder="Fecha y hora"%}
+                                <label for="fecha">Fecha de emisión</label>
+                            </div>
+
+                             <!-- oficio de la tutor_firmaia input -->
+                             <div class="form-outline mb-4">
+                                <div class="form-outline">                                
+                                    {% render_field form.oficio type="text" class="form-control" id="oficio" rows="3" placeholder="DNC_CODDAA_XXX_20XX"%}
+                                    <label class="form-label" for="oficio">No. Oificio</label>
                                 </div>
+                            </div>
+
+
+                            <!-- oficio de la tutor_firmaia input -->
+                            <div class="form-floating mb-4">
+                                {% render_field form.plantilla class="form-select" id="plantilla" %}
+                                <label for="plantilla">Plantilla</label>
                             </div>
 
                             <!-- Submit button -->
@@ -69,5 +67,5 @@
             </div>
         </div>
     </section>
-
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"></script>
 {% endblock %}

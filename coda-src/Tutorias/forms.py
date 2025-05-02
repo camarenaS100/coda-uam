@@ -37,13 +37,37 @@ class FormSeguimiento(forms.ModelForm):
 
 class FormReporte(forms.ModelForm):
     oficio = forms.CharField(required=False)
-    tutor_firma = forms.MultipleChoiceField(choices=TEMAS)
-    # tutor_firma = forms.CharField(widget=forms.Textarea, max_length=255, required=False)
     fecha = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
     plantilla = forms.ModelChoiceField(queryset=Documento.objects.all(), to_field_name='nombre', label="Selecciona una plantilla")
-    tem = forms.CheckboxInput()
+    tutor = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+    carrera = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
 
     class Meta:
         model = Documento
-        fields = ['oficio', 'tutor_firma', 'fecha']
+        fields = ['oficio', 'plantilla', 'fecha']
 
+    def __init__(self, *args, tutor_instance=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        if tutor_instance:
+            full_name = ""
+            # Llenamos el nombre del tutor.
+            if tutor_instance.sexo:
+                if tutor_instance.sexo == "F":
+                    full_name = "Dra."
+                else:
+                    full_name = "Dr."
+                pass
+            full_name += f" {tutor_instance.first_name} {tutor_instance.last_name}"
+            if tutor_instance.second_last_name:
+                full_name += f" {tutor_instance.second_last_name}"
+            self.fields['tutor'].initial = full_name
+
+        carreras_dict = dict([
+            ("MAT", "Matemáticas Aplicadas"),
+            ("COM", "Ingeniería en Computación"),
+            ("IB", "Ingeniería Biológica"),
+            ("BM", "Biología Molecular"),
+        ])
+
+        self.fields['carrera'].initial = carreras_dict.get(tutor_instance.coordinacion, "Carrera desconocida")

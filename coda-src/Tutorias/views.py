@@ -354,6 +354,13 @@ class ReporteCreateView(CodaViewMixin, CreateView):
     template_name = 'Tutorias/generartutorados.html'
     success_url = reverse_lazy('Tutorados-Coda')  # Cambia esto a la URL adecuada
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        tutor_pk = self.kwargs.get('pk')
+        tutor_instance = Tutor.objects.get(pk=tutor_pk)
+        kwargs['tutor_instance'] = tutor_instance
+        return kwargs
+
     def form_valid(self, form):
         # Obtén el nombre del alumno desde la URL
         tutor_pk = self.kwargs.get('pk_tutor')
@@ -436,6 +443,7 @@ class ReporteCreateView(CodaViewMixin, CreateView):
         reg_tut = re.compile(r'\{nombre_mayus_tutor\}') #Nombre de tutor en mayusculas
         reg_est = re.compile(r'\{estimado\}') # indentificamos el articulo en minusculas
         reg_tut_min = re.compile(r'\{nombre_tutor\}')
+        reg_lic = re.compile(r'\{licenciatura\}')
 
         tut_alums = Alumno.objects.filter(tutor_asignado=tutor_pk)
         
@@ -511,6 +519,7 @@ class ReporteCreateView(CodaViewMixin, CreateView):
         self.dr = ""
         self.name = ""
         self.name = f"{tutor.first_name} {tutor.last_name}"
+        self.nombre_licenciatura = ""
         if tutor.sexo == "M":
             # print(f'Masculino')
             self.est = "Estimado"
@@ -520,6 +529,14 @@ class ReporteCreateView(CodaViewMixin, CreateView):
             self.dr = "Dra."
         if tutor.second_last_name:
             self.name = self.name + f" {tutor.second_last_name}"
+
+        carreras_dict = {
+            "MAT": "Matemáticas Aplicadas",
+            "COM": "Ingeniería en Computación",
+            "IB": "Ingeniería Biológica",
+            "BM": "Biología Molecular"
+        }
+        self.nombre_licenciatura = carreras_dict.get(tutor.coordinacion, "Licenciatura desconocida")
 
         ##EDICIÓN DE LOS PLACEHOLDERS
         c=0
@@ -545,8 +562,10 @@ class ReporteCreateView(CodaViewMixin, CreateView):
                     self.paragraph_replace_text(p, reg_est, self.est)
                 if re.match(reg_tut_min,match):
                     self.paragraph_replace_text(p, reg_tut_min, self.dr+" "+self.name)
+                if re.match(reg_lic, match):
+                    self.paragraph_replace_text(p,reg_lic, self.nombre_licenciatura)
 
-        response = HttpResponse(content_type='application')
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
         response['Content-Disposition'] = f'attachment; filename={tutor.last_name}_TUTORES_ATENDIDOS.docx'
         
         open_plantilla.save(response)

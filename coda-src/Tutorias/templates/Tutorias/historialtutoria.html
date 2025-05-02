@@ -30,7 +30,7 @@
                                 </thead>
                                 <tbody>
                                     {% for tutoria in object_list %}
-                                    <tr>
+                                    <tr class="text-center">
                                         <td>{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }} {{ tutoria.alumno.second_last_name }}</td>
                                         <td>{{ tutoria.fecha|date:"Y-m-d" }}</td>
                                         <td>{{ tutoria.fecha|date:"H:i" }}</td>
