@@ -25,6 +25,7 @@
                               <th>Coordinación</th>
                               <th>Tutorias</th>
                               <th>Tutorados</th>
+                              <!-- <th>Acciones</th> -->
                             </tr>
                           </thead>
                           <tbody>
@@ -44,6 +45,7 @@
                               <td>{{ tutor.get_coordinacion_display }}</td>
                               <td><a class="text-body-bold" href="{% url 'Tutorias-Coda' tutor.pk%}">Ver Tutorias</a></td>
                               <td><a class="text-body-bold" href="{% url 'Tutorados-Coda' tutor.pk%}">Ver Tutorados</a></td>
+                              <!-- <td><a class="text-body-bold" href="">Editar</a></td> -->
                             </tr>
                             {% endfor %}
                           </tbody>

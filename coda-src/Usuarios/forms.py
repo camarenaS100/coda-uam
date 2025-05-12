@@ -105,3 +105,31 @@ class DocumentoForm(forms.ModelForm):
         # Hacemos que el campo "nombre" no sea obligatorio si ya existe un archivo
         if self.instance and self.instance.archivo:
             self.fields['nombre'].required = False
+
+# Este formulario es para editar un usuario tipo alumno
+class FormAlumnoUpdate(forms.ModelForm):
+    carrera = forms.ChoiceField(choices=CARRERAS)
+    # la matrícula es un campo importante que guarda relaciones con otras tablas, por tanto, no se permite su edición.
+    matricula = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+    tutor_asignado = forms.ModelChoiceField(
+        queryset=Tutor.objects.all().order_by('coordinacion', 'matricula'),
+        empty_label="Seleccione tutor"
+    )
+    estado = forms.ChoiceField(choices=ESTADOS_ALUMNO)
+    trimestre_ingreso = forms.CharField(max_length=30)
+    rfc = forms.CharField()
+    sexo = forms.ChoiceField(choices=SEXOS)
+
+    class Meta:
+        model = Alumno
+        fields = [
+            'first_name', 'last_name', 'second_last_name', 'matricula', 'email',
+            'correo_personal', 'carrera', 'tutor_asignado', 'rfc', 'sexo', 'trimestre_ingreso',
+            'estado'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__( *args, **kwargs)
+        self.fields['tutor_asignado'].label_from_instance = lambda obj: (
+            f"{obj.matricula} - {obj.first_name} {obj.last_name} | {obj.coordinacion}"
+        )

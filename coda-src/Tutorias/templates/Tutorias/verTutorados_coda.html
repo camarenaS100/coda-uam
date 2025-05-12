@@ -57,7 +57,7 @@
                               <th class="text-title h6 text-center">Carrera</th>
                               <th class="text-title h6 text-center">Trimestre de Ingreso</th>
                               <th class="text-title h6 text-center">Estado</th>
-                              <th class="text-title h6 text-center"></th>
+                              <th class="text-title h6 text-center">Acciones</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -74,7 +74,7 @@
                               <td class="text-body text-center">{{ alumno.get_carrera_display }}</td>
                               <td class="text-body text-center">{{ alumno.trimestre_ingreso }}</td>
                               <td class="text-body text-center">{{ alumno.estado }}</td>
-                              <td><a class="text-body-bold text-primary" href="{% url 'modificar-alumno' %}">Editar</a></td>
+                              <td class="text-center"><a class="text-body-bold text-primary" href="{% url 'editar-alumno' alumno.pk %}">Editar</a></td>
                             </tr>
                             {% endfor %}
                           </tbody>

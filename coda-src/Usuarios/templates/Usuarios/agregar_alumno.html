@@ -61,7 +61,7 @@
                                     </div>
                                     <div class="form-label from-control w-50 ms-1">
                                         <!-- <input type="text" class="form-control" value="" /> -->
-                                        {% render_field form.sexo type="text" class="form-control" id="sexo"%}
+                                        {% render_field form.sexo type="text" class="form-select" id="sexo"%}
                                     </div>
                                 </div>
 
@@ -101,7 +101,6 @@
                                 <!-- Text input -->
                                 <!-- Select input -->
                                 <div class="form-floating mb-3">
-                                
                                     {% render_field form.carrera class="form-select " id="carrera"%}
                                     <label class="form-label " for="carrera">Carrera</label>
                                     
@@ -135,7 +134,7 @@
                                         <label class="form-label" for="ingreso">Trimestre de Ingreso</label>
                                     </div>
                                     <div class="form-label w-50 ms-1">
-                                        {% render_field form.estado type="text" class="form-control" id="estado"%}
+                                        {% render_field form.estado type="text" class="form-select" id="estado"%}
                                     </div>
                                 </div>
                                 

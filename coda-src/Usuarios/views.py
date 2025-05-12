@@ -202,21 +202,23 @@ class CreateAlumnoView(CodaViewMixin, CreateView):
         return context
 
 
-class ChangeAlumnoView(CodaViewMixin, CreateView):
+class ChangeAlumnoView(CodaViewMixin, UpdateView):
+    model = Alumno
     template_name = 'Usuarios/modificar_alumno.html'
     success_url = reverse_lazy('Tutores-Coda')
-    form_class = userForms.FormAlumno
-
-    def post(self, request):
-        form = userForms.FormAlumno(request.POST)
-        print(request)
-        print(request.POST.get('tutor_asignado'))
-        print("Info del form")
-        print(form)
-        if form.is_valid():
-            print("Y es válida")
-            form.save()
-        return HttpResponseRedirect(request.path_info)
+    form_class = userForms.FormAlumnoUpdate
+    
+    def get_object(self, queryset=None):
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(Alumno, pk=pk)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Convierte CARRERAS en diccionario {'MAT': 'Matemáticas Aplicadas', ...}
+        context['coordinacion_dict'] = {clave: nombre for clave, nombre in CARRERAS if clave}
+        
+        return context
 
 #PermissionRequiredMixin
 class CreateCordinadorView(CodaViewMixin, CreateView):
