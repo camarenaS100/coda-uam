@@ -581,6 +581,13 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
     template_name = 'Tutorias/generarnotiftutor.html'
     success_url = reverse_lazy('Tutorados-Coda')  # Cambia esto a la URL adecuada
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        tutor_pk = self.kwargs.get('pk')
+        tutor_instance = Tutor.objects.get(pk=tutor_pk)
+        kwargs['tutor_instance'] = tutor_instance
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
@@ -671,71 +678,145 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
         #Creación de las expresiones regulares que se buscaran en el doc
         reg_placeh = re.compile(r'\{.*?\}') #Placeholder "{}"
         reg_gen = re.compile(r'\{(a|o|e)\}') #Género
-        # reg_tut = re.compile(r'\{(Dr\.|Dra\.|Doctor|Doctora)\s+(.)*\}')
-        # reg_tut = re.compile(r'\{(((d|D)[a-zA-Z]+)(\.*))+(\s[A-Z][a-zA-Z]*)*(\s[A-Z][a-zA-Z]*)+(\s[A-Z][a-zA-Z]*)*\}') #Tutor ex. Dr/doctor Algo
-        reg_palab_tutor = re.compile(r'\{(T|t)utor(a)*\}')
-        reg_tut = re.compile(r'\{(((d|D)[a-zA-Z]+)(\.*))+\s+(.)*\}') #Tutor ex. Dr/doctor Algo
-        reg_fech =re.compile( r'\{[0-9]+.*[a-zA-Z0-9]+.*[0-9]+\}') #Fecha
-        reg_ofi = re.compile(r'\{[a-zA-Z0-9\-]*(_[a-zA-Z0-9]*)+\}') #Número de oficio
-        reg_alu = re.compile(r'\{(?!LICENCIATURA|LIC.|Licenciatura|Lic.)(?:[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*\.?|[A-ZÁÉÍÓÚÑ]+\.?)(?:\s+(?:de|del|la|y|los|las|san|santa|C|Dr|Dra|Lic|Ing|Sr|Sra)\.?|[A-ZÁÉÍÓÚÑ]+\.?)*\s+(?:[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*|[A-ZÁÉÍÓÚÑ]+)\b(?:\s+(?:[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*|[A-ZÁÉÍÓÚÑ]+))*\}')
-        reg_carr = re.compile(r'\{(LICENCIATURA|LIC.|Licenciatura|Lic.)(.)*\}')
+        reg_palab_tutor = re.compile(r'\{tutor*\}')
+        reg_tut = re.compile(r'\{dr\}') #Tutor ex. Dr/doctor Algo
+        reg_fech =re.compile( r'\{fecha\}') #Fecha
+        reg_ofi = re.compile(r'\{no_oficio\}') #Número de oficio
+        reg_nombre_alumno = re.compile(r'\{nombre_alumno\}') # nombre del alumno
+        reg_licenciatura = re.compile(r'\{licenciatura\}') # licenciatura
         reg_det = re.compile(r'\{(la|el|él)\}')
+        reg_academico = re.compile(r'\{academico\}')
+        reg_nombre_tutor = re.compile(r'\{nombre_tutor\}')
 
-        ##EDICIÓN DE LOS PLACEHOLDERS
-        zip_buffer = BytesIO()
-        with ZipFile(zip_buffer, 'w') as zip_file:
-            for alumno in alumnos:
-                open_plantilla = docx.Document(plantilla.archivo)
-                c=0
-                for p in open_plantilla.paragraphs:
-                    c = c+1
-                    # print(c)
-                    line = p.text
-                    result = []
-                    line_matches = [] if (result := re.findall(reg_placeh,line)) is None else result
-                    for match in line_matches:
-                        if re.search(reg_ofi,match):
-                            self.paragraph_replace_text(p, reg_ofi, f"{oficio_form}").text
-                        if re.match(reg_fech,match):
-                            self.paragraph_replace_text(p, reg_fech, f"{fecha_form}").text
-                        # if re.match(reg_tut,match):
-                        #     print(f"Tutor IF")
-                        #     self.paragraph_replace_text(p, reg_tut, f"Doctor {tutor.last_name}").text
-                        if re.match(reg_palab_tutor,match):
+        # Esta validacion es para generar una sola carta de asignación y no generar el zip de forma innecesaria.
+        if len(alumnos) == 1:
+            alumno = alumnos[0]
+            open_plantilla = docx.Document(plantilla.archivo)
+            c=0
+            for p in open_plantilla.paragraphs:
+                c = c+1
+                # print(c)
+                line = p.text
+                result = []
+                line_matches = [] if (result := re.findall(reg_placeh,line)) is None else result
+                for match in line_matches:
+                    if re.search(reg_ofi,match):
+                        self.paragraph_replace_text(p, reg_ofi, f"{oficio_form}").text
+                    if re.match(reg_fech,match):
+                        self.paragraph_replace_text(p, reg_fech, f"{fecha_form}").text
+                    # if re.match(reg_tut,match):
+                    #     print(f"Tutor IF")
+                    #     self.paragraph_replace_text(p, reg_tut, f"Doctor {tutor.last_name}").text
+                    if re.match(reg_palab_tutor,match):
+                        if tutor.sexo == "M":
+                            self.paragraph_replace_text(p, reg_palab_tutor, f"tutor".capitalize()).text
+                        if tutor.sexo == "F":
+                            self.paragraph_replace_text(p, reg_palab_tutor, f"tutora".capitalize()).text
+                    if re.match(reg_tut,match):
+                        if tutor.sexo == "M":
+                            self.paragraph_replace_text(p, reg_tut, f"Dr.").text
+                        if tutor.sexo == "F":
+                            self.paragraph_replace_text(p, reg_tut, f"Dra.").text
+                    if re.match(reg_nombre_tutor, match):
+                        name = f"{tutor.first_name.capitalize()} {tutor.last_name.capitalize()}"
+                        if tutor.second_last_name:
+                            name += f" {tutor.second_last_name.capitalize()}"
+                        self.paragraph_replace_text(p, reg_nombre_tutor, name.title())
+                    if re.match(reg_nombre_alumno,match):
+                        nombre_alumno = f"{alumno.first_name} {alumno.last_name}"
+                        if alumno.second_last_name:
+                            nombre_alumno += f" {alumno.second_last_name}"
+                        nombre_alumno = nombre_alumno.upper()
+                        self.paragraph_replace_text(p, reg_nombre_alumno, nombre_alumno).text
+                    if re.match(reg_academico, match):
+                        academico = ""
+                        if tutor.sexo:
                             if tutor.sexo == "M":
-                                self.paragraph_replace_text(p, reg_palab_tutor, f"tutor").text
+                                academico = "Académico"
                             if tutor.sexo == "F":
-                                self.paragraph_replace_text(p, reg_palab_tutor, f"tutora").text
-                        if re.match(reg_tut,match):
-                            if tutor.sexo == "M":
-                                self.paragraph_replace_text(p, reg_tut, f"Dr. {tutor.last_name}").text
-                            if tutor.sexo == "F":
-                                self.paragraph_replace_text(p, reg_tut, f"Dra. {tutor.last_name}").text
-                        if re.match(reg_alu,match):
-                            self.paragraph_replace_text(p, reg_alu, f"{alumno.first_name} {alumno.last_name}").text
-                        if re.match(reg_carr,match):
-                            self.paragraph_replace_text(p, reg_carr, f"{alumno.get_carrera_display()}").text
-                        if re.match(reg_det,match):
-                            if tutor.sexo == "M":
-                                self.paragraph_replace_text(p, reg_det, f"él").text
-                            if tutor.sexo == "F":
-                                self.paragraph_replace_text(p, reg_det, f"la").text
-                        if re.match(reg_gen,match):
-                            if tutor.sexo == "M":
-                                self.paragraph_replace_text(p, reg_gen, f"o").text
-                            if tutor.sexo == "F":
-                                self.paragraph_replace_text(p, reg_gen, f"a").text
+                                academico = "Académica"
+                        self.paragraph_replace_text(p, reg_academico, academico)
+                    if re.match(reg_licenciatura,match):
+                        licenciatura = alumno.get_carrera_display()
+                        self.paragraph_replace_text(p, reg_licenciatura, f"{licenciatura}".upper()).text
+                    if re.match(reg_det,match):
+                        if tutor.sexo == "M":
+                            self.paragraph_replace_text(p, reg_det, f"el").text
+                        if tutor.sexo == "F":
+                            self.paragraph_replace_text(p, reg_det, f"la").text
+            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+            response['Content-Disposition'] = f'attachment; filename={alumno.first_name}_{alumno.last_name}_TUTOR.docx'
+            open_plantilla.save(response)
 
-                # Save each document to ZIP
-                temp_buffer = BytesIO()
-                open_plantilla.save(temp_buffer)
-                temp_buffer.seek(0)
-                zip_file.writestr(f"{alumno.first_name}_{alumno.last_name}_TUTOR.docx", temp_buffer.getvalue())
+        else :    
+            ##EDICIÓN DE LOS PLACEHOLDERS
+            zip_buffer = BytesIO()
+            with ZipFile(zip_buffer, 'w') as zip_file:
+                for alumno in alumnos:
+                    open_plantilla = docx.Document(plantilla.archivo)
+                    c=0
+                    for p in open_plantilla.paragraphs:
+                        c = c+1
+                        # print(c)
+                        line = p.text
+                        result = []
+                        line_matches = [] if (result := re.findall(reg_placeh,line)) is None else result
+                        for match in line_matches:
+                            if re.search(reg_ofi,match):
+                                self.paragraph_replace_text(p, reg_ofi, f"{oficio_form}").text
+                            if re.match(reg_fech,match):
+                                self.paragraph_replace_text(p, reg_fech, f"{fecha_form}").text
+                            # if re.match(reg_tut,match):
+                            #     print(f"Tutor IF")
+                            #     self.paragraph_replace_text(p, reg_tut, f"Doctor {tutor.last_name}").text
+                            if re.match(reg_palab_tutor,match):
+                                if tutor.sexo == "M":
+                                    self.paragraph_replace_text(p, reg_palab_tutor, f"tutor".capitalize()).text
+                                if tutor.sexo == "F":
+                                    self.paragraph_replace_text(p, reg_palab_tutor, f"tutora".capitalize()).text
+                            if re.match(reg_tut,match):
+                                if tutor.sexo == "M":
+                                    self.paragraph_replace_text(p, reg_tut, f"Dr.").text
+                                if tutor.sexo == "F":
+                                    self.paragraph_replace_text(p, reg_tut, f"Dra.").text
+                            if re.match(reg_nombre_tutor, match):
+                                name = f"{tutor.first_name.capitalize()} {tutor.last_name.capitalize()}"
+                                if tutor.second_last_name:
+                                    name += f" {tutor.second_last_name.capitalize()}"
+                                self.paragraph_replace_text(p, reg_nombre_tutor, name.title())
+                            if re.match(reg_nombre_alumno,match):
+                                nombre_alumno = f"{alumno.first_name} {alumno.last_name}"
+                                if alumno.second_last_name:
+                                    nombre_alumno += f" {alumno.second_last_name}"
+                                nombre_alumno = nombre_alumno.upper()
+                                self.paragraph_replace_text(p, reg_nombre_alumno, nombre_alumno).text
+                            if re.match(reg_academico, match):
+                                academico = ""
+                                if tutor.sexo:
+                                    if tutor.sexo == "M":
+                                        academico = "Académico"
+                                    if tutor.sexo == "F":
+                                        academico = "Académica"
+                                self.paragraph_replace_text(p, reg_academico, academico)
+                            if re.match(reg_licenciatura,match):
+                                licenciatura = alumno.get_carrera_display()
+                                self.paragraph_replace_text(p, reg_licenciatura, f"{licenciatura}".upper()).text
+                            if re.match(reg_det,match):
+                                if tutor.sexo == "M":
+                                    self.paragraph_replace_text(p, reg_det, f"el").text
+                                if tutor.sexo == "F":
+                                    self.paragraph_replace_text(p, reg_det, f"la").text
 
-        # Return ZIP file
-        zip_buffer.seek(0)
-        response = HttpResponse(zip_buffer.getvalue(), content_type='application/zip')
-        response['Content-Disposition'] = 'attachment; filename="Documentos_Alumnos.zip"'
+                    # Save each document to ZIP
+                    temp_buffer = BytesIO()
+                    open_plantilla.save(temp_buffer)
+                    temp_buffer.seek(0)
+                    zip_file.writestr(f"{alumno.first_name}_{alumno.last_name}_TUTOR.docx", temp_buffer.getvalue())
+
+            # Return ZIP file
+            zip_buffer.seek(0)
+            response = HttpResponse(zip_buffer.getvalue(), content_type='application/zip')
+            response['Content-Disposition'] = 'attachment; filename="Documentos_Alumnos.zip"'
 
         return response
 
