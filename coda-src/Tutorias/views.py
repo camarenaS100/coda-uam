@@ -17,7 +17,7 @@ from django.contrib import messages
 from datetime import datetime, timedelta
 
 from .models import Tutoria
-from .forms import FormTutorias, FormSeguimiento, FormReporte
+from .forms import FormTutorias, FormSeguimiento, FormReporte, FormCartasDeAsignacion
 # from .forms import FormSeguimiento # de nuevo, no estoy seguro, FormReporte
 from .constants import PENDIENTE, ACEPTADO, RECHAZADO, DURACION_ASESORIA # de nuevo, no estoy seguro
 from Usuarios.constants import TUTOR, ALUMNO, COORDINADOR, TEMPLATES, CORREO
@@ -577,7 +577,7 @@ class ReporteCreateView(CodaViewMixin, CreateView):
 # Carta de asignación tutor para alumno (para el alumno)
 class Reporte2CreateView(CodaViewMixin, CreateView):
     model = Coda
-    form_class = FormReporte
+    form_class = FormCartasDeAsignacion
     template_name = 'Tutorias/generarnotiftutor.html'
     success_url = reverse_lazy('Tutorados-Coda')  # Cambia esto a la URL adecuada
 
@@ -593,6 +593,8 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
         
         # Get selected students from URL parameters
         selected_ids = self.request.GET.getlist('selected_alumnos')
+        if not selected_ids:
+                selected_ids = self.request.session.get('selected_alumnos', [])
         print(selected_ids)
         
         # Fetch student objects from the database
@@ -601,6 +603,9 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
         # Pass single or multiple students to template
         context['alumnos'] = alumnos
         context['is_multiple'] = len(alumnos) > 1  # True if multiple students
+        context['len_alumnos'] = len(alumnos) # Lenght of students selected
+
+        self.request.session.pop('selected_alumnos', None)
 
         return context
 
@@ -669,12 +674,26 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
         oficio_form = form.get('oficio')
         plantilla_nombre = form.get('plantilla')
         fecha_form = form.get('fecha')
+        no_inicio_form = form.get('no_inicio')
         fecha_form = datetime.strptime(fecha_form,'%Y-%m-%dT%H:%M').date()
         tutor_pk = self.kwargs.get('pk')
         alumnos = get_list_or_404(Alumno, pk__in=selected_ids)
         plantilla = get_object_or_404(Documento, nombre=plantilla_nombre)
         tutor = get_object_or_404(Tutor, pk=tutor_pk)
         
+        open_plantilla = docx.Document(plantilla.archivo)   
+        if open_plantilla.tables:
+            messages.error(request, "Este archivo no es compatible con el tipo de carta que deseas generar")
+
+            # Obtener la URL base con el PK del tutor
+            url_base = f"/crear-reporte-2/{tutor_pk}"
+
+            # Agregar los parámetros GET con los alumnos seleccionados
+            selected_param = "&".join([f"selected_alumnos={id}" for id in selected_ids])
+            redirect_url = f"{url_base}?{selected_param}"
+
+            return redirect(redirect_url)
+
         #Creación de las expresiones regulares que se buscaran en el doc
         reg_placeh = re.compile(r'\{.*?\}') #Placeholder "{}"
         reg_gen = re.compile(r'\{(a|o|e)\}') #Género
@@ -751,6 +770,11 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
         else :    
             ##EDICIÓN DE LOS PLACEHOLDERS
             zip_buffer = BytesIO()
+            oficio_regex = re.search(r'\_[xX]+\_', oficio_form)
+            if no_inicio_form:
+                contador_documentos:int = int(no_inicio_form)
+            else:
+                contador_documentos = 1
             with ZipFile(zip_buffer, 'w') as zip_file:
                 for alumno in alumnos:
                     open_plantilla = docx.Document(plantilla.archivo)
@@ -763,7 +787,12 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
                         line_matches = [] if (result := re.findall(reg_placeh,line)) is None else result
                         for match in line_matches:
                             if re.search(reg_ofi,match):
-                                self.paragraph_replace_text(p, reg_ofi, f"{oficio_form}").text
+                                if oficio_regex:
+                                    oficio_nuevo = re.sub(r'\_[xX]+\_', f"_{contador_documentos}_",oficio_form )
+                                    print("Oficio nuevo: ", oficio_nuevo)
+                                    self.paragraph_replace_text(p, reg_ofi, f"{oficio_nuevo}").text
+                                else:
+                                    self.paragraph_replace_text(p, reg_ofi, f"{oficio_form} {contador_documentos}").text
                             if re.match(reg_fech,match):
                                 self.paragraph_replace_text(p, reg_fech, f"{fecha_form}").text
                             # if re.match(reg_tut,match):
@@ -812,6 +841,7 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
                     open_plantilla.save(temp_buffer)
                     temp_buffer.seek(0)
                     zip_file.writestr(f"{alumno.first_name}_{alumno.last_name}_TUTOR.docx", temp_buffer.getvalue())
+                    contador_documentos = contador_documentos+1
 
             # Return ZIP file
             zip_buffer.seek(0)
