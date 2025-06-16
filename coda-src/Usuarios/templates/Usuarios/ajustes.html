@@ -17,31 +17,29 @@
                             <hr class="text-secondary">
                              <!--Inicio de table-->
                             <div class = "table-responsive">
-                                <table class="table table-striped table-hover">
+                                <table class="table table-striped table-hover datatable">
                                 <thead class="">
                                     <tr>
-                                    <th>Nombre</th>
-                                    <th>Template</th>
-                                    <th></th>
-                                    <th></th>
+                                        <th>Nombre</th>
+                                        <th>Template</th>
+                                        <th></th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody class="w-100">
-                                    <tr>
                                     {% for documento in documentos %}
                                     <tr>
-                                    <td class="text-body">{{ documento.nombre }}</td>
-                                    <td class="text-body">{{ documento.archivo.name|slice:"11:" }}</td>
-                                    <td class="text-body-bold "><a href="{% url 'ver_plantilla' documento.id %}">Ver</a></td>
-                                    <td>
-                                        <a class="text-body-bold text-muted" 
-                                            href="{% url 'eliminar_documento' documento.id %}"
-                                            onclick="return confirm('¿Estás seguro de que deseas eliminar este documento?')"
-                                        >
-                                           Eliminar
-                                        </a>
-                                    </td>
-                                    
+                                        <td class="text-body">{{ documento.nombre }}</td>
+                                        <td class="text-body">{{ documento.archivo.name|slice:"11:" }}</td>
+                                        <td class="text-body-bold "><a href="{% url 'ver_plantilla' documento.id %}">Ver</a></td>
+                                        <td>
+                                            <a class="text-body-bold text-muted" 
+                                                href="{% url 'eliminar_documento' documento.id %}"
+                                                onclick="return confirm('¿Estás seguro de que deseas eliminar este documento?')"
+                                            >
+                                            Eliminar
+                                            </a>
+                                        </td>
                                     </tr>
                                     {% empty %}
                                     <tr>

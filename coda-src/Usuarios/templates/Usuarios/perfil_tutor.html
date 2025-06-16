@@ -20,8 +20,7 @@
        />
     <h5 class="text-black">{{ usuario.first_name }}</h5>
     <h5 class="text-black">{{ usuario.last_name }} {{ usuario.second_last_name}}</h5>
-    <p class="text-primary">{{ usuario.get_coordinacion_display }}</p>
-    <a href="#!"><i class="far fa-edit fa-lg"></i></a>
+    <!-- <a href="#!"><i class="far fa-edit fa-lg"></i></a> -->
   </div>
   <div class="col-md-8">
     <div class="card-body p-4 w-100">
@@ -38,8 +37,11 @@
         </div>
         <div class="mb-3">
           <h6>Número económico</h6>
-          <p class="text-muted">{{ usuario.matricula }}</p>
-          
+          <p class="text-muted">{{ usuario.tutor.matricula }}</p>
+        </div>
+        <div class="mb-3">
+          <h6>Coordinación a la que pertenece el tutor</h6>
+          <p class="text-muted">{{ usuario.tutor.get_coordinacion_display }}</p>
         </div>
       </div>
       <hr class="mt-0 mb-4">

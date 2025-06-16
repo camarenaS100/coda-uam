@@ -183,6 +183,54 @@
 <!-- Fin Footer -->
 <!--Scrip MDB -->
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"></script>
+
+    <!-- Para la paginacion y la estructuracion de las tablas -->
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- Configuración global -->
+    <script>
+    $(document).ready(function () {
+        $('.datatable').DataTable({
+        language: {
+            decimal: "",
+            emptyTable: "No hay datos disponibles en la tabla",
+            info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+            infoEmpty: "Mostrando 0 a 0 de 0 entradas",
+            infoFiltered: "(filtrado de _MAX_ entradas totales)",
+            infoPostFix: "",
+            thousands: ",",
+            lengthMenu: "Mostrar _MENU_ entradas",
+            loadingRecords: "Cargando...",
+            processing: "Procesando...",
+            search: "Buscar:",
+            zeroRecords: "No se encontraron registros coincidentes",
+            paginate: {
+                first: "Primero",
+                last: "Último",
+                next: "Siguiente",
+                previous: "Anterior"
+            },
+            aria: {
+                sortAscending: ": activar para ordenar la columna de manera ascendente",
+                sortDescending: ": activar para ordenar la columna de manera descendente"
+            }
+        },
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        order: []
+        });
+    });
+    
+    </script>
+
 </body>
 
 </html>

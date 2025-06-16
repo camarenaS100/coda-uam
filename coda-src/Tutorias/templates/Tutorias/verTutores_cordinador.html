@@ -15,31 +15,30 @@
 
                       <!--Inicio de table-->
                       <div class = "table-responsive">
-                        <table class="table table-striped table-hover">
+                       <table class="table table-striped table-hover datatable">
                           <thead>
-                            <tr class="text-title">
+                            <tr class="text-center text-title h6">
+                              <th>N. Económico</th>
                               <th>Nombre</th>
                               <th>Correo</th>
-                              <th>Número económico</th>
                               <th>Coordinación</th>
                               <th>Tutorias</th>
                               <th>Tutorados</th>
                             </tr>
                           </thead>
-                          <tbody class="text-body">
-                            <tr>
+                          <tbody>
                             {% for tutor in object_list %}
-                            <tr>
-                              <td>{{ tutor.first_name }} {{ tutor.last_name }} {{ tutor.second_last_name }}</td>
-                              <td>{{ tutor.email}} </td>
-                              <td>{{ tutor.matricula }} </td>
+                            <tr class="text-body">
+                              <td class="text-center">{{ tutor.matricula }}</td>
+                              <td>{{ tutor.first_name }} {{ tutor.last_name }}{% if tutor.second_last_name %} {{ tutor.second_last_name }}{% endif %}</td>
+                              <td>{{ tutor.email }}</td>
                               <td>{{ tutor.get_coordinacion_display }}</td>
-                              <td><a class="text-body-bold" href="{% url 'Tutorias-Cordinador' tutor.pk%}">Ver Tutorias</a></td>
-                              <td><a class="text-body-bold"  href="{% url 'Tutorados-Cordinador' tutor.pk%}">Ver Tutorados</a></td>
+                              <td><a class="text-body-bold" href="{% url 'Tutorias-Cordinador' tutor.pk %}">Ver Tutorias</a></td>
+                              <td><a class="text-body-bold" href="{% url 'Tutorados-Cordinador' tutor.pk %}">Ver Tutorados</a></td>
                             </tr>
                             {% endfor %}
                           </tbody>
-                        </table>
+                      </table>
                       </div>
                       <!--Fin de table-->
                   </div>
