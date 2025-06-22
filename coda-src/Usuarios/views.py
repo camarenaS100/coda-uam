@@ -262,7 +262,7 @@ class ImportAlumnosView(CodaViewMixin, FormView):
                 return render(self.request, self.template_name, context)
 
             # Check for required columns
-            required_columns = ["Plan de estudios", "Matrícula", "Correo institucional", "Correo", "Apellido 1", "Apellido 2", "Nombres", "No. Económico", "Estado", "Sexo"]
+            required_columns = ["Plan de estudios", "Matrícula", "Correo institucional", "Correo", "Apellido 1", "Apellido 2", "Nombres", "No. Económico de Tutor", "Estado", "Sexo", "rfc", "Trimestre Ingreso"]
             missing_columns = [col for col in required_columns if col not in df.columns]
             if missing_columns:
                 context["error"] = f"Missing columns: {', '.join(missing_columns)}"
@@ -277,14 +277,29 @@ class ImportAlumnosView(CodaViewMixin, FormView):
                     last_name = row["Apellido 1"].strip()
                     second_last_name = row["Apellido 2"].strip()
                     first_name = row["Nombres"].strip()
-                    carrera = next((key for key, value in CARRERAS if value == row["Plan de estudios"]), None)
-                    estado = next((key for key, value in ESTADOS_ALUMNO if value == row["Estado"]), None)
-                    sexo = next((key for key, value in SEXOS if value == row["Sexo"]), None)
-                    tutor_id = row["No. Económico"]
-                    trimestre_ingreso = row["Trimestre de ingreso"].strip()
+                    rfc = row["rfc"].strip()
+                    # carrera = CARRERAS[row["Plan de estudios"].strip()]
+                    carrera = next((key for key, value in CARRERAS if value == row["Plan de estudios"].strip()), None)
+                    estado = row["Estado"]
+                    # estado = next((key for key, value in ESTADOS_ALUMNO if value == row["Estado"]), None)
+                    sexo = next((key for key, value in SEXOS if value == row["Sexo"].strip()), None)
+                    tutor_id = row["No. Económico de Tutor"]
+                    trimestre_ingreso = row["Trimestre Ingreso"].strip()
 
                     # Ensure required fields are valid
                     if not (matricula and email and first_name and last_name and carrera and estado and sexo and tutor_id):
+                        print("matricula :",matricula)
+                        print("email :",email)
+                        print("correo_personal :",correo_personal)
+                        print("last_name :",last_name)
+                        print("second_last_name :",second_last_name)
+                        print("first_name :",first_name)
+                        print("rfc :",rfc)
+                        print("carrera :",carrera)
+                        print("estado :",estado)
+                        print("sexo :",sexo)
+                        print("tutor_id :",tutor_id)
+                        print("trimestre_ingreso :",trimestre_ingreso)
                         warnings.append(f"Alumno {matricula}: Datos obligatorios faltantes. Asegúrese de que todos los campos obligatorios de información estén presentes.")
                         continue  # Skip to the next student
 
@@ -309,6 +324,7 @@ class ImportAlumnosView(CodaViewMixin, FormView):
                             "second_last_name": second_last_name,
                             "password": hashed_password,
                             "rol": [ALUMNO],
+                            "sexo":sexo
                         },
                     )
 
@@ -318,9 +334,9 @@ class ImportAlumnosView(CodaViewMixin, FormView):
                             id=usuario.id,
                             carrera=carrera,
                             estado=estado,
-                            sexo=sexo,
                             tutor_asignado=tutor_asignado,
                             trimestre_ingreso=trimestre_ingreso,
+                            rfc=rfc
                         )
                         alumno.__dict__.update(usuario.__dict__)  # Copy fields
                         alumno.save()

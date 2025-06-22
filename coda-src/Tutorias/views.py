@@ -311,8 +311,6 @@ class TutoriaUpdateView(BaseAccessMixin, UpdateView):
     
 # Solicitud Tutorias
 class TutoriaCreateView(AlumnoViewMixin, CreateView):
-    #model = Tutoria
-    #fields = ['tema', 'fecha', 'descripcion']
 
     form_class = FormTutorias
 

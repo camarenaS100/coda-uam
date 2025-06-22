@@ -7,26 +7,38 @@ class FormTutorias(forms.ModelForm):
 
     alumno = forms.CharField(disabled=True, required=False)
     tutor = forms.CharField(disabled=True, required=False)
-    # tema = forms.ChoiceField(choices=TEMAS)
-    #Despliega campo para multiples opciones
-    tema = forms.MultipleChoiceField(choices=TEMAS)
+    tema= forms.MultipleChoiceField(
+        choices=TEMAS,
+        widget=forms.CheckboxSelectMultiple,
+        label="Temas de la tutoría"
+    )
+    otro_tema = forms.CharField(required=False, label='Especificar tema')
     fecha = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
     descripcion = forms.CharField(widget=forms.Textarea, max_length=255, required=False)
     estado = forms.ChoiceField(choices=ESTADO, required=False)
-
 
     class Meta:
         model = Tutoria
         fields = ['tema', 'fecha', 'descripcion']
 
+    def clean(self):
+        cleaned_data = super().clean()
+        temas = cleaned_data.get('tema')
+        otro_tema = cleaned_data.get('otro_tema')
+
+        if temas and 'OTRO' in temas:
+            if not otro_tema or not otro_tema.strip():
+                self.add_error('otro_tema', 'Este campo es obligatorio si seleccionas "Otro".')
+
+
 class FormSeguimiento(forms.ModelForm):
-    asistencia = forms.BooleanField(required=False)
-    duracion = forms.ChoiceField(choices=DURACION_ASESORIA, required=False)
-    firma_documentos_beca = forms.BooleanField(required=False)
+    asistencia = forms.BooleanField(required=True)
+    duracion = forms.ChoiceField(choices=DURACION_ASESORIA, required=True)
+    firma_documentos_beca = forms.BooleanField(required=True)
     beca_otorgada = forms.CharField(max_length=255, required=False)
-    asesoria_especializada = forms.BooleanField(required=False)
+    asesoria_especializada = forms.BooleanField(required=True)
     observaciones = forms.CharField(widget=forms.Textarea, max_length=1000, required=False)
-    impacto_tutoria = forms.IntegerField(required=False)
+    impacto_tutoria = forms.IntegerField(required=True)
     resultados_tutoria = forms.CharField(widget=forms.Textarea, max_length=1000, required=False)
 
     class Meta:

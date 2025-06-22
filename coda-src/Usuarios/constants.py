@@ -39,8 +39,8 @@ CORREO = 'tutorias.beta.uamc@gmail.com'
 
 SEXOS = [
     ('', "Seleccione un sexo"),
-    ("M","Masculino"),
-    ("F","Femenino"),
+    ('M',"Masculino"),
+    ('F',"Femenino"),
 ]
 
 ESTADOS_ALUMNO = [
