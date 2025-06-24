@@ -21,7 +21,7 @@ from .constants import TEMAS
 from .models import Tutoria
 from .forms import FormTutorias, FormSeguimiento, FormReporte, FormCartasDeAsignacion, FormReporteDeTutorias
 # from .forms import FormSeguimiento # de nuevo, no estoy seguro, FormReporte
-from .constants import PENDIENTE, ACEPTADO, RECHAZADO, DURACION_ASESORIA # de nuevo, no estoy seguro
+from .constants import PENDIENTE, ACEPTADO, RECHAZADO, DURACION_ASESORIA, CANCELADO # de nuevo, no estoy seguro
 from Usuarios.constants import TUTOR, ALUMNO, COORDINADOR, TEMPLATES, CORREO
 from Usuarios.views import BaseAccessMixin, CodaViewMixin, TutorViewMixin, AlumnoViewMixin, CordinadorViewMixin
 from Usuarios.models import Tutor, Alumno, Cordinador, Coda
@@ -290,24 +290,40 @@ class RechazarTutoriaView(View):
         tutoria = get_object_or_404(Tutoria, pk=pk)
         tutoria.estado = RECHAZADO
         tutoria.save()
-        return redirect('Tutorias-tutor')    
+        return redirect('Tutorias-tutor')
+
+class CancelarTutoriaView(View):
+    def post(self, request, pk):
+        tutoria = get_object_or_404(Tutoria, pk=pk)
+        tutoria.estado = CANCELADO
+        tutoria.save()
+        return redirect('Tutorias-tutor')
     
 class TutoriaUpdateView(BaseAccessMixin, UpdateView):
     model = Tutoria
-    fields = ['tema', 'fecha', 'descripcion']
-
-    success_url  = reverse_lazy('Tutorias-historial')
-
+    form_class = FormTutorias  # ← Usa tu formulario personalizado
     template_name = 'Tutorias/editarTutoria.html'
+    success_url = reverse_lazy('Tutorias-tutor')
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
-        # rol = self.request.user.get_rol()
         if self.request.user.has_role("TUT"):
             tutor = Tutor.objects.get(pk=self.request.user)
         recipient = Alumno.objects.filter(pk=self.get_object().alumno)
-
         notify.send(tutor, recipient=recipient, verb='Tutoria Modificada')
         return super().form_valid(form)
+    
+    def editar_tutoria(request, pk):
+        tutoria = get_object_or_404(Tutoria, pk=pk)
+
+        if request.method == 'POST':
+            form = FormTutorias(request.POST, instance=tutoria)
+            if form.is_valid():
+                form.save()
+                return redirect('nombre-de-tu-vista-exitosa')  # Ajusta esto
+        else:
+            form = FormTutorias(instance=tutoria)
+
+        return render(request, 'tutoria/editar_tutoria.html', {'form': form})
     
     
 # Solicitud Tutorias

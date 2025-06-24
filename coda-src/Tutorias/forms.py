@@ -5,16 +5,24 @@ from .constants import TEMAS, ESTADO, ACEPTADO, PENDIENTE, DURACION_ASESORIA
 
 class FormTutorias(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Si existe instancia con fecha, ajustamos el formato para HTML5
+        if self.instance and self.instance.fecha:
+            self.initial['fecha'] = self.instance.fecha.strftime('%Y-%m-%dT%H:%M')
+
     alumno = forms.CharField(disabled=True, required=False)
     tutor = forms.CharField(disabled=True, required=False)
     tema= forms.MultipleChoiceField(
         choices=TEMAS,
         widget=forms.CheckboxSelectMultiple,
-        label="Temas de la tutoría"
+        label="Temas de la tutoría",
+        required=True
     )
     otro_tema = forms.CharField(required=False, label='Especificar tema')
-    fecha = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
-    descripcion = forms.CharField(widget=forms.Textarea, max_length=255, required=False)
+    fecha = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}), required=True)
+    descripcion = forms.CharField(widget=forms.Textarea, max_length=255, required=True)
     estado = forms.ChoiceField(choices=ESTADO, required=False)
 
     class Meta:

@@ -27,7 +27,7 @@
                           <tbody>
                             {% for tutor in object_list %}
                             <tr class="text-body">
-                              <td class="text-center">{{ tutor.matricula }}</td>
+                              <td>{{ tutor.matricula }}</td>
                               <td>{{ tutor.first_name }} {{ tutor.last_name }} {% if tutor.second_last_name %}{{ tutor.second_last_name }}{% endif %}</td>
                               <td>{{ tutor.email }}</td>
                               <td>{{ tutor.get_coordinacion_display }}</td>

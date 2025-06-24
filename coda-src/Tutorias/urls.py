@@ -29,6 +29,7 @@ urlpatterns = [
     # URLS TUTORES
     path('tutoria/<int:pk>/aceptar/', views.AceptarTutoriaView.as_view(), name='aceptar_tutoria'),
     path('tutoria/<int:pk>/rechazar/', views.RechazarTutoriaView.as_view(), name='rechazar_tutoria'),
+    path('tutoria/<int:pk>/cancelar/', views.CancelarTutoriaView.as_view(), name='cancelar-tutoria'),
     path('historial-tutorias/', views.HistorialTutoriasListView.as_view(), name='Tutorias-historial'),
     path('historial-tutorias-generar/', views.HistorialTutoriasGenerateView.as_view(), name='Tutorias-historial-generar'),
     path('tutorados-tutor/', views.VerTutoradosTutorListView.as_view(), name='Tutorados-tutor'),

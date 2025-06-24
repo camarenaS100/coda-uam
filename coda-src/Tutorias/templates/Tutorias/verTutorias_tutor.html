@@ -36,7 +36,7 @@
                     <th>Fecha</th>
                     <th>Hora</th>
                     <th>Tema</th>
-                    <th>Observaciones</th>
+                    <th>Acciones</th>
                     <th>Estado</th>
                   </tr>
                 </thead>
@@ -50,20 +50,30 @@
                     <td>{{ tutoria.fecha|date:"P" }}</td>
                     <td>{{ tutoria.get_tema_display|join:", " }} </td>
                     <td class="text-body-bold">
-                      <a href="{% url 'Tutorias-update' pk=tutoria.pk %}">Editar Tutoria</a>
+                      {% if tutoria.asistencia or tutoria.estado == "REJ" or tutoria.estado == "CAN" %}
+                      <p class="text-body-bold text-muted">Editar</p>
+                      {% else %}
+                      <a href="{% url 'Tutorias-update' pk=tutoria.pk %}">Editar</a>
+                      {% endif %}
                     </td>
                     <td>
-                      {% if tutoria.get_estado_display == 'Aceptada' %}
+                      {% if tutoria.get_estado_display == 'Aceptada' and not tutoria.asistencia %}
                         <span class="badge bg-success">Aceptada</span>
+                      {% elif tutoria.get_estado_display == 'Aceptada' and tutoria.asistencia %}
+                        <span class="badge badge-success text-dark">Completada</span>
                       {% elif tutoria.get_estado_display == 'Rechazada' %}
                         <span class="badge badge-warning text-dark">Rechazada</span>
+                      {% elif tutoria.get_estado_display == 'Cancelada' %}
+                        <span class="badge badge-danger text-dark">Cancelada</span>
                       {% else %}
-                        <form method="post" action="{% url 'aceptar_tutoria' tutoria.pk%}"> {% csrf_token %}
-                          <button type="submit" class="btn btn-sm btn-success">Aceptar</button>
-                        </form>
-                        <form method="post" action="{% url 'rechazar_tutoria' tutoria.pk%}"> {% csrf_token %}
-                          <button type="submit" class="btn btn-sm btn-danger">Rechazar</button>
-                        </form>
+                        <div class="d-flex align-items-center">
+                          <form method="post" action="{% url 'aceptar_tutoria' tutoria.pk%}"> {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success me-2">Aceptar</button>
+                          </form>
+                          <form method="post" action="{% url 'rechazar_tutoria' tutoria.pk%}"> {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger">Rechazar</button>
+                          </form>
+                        </div>
                       {% endif %}
                     </td>
                   </tr>

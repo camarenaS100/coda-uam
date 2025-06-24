@@ -4,16 +4,16 @@
 
 {% block body %}
 <!--Ver Tutorias-->
-<section id="section" class="w-100" style="background-color: #eee; padding: 0px;">
-        <div class="row d-flex justify-content-center align-items-center h-100" style="width: 110rem">
-            <div class="w-100 card border-top border-bottom border-4 p-4" style="border-color: #f08200 !important">
+<section id="section" class="w-100" style="background-color: #eee;">
+        <div class="row d-flex justify-content-center align-items-center h-100 mb-5 mt-5" style="width: 110rem">
+            <div class="w-100 card border-top border-bottom border-4 p-3" style="border-color: #f08200 !important">
                 <h3 class="fw-bold mb-4 text-primary text-title-bold">Historial de tutorías</h3>
                     <div class="table-responsive w-100"
                             style="width:100%"
                         >
                              {% load widget_tweaks %}
                             <table class="w-100 table table-striped table-hover text-body overflow-x-scroll overflow-y-scroll datatable">
-                                <thead class="text-title text-center">
+                                <thead class="text-title">
                                     <th>Id</th>
                                     <th>Matrícula</th>
                                     <th>Alumno</th>
@@ -34,7 +34,7 @@
                                 <tbody>
                                     {% for tutoria in object_list %}
                                         {% if tutoria.estado == "ACE" %}
-                                        <tr class="text-center">
+                                        <tr>
                                             <td>{{ tutoria.pk }}</td>
                                             <td>{{ tutoria.alumno.matricula }}</td>
                                             <td>{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }} {{ tutoria.alumno.second_last_name }}</td>

@@ -34,8 +34,8 @@
                             <div class="w-100 d-flex flex-row align-items-center mb-3">
                                 <label class="form-label fw-bold w-50">¿El alumno asistió a la tutoría?:</label><br>
                                 <div class="w-50 d-flex align-items-center">
-                                    <input type="radio" name="asistencia" value="True" class="" required class="me-1" > Sí</input>
-                                    <input type="radio" name="asistencia" value="False" class="ms-5 me-1"> No </input>
+                                    <input type="radio" name="asistencia" value="True" class="me-1" checked>Sí</input>
+                                    <input type="radio" name="asistencia" value="False" class="ms-5 me-1">  No </input>
                                 </div>
                             </div>
 
@@ -47,64 +47,69 @@
                                     <label class="form-label" for="id_duracion">Selecciona una opción</label>
                                 </div>
 
-                            <div class="w-100 d-flex flex-row align-items-center mb-3">
-                                <label class="form-label fw-bold w-50">¿Se firmó algún formato de solicitud de beca?</label><br>
-                                <div class="w-50 d-flex align-items-center">
-                                    <input type="radio" name="firma_documentos_beca" value="True" required class="me-1" > Sí
-                                    <input type="radio" name="firma_documentos_beca" value="False" class="ms-5 me-1" > No
-                                </div>
-                            </div>
-
-                            <div class="mb-3" id="beca-field">
-                                <label class="form-label fw-bold">Nombre de la beca otorgada al alumno:</label>
-                                <input type="text" name="beca_otorgada" class="form-control" maxlength="255">
-                            </div>
-
-                            <div class="w-100 d-flex flex-row align-items-center mb-3">
-                                <label class="form-label fw-bold w-50">¿Requirió asesoría especializada?:</label><br>
-                                <div class="w-50 d-flex align-items-center">
-                                    <input type="radio" name="asesoria_especializada" value="True" required class="me-1"> Sí
-                                    <input type="radio" name="asesoria_especializada" value="False"  class="ms-5 me-1" > No
-                                </div>
-                            </div>
-
-                            <!-- Aspectos tratados (se oculta si "No" en asesoría) -->
-                            <div class="mb-3"  id="aspectos-field">
-                                <label class="form-label fw-bold">Aspectos tratados en la tutoría, acuerdos o acciones establecidas, canalizaciones</label>
-                                <textarea name="observaciones" class="form-control" maxlength="1000"></textarea>
-                            </div>
-
-                            <div class="w-100 d-flex flex-row align-items-center mb-3">
-                                <label class="form-label fw-bold w-50">¿Nivel de impacto de la tutoría en el desempeño académico del alumno?:</label><br>
-                                <div class="w-50 d-flex align-items-center">
-                                    <div class="d-flex align-items-center me-3">
-                                        <input type="radio" name="impacto_tutoria" value="1" class="me-1" required> 1</input>
-                                    </div>
-                                    <div class="d-flex align-items-center me-3">
-                                        <input type="radio" name="impacto_tutoria" value="2" class="me-1"> 2 </input>
-                                    </div>
-                                    <div class="d-flex align-items-center me-3">
-                                        <input type="radio" name="impacto_tutoria" value="3" class="me-1"> 3 </input>
-                                    </div>
-                                    <div class="d-flex align-items-center me-3">
-                                        <input type="radio" name="impacto_tutoria" value="4" class="me-1"> 4 </input>
-                                    </div>
-                                    <div class="d-flex align-items-center me-3">
-                                        <input type="radio" name="impacto_tutoria" value="5" class="me-1"> 5 </input>
+                                <div class="w-100 d-flex flex-row align-items-center mb-3">
+                                    <label class="form-label fw-bold w-50">¿Se firmó algún formato de solicitud de beca?</label><br>
+                                    <div class="w-50 d-flex align-items-center">
+                                        <input type="radio" name="firma_documentos_beca" value="True" required class="me-1" > Sí
+                                        <input type="radio" name="firma_documentos_beca" value="False" class="ms-5 me-1" > No
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Resultados de la tutoría:</label>
-                                <textarea name="resultados_tutoria" class="form-control" maxlength="1000"></textarea>
+                                <div class="mb-3" id="beca-field">
+                                    <label class="form-label fw-bold">Nombre de la beca otorgada al alumno:</label>
+                                    <input type="text" name="beca_otorgada" class="form-control" maxlength="255">
+                                </div>
+
+                                <div class="w-100 d-flex flex-row align-items-center mb-3">
+                                    <label class="form-label fw-bold w-50">¿Requirió asesoría especializada?:</label><br>
+                                    <div class="w-50 d-flex align-items-center">
+                                        <input type="radio" name="asesoria_especializada" value="True" required class="me-1"> Sí
+                                        <input type="radio" name="asesoria_especializada" value="False"  class="ms-5 me-1" > No
+                                    </div>
+                                </div>
+
+                                <!-- Aspectos tratados (se oculta si "No" en asesoría) -->
+                                <div class="mb-3"  id="aspectos-field">
+                                    <label class="form-label fw-bold">Aspectos tratados en la tutoría, acuerdos o acciones establecidas, canalizaciones</label>
+                                    <textarea name="observaciones" class="form-control" maxlength="1000"></textarea>
+                                </div>
+
+                                <div class="w-100 d-flex flex-row align-items-center mb-3">
+                                    <label class="form-label fw-bold w-50">¿Nivel de impacto de la tutoría en el desempeño académico del alumno?:</label><br>
+                                    <div class="w-50 d-flex align-items-center">
+                                        <div class="d-flex align-items-center me-3">
+                                            <input type="radio" name="impacto_tutoria" value="1" class="me-1" required> 1</input>
+                                        </div>
+                                        <div class="d-flex align-items-center me-3">
+                                            <input type="radio" name="impacto_tutoria" value="2" class="me-1"> 2 </input>
+                                        </div>
+                                        <div class="d-flex align-items-center me-3">
+                                            <input type="radio" name="impacto_tutoria" value="3" class="me-1"> 3 </input>
+                                        </div>
+                                        <div class="d-flex align-items-center me-3">
+                                            <input type="radio" name="impacto_tutoria" value="4" class="me-1"> 4 </input>
+                                        </div>
+                                        <div class="d-flex align-items-center me-3">
+                                            <input type="radio" name="impacto_tutoria" value="5" class="me-1"> 5 </input>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Resultados de la tutoría:</label>
+                                    <textarea name="resultados_tutoria" class="form-control" maxlength="1000"></textarea>
+                                </div>
+                                <div class="py-4 d-flex w-100 justify-content-center text-title">
+                                    <button type="submit" class="btn btn-primary ms-2" id="guardar-btn">Guardar Seguimiento</button>
+                                </div>   
                             </div>
-                            <div class="py-4 d-flex w-100 justify-content-center text-title">
-                                <button type="submit" class="btn btn-primary ms-2">Guardar Seguimiento</button>
-                            </div>
+                        </form>
+                        <div class="py-4 d-flex w-100 justify-content-center text-title" style="display: none;">
+                            <form method="post" action="{% url 'cancelar-tutoria' tutoria.pk %}" id="cancelar-form">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger" id="cancel-btn">Cancelar tutoría</button>
+                            </form>
                         </div>
-                    </form>
-
                 </div>
             </div>
     </div>
@@ -113,38 +118,47 @@
 <!-- JavaScript para ocultar/mostrar los campos -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function () {
-        function toggleFields() {
-            // Ocultar todo si el alumno no asistió
-            if ($("input[name='asistencia']:checked").val() === "False") {
-                $("#extra-fields").hide();
-            } else {
-                $("#extra-fields").show();
-            }
+  $(document).ready(function () {
+    function toggleFields() {
+      const asistencia = $("input[name='asistencia']:checked").val();
 
-            // Ocultar nombre de la beca si no se firmó un documento de beca
-            if ($("input[name='firma_documentos_beca']:checked").val() === "False") {
-                $("#beca-field").hide();
-            } else {
-                $("#beca-field").show();
-            }
+      const extraFields = $("#extra-fields").find("input, select, textarea");
+      const guardarBtn = $("#guardar-btn");
+      const cancelarBtn = $("#cancel-btn");
 
-            // Ocultar aspectos tratados si no requirió asesoría
-            if ($("input[name='asesoria_especializada']:checked").val() === "False") {
-                $("#aspectos-field").hide();
-            } else {
-                $("#aspectos-field").show();
-            }
-        }
+      if (asistencia === "False") {
+        extraFields.prop("disabled", true);
+        guardarBtn.prop("disabled", true);
+        cancelarBtn.prop("disabled", false);
+      } else {
+        extraFields.prop("disabled", false);
+        guardarBtn.prop("disabled", false);
+        cancelarBtn.prop("disabled", true);
+      }
+    }
 
-        // Llamar a la función al cambiar las opciones
-        $("input[name='asistencia'], input[name='firma_documentos_beca'], input[name='asesoria_especializada']").change(function () {
-            toggleFields();
+    // Ejecutar al cambiar la opción de asistencia
+    $("input[name='asistencia']").on("change", toggleFields);
+
+    // Ejecutar al cargar
+    toggleFields();
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const cancelForm = document.getElementById('cancelar-form');
+    if (cancelForm) {
+        cancelForm.addEventListener('submit', function (e) {
+            const confirmacion = confirm("¿Estás seguro de que deseas cancelar esta tutoría?");
+            if (!confirmacion) {
+                e.preventDefault();  // Cancela el envío si el usuario presiona "Cancelar"
+            }
         });
+    }
+});
 
-        // Asegurar que el estado inicial es correcto en caso de recargar la página
-        toggleFields();
-    });
 </script>
+
+
+
 
 {% endblock %}
