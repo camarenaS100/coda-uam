@@ -72,7 +72,7 @@
                               {% comment %} <td class="text-body text-center">{{ alumno.correo_personal|default_if_none:"No registrado" }}</td> {% endcomment %}
                               <td class="text-body text-center">{{ alumno.get_carrera_display }}</td>
                               <td class="text-body text-center">{{ alumno.trimestre_ingreso }}</td>
-                              <td class="text-body text-center">{{ alumno.estado }}</td>
+                              <td class="text-body text-center">{{ alumno.get_estado_display }}</td>
                               <td class="text-center"><a class="text-body-bold text-primary" href="{% url 'editar-alumno' alumno.pk %}">Editar</a></td>
                             </tr>
                             {% endfor %}

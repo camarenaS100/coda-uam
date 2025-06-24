@@ -17,7 +17,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy, reverse
 from django.views.generic.edit import FormView
-from .forms import ImportAlumnosForm
+from .forms import FormVerAlumnos, ImportAlumnosForm
 from django.shortcuts import get_object_or_404
 from django.views.generic.list import ListView
 from django.http import HttpResponseBadRequest
@@ -409,3 +409,26 @@ class VerPlantilla(CodaViewMixin, UpdateView):
         context['nombre_fuente'] = self.object.nombre
         context['archivo_url'] = self.object.archivo.url if self.object.archivo else None
         return context
+
+class VerAlumnosCODDAAView(FormView):
+    template_name = "Usuarios/ver_alumnos_coda.html"
+    form_class = FormVerAlumnos
+
+    def form_valid(self, form):
+        carrera = form.cleaned_data.get("carrera")
+        estado = form.cleaned_data.get("estado")
+
+        alumnos = Alumno.objects.all()
+
+        if carrera:
+            alumnos = alumnos.filter(carrera=carrera)
+        if estado:
+            alumnos = alumnos.filter(estado=estado)
+
+        context = self.get_context_data(form=form, alumnos=alumnos)
+        return self.render_to_response(context)
+
+    def get(self, request, *args, **kwargs):
+        form = self.get_form()
+        alumnos = Alumno.objects.all()  # por defecto muestra todos
+        return self.render_to_response(self.get_context_data(form=form, alumnos=alumnos))

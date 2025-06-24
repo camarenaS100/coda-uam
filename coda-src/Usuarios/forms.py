@@ -133,3 +133,15 @@ class FormAlumnoUpdate(forms.ModelForm):
         self.fields['tutor_asignado'].label_from_instance = lambda obj: (
             f"{obj.matricula} - {obj.first_name} {obj.last_name} | {obj.coordinacion}"
         )
+
+class FormVerAlumnos(forms.Form):
+    carrera = forms.ChoiceField(
+        choices=[('', 'Todas las carreras')] + CARRERAS[1:],
+        required=False,
+        label="Carrera"
+    )
+    estado = forms.ChoiceField(
+        choices=[('', 'Todos los estados')] + ESTADOS_ALUMNO[1:],
+        required=False,
+        label="Estado"
+    )

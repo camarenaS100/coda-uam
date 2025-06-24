@@ -43,6 +43,8 @@ urlpatterns = [
     path('alumnos-coda/', views.VerAlumnosListView.as_view(), name='Alumnos-Coda'),
     path('tutorias-coda/<int:pk>', views.VerTutoriasCodaListView.as_view(), name='Tutorias-Coda'),
     path('tutorados-coda/<int:pk>', views.VerTutoradosCodaListView.as_view(), name='Tutorados-Coda'),
+    path('tutorias-aceptadas/', views.TutoriasAceptadasListView.as_view(), name='tutorias-aceptadas'),
+    path('exportar-tutorias-aceptadas', views.ExportarTutoriasAceptadasExcelView.as_view(), name='exportar-tutorias-aceptadas'),
 
 
     path('ruta-pdf/', views.generar_pdf, name='generar_pdf'),

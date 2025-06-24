@@ -15,6 +15,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.contrib import messages
 from datetime import datetime, timedelta
+import pandas as pd
 from .constants import TEMAS
 
 from .models import Tutoria
@@ -1419,3 +1420,58 @@ class RealizarSeguimientoView(TutorViewMixin, UpdateView):
 
         notify.send(tutor, recipient=recipient, verb='Seguimiento de tutoria realizado')
         return super().form_valid(form)
+    
+class TutoriasAceptadasListView(CodaViewMixin, ListView):
+    model = Tutoria
+    template_name = 'Tutorias/ver_tutorias_aceptadas_coda.html'
+    context_object_name = 'tutorias'
+
+    def get_queryset(self):
+        return Tutoria.objects.filter(estado='ACE').order_by('-fecha')
+
+class ExportarTutoriasAceptadasExcelView(CodaViewMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        tema_dict = dict(TEMAS) 
+        tutorias = Tutoria.objects.filter(estado='ACE').select_related('alumno', 'tutor')
+
+        data = []
+        for tutoria in tutorias:
+            temas = ", ".join([tema_dict.get(t, t) for t in tutoria.tema])
+            nombre_alumno = str(tutoria.alumno.first_name)
+            nombre_alumno = nombre_alumno + " " + str(tutoria.alumno.last_name)
+            if tutoria.alumno.second_last_name:
+                nombre_alumno = nombre_alumno + " " + str(tutoria.alumno.second_last_name)
+            nombre_tutor = str(tutoria.tutor.first_name)
+            nombre_tutor = nombre_tutor + " " + str(tutoria.tutor.last_name)
+            if tutoria.tutor.second_last_name:
+                nombre_tutor = nombre_tutor + " " + str(tutoria.tutor.second_last_name)
+
+            asistencia = "No"
+            if tutoria.asistencia:
+                asistencia = "Sí"
+            
+            data.append({
+                "Id":tutoria.pk,
+                "Matricula": tutoria.alumno.matricula,
+                "Alumno:":nombre_alumno,
+                "Correo Alumno": tutoria.alumno.email,
+                "Tutor": nombre_tutor,
+                "Numero Economico Tutor": tutoria.tutor.matricula,
+                "Fecha": tutoria.fecha.strftime("%d/%m/%Y"),
+                "Hora": tutoria.fecha.strftime("%H:%M"),
+                "Tema(s)": temas,
+                "Descripción": tutoria.descripcion,
+                "Asistencia":asistencia
+            })
+
+        df = pd.DataFrame(data)
+
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename="tutorias_aceptadas.xlsx"'
+
+        with pd.ExcelWriter(response, engine='openpyxl') as writer:
+            df.to_excel(writer, sheet_name='Tutorías Aceptadas', index=False)
+
+        return response
+

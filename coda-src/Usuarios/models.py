@@ -169,6 +169,11 @@ class Alumno(Usuario):
             self.rol.append(ALUMNO)
         super().save(*args, **kwargs)
         
+    def get_estado_display(self):
+        dict_estado = dict(ESTADOS_ALUMNO)
+        print(" dfansrfnakerfnakfnasdkfansdkfasdkfasmdf ------------------> ", dict_estado)
+        return dict_estado.get(self.estado, "Desconocido")
+    
     class Meta:
         verbose_name = 'Alumno'
         verbose_name_plural = 'Alumnos'
