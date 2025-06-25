@@ -722,6 +722,8 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
         reg_det = re.compile(r'\{(la|el|él)\}')
         reg_academico = re.compile(r'\{academico\}')
         reg_nombre_tutor = re.compile(r'\{nombre_tutor\}')
+        reg_asignacion = re.compile(r'\{asignado\}')
+        reg_reasignacion = re.compile(r'\{reasignado\}')
 
         # Esta validacion es para generar una sola carta de asignación y no generar el zip de forma innecesaria.
         if len(alumnos) == 1:
@@ -851,6 +853,16 @@ class Reporte2CreateView(CodaViewMixin, CreateView):
                                     self.paragraph_replace_text(p, reg_det, f"el").text
                                 if tutor.sexo == "F":
                                     self.paragraph_replace_text(p, reg_det, f"la").text
+                            if re.match(reg_asignacion, match):
+                                if tutor.sexo == "F":
+                                    self.paragraph_replace_text(p, reg_asignacion, f"asignada")
+                                elif tutor.sexo == "M":
+                                    self.paragraph_replace_text(p, reg_asignacion, f"asignado")
+                            if re.match(reg_reasignacion, match):
+                                if tutor.sexo == "F":
+                                    self.paragraph_replace_text(p, reg_reasignacion, f"reasignada")
+                                elif tutor.sexo == "M":
+                                    self.paragraph_replace_text(p, reg_reasignacion, f"reasignado")
 
                     # Save each document to ZIP
                     temp_buffer = BytesIO()
