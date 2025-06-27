@@ -64,7 +64,7 @@
                         <span class="badge rounded-pill badge-notification bg-primary">{{ unread_count }}</span>
                         {% endif %}
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end overflow-y-auto px-1 py-1 text-center" style="width: 18rem; height: auto;" aria-labelledby="navbarDropdownMenuNotification">
+                    <ul class="dropdown-menu dropdown-menu-end overflow-auto text-center"  style="max-height: 400px; min-width: 300px;" aria-labelledby="navbarDropdownMenuNotification">
                         {% if notificaciones_list %}
                         {% for notificacion in notificaciones_list %}
                         <li>

@@ -13,7 +13,7 @@
                 <div class="col-lg-8 col-xl-10">
                     <div class="card border-top border-bottom border-4" style="border-color: #F08200 !important;">
                         <div class="card-body p-4">
-                            <h3 class="fw-bold mb-4 text-primary text-title-bold">Tutorías Solicitadas</h3>
+                            <h3 class=" mb-4 text-primary text-title-bold">Tutorías Solicitadas</h3>
                             
                             <!--Inicio de table-->
                             <div class="row justify-content-center align-items-center">
@@ -48,6 +48,8 @@
                                                         <span class="badge bg-success">Aceptada</span>
                                                         {% elif tutoria.estado == 'REJ' %}
                                                         <span class="badge badge-warning text-dark">Rechazada</span>
+                                                        {% elif tutoria.get_estado_display == 'Cancelada' %}
+                                                        <span class="badge badge-danger text-dark">Cancelada</span>
                                                         {% else %}
                                                         <span class="badge badge-warning text-dark">Pendiente</span>
                                                         {% endif %}
@@ -70,7 +72,7 @@
     <!-- No borras por si lo que hiso felipe la caga
         <section style="background-color: #eee;">
             <div class="container">
-                <h3 class="fw-bold mb-5 text-primary">Tutorias Solicitadas</h3>
+                <h3 class=" mb-5 text-primary">Tutorias Solicitadas</h3>
                 <div class="row justify-content-center align-items-center">
                 <div class="col-lg-10">
                     <table class="table table-striped">
