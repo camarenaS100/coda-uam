@@ -18,16 +18,16 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     </head>
     
-<body>
+<body class="vh-100 d-flex flex-column w-100">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg bg-secondary p-2">
+    <nav class="navbar navbar-expand-lg bg-secondary p-2 d-flex flex-row justify-content-center align-items-center">
         <!-- Container -->
-        <div class="container-fluid">
+        <div class="container-fluid d-flex flex-row align-items-center">
             <!--Boton Toggle-->
             <button class="navbar-toggler" type="button" data-mdb-toggle="collapse"
                 data-mdb-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation">
-                <i class="fas fa-bars"></i>
+                <i class="fas fa-bars text-primary"></i>
             </button>
 
             <!-- Collapsible wrapper -->
@@ -39,7 +39,7 @@
 
 
                 <!-- Izquierda links -->
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav me-auto mb-lg-0 text-title">
                 {% block navbar %}
 
                 {% endblock %}
@@ -56,22 +56,19 @@
                 {% load notifications_tags %}
                 {% notifications_unread as unread_count %}
 
-
-
-                
                 <div class="dropdown">
-                    <a class="text-reset me-3 dropdown-toggle hidden-arrow" href="#" id="navbarDropdownMenuLink"
+                    <a class="fs-6 dropdown-toggle hidden-arrow" href="#" id="navbarDropdownMenuLink"
                         id="navbarDropdownMenuNotification" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
-                        <i class="far fa-bell text-primary"></i>
+                        <i class="far fa-bell text-primary h5 m-3"></i>
                         {% if unread_count %}
                         <span class="badge rounded-pill badge-notification bg-primary">{{ unread_count }}</span>
                         {% endif %}
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end overflow-auto" style="width: 18rem; height: 500px;" aria-labelledby="navbarDropdownMenuNotification">
+                    <ul class="dropdown-menu dropdown-menu-end overflow-auto text-center"  style="max-height: 400px; min-width: 300px;" aria-labelledby="navbarDropdownMenuNotification">
                         {% if notificaciones_list %}
                         {% for notificacion in notificaciones_list %}
                         <li>
-                            <div class="card border border-primary shadow-0 my-1" style="max-width: 18rem;">
+                            <div class="card border border-primary shadow-0 my-1 mx-1" style="max-width: 18rem;">
                                 <h5 class="card-header text-primary">{{notificacion.header}}</h5>
                                 <div class="card-body text-primary">
                                     <!-- <h6 class="card-title">{{notificacion.title}}</h5> -->
@@ -84,10 +81,10 @@
                         {% endfor %}
                         <!-- <a href="{% url 'remove-notifications'%}"><small>Eliminar todas</small></a> -->
                         <form method='post' action="{% url 'remove-notifications'%}">{% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-link">Eliminar notificaciones</button>
+                            <button type="submit" class="btn btn-sm btn-link my-1">Eliminar notificaciones</button>
                         </form>
                         {% else %}
-                        <p>No hay notificaciones</p>
+                        <p class="text-primary mt-3 text-title h8">No hay notificaciones</p>
                         {% endif %}
                         
                         <!-- Example notification
@@ -103,24 +100,23 @@
                         
                     </ul>
                 </div>
-
                 
                 <!-- Avatar -->
-                <div class="dropdown">
+                <div class="dropdown p-3">
                     <a class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#"
                         id="navbarDropdownMenuAvatar" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
-                        <img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" class="rounded-circle" height="30"
+                        <img src="{% static 'Alumnos/img/user_mini.png'%}" class="rounded-circle" height="30"
                             alt="" loading="lazy" />
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
                         <li>
-                            <a href="{% url 'perfil' %}"  class="dropdown-item" >Mi perfil</a>
+                            <a href="{% url 'perfil' %}"  class="dropdown-item text-title h8" >Mi perfil</a>
                         </li>
-                        <li>
+                        {% comment %} <li>
                             <a class="dropdown-item" href="#">Configuraciones</a>
-                        </li>
+                        </li> {% endcomment %}
                         <li>
-                            <a class="dropdown-item" href="{% url 'logout' %}">Cerrar Sesión</a>
+                            <a class="dropdown-item text-title h8" href="{% url 'logout' %}">Cerrar Sesión</a>
                         </li>
                     </ul>
                 </div>
@@ -139,9 +135,8 @@
 
 <!-- </div> -->
     
-
 <!-- Footer -->
-<footer class="bg-secondary text-center text-primary">
+<footer class="d-flex flex-column bg-secondary text-center text-primary">
     <!-- Grid container -->
     <div class="container p-4">
         <!-- Section: Social media -->
@@ -152,7 +147,7 @@
 
             <!-- Twitter -->
             <a class="btn btn-outline-primary btn-floating m-1" href="https://twitter.com/uamcuajimalpa" role="button"><i
-                    class="fab fa-twitter"></i></a>
+                    class="fab fa-x"></i></a>
 
             <!-- Youtube -->
             <a class="btn btn-outline-primary btn-floating m-1" href="https://www.youtube.com/channel/UCeqAccBtLAr-pOeOUoE4iDw" role="button"><i
@@ -165,7 +160,7 @@
         <!-- Section: Social media -->
 
         <!-- Section: Text -->
-        <section class="mb-4">
+        <section class="mb-4 text-title">
             <h4>Universidad Autónoma Metropolitana Cuajimalpa</h4>
             <h5>División de Ciencias Naturales e Ingeniería</h5>
         </section>
@@ -175,8 +170,8 @@
     <!-- Grid container -->
 
     <!-- Copyright -->
-    <div id = "copyright" class="text-center p-3">
-        © 2023 Copyright: 
+    <div id = "copyright" class="text-center p-3 text-title">
+        © 2025 Copyright: 
         <a class="text-primary" href="">GCC</a>
     </div>
     <!-- Copyright -->
@@ -184,6 +179,54 @@
 <!-- Fin Footer -->
 <!--Scrip MDB -->
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"></script>
+
+    <!-- Para la paginacion y la estructuracion de las tablas -->
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- Configuración global -->
+    <script>
+    $(document).ready(function () {
+        $('.datatable').DataTable({
+        language: {
+            decimal: "",
+            emptyTable: "No hay datos disponibles en la tabla",
+            info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+            infoEmpty: "Mostrando 0 a 0 de 0 entradas",
+            infoFiltered: "(filtrado de _MAX_ entradas totales)",
+            infoPostFix: "",
+            thousands: ",",
+            lengthMenu: "Mostrar _MENU_ entradas",
+            loadingRecords: "Cargando...",
+            processing: "Procesando...",
+            search: "Buscar:",
+            zeroRecords: "No se encontraron registros coincidentes",
+            paginate: {
+                first: "Primero",
+                last: "Último",
+                next: "Siguiente",
+                previous: "Anterior"
+            },
+            aria: {
+                sortAscending: ": activar para ordenar la columna de manera ascendente",
+                sortDescending: ": activar para ordenar la columna de manera descendente"
+            }
+        },
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        order: []
+        });
+    });
+    
+    </script>
+
 </body>
 
 </html>

@@ -7,43 +7,49 @@
 
 <!-- <body> -->
     <!--Ver Tutorias-->
-    <section class="min-vh-100" style="background-color: #eee;">
+    <section id="section" style="background-color: #eee;">
         <div class="container py-5 h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-lg-8 col-xl-10">
                     <div class="card border-top border-bottom border-4" style="border-color: #F08200 !important;">
                         <div class="card-body p-4">
-                            <h3 class="fw-bold mb-5 text-primary">Tutorias Solicitadas</h3>
+                            <h3 class=" mb-4 text-primary text-title-bold">Tutorías Solicitadas</h3>
                             
                             <!--Inicio de table-->
                             <div class="row justify-content-center align-items-center">
                                 <div class="col-lg-8 col-xl-12">
                                     <div class="table-responsive"> 
-                                        <table class="table table-striped">
+                                        <table class="table table-striped datatable">
                                             <thead>
-                                                <tr>
+                                                <tr class="text-title text-center">
+                                                    <th>Id</th>
+                                                    <th>Matrícula</th>
                                                     <th>Nombre</th>
                                                     <th>Fecha</th>
                                                     <th>Hora</th>
                                                     <th>Tema</th>
-                                                    <th>Tutor</th>
+                                                    <th>Tutor(a)</th>
                                                     <th>Estado de Aceptación</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {% for tutoria in object_list %}
-                                                <tr>
-                                                    <td>{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }}</td>
+                                                <tr class="text-body">
+                                                    <td>{{ tutoria.pk }} </td>
+                                                    <td>{{ tutoria.alumno.matricula }} </td>
+                                                    <td>{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }} {{ tutoria.alumno.second_last_name }} </td>
                                                     <td>{{ tutoria.fecha|date }}</td>
                                                     <td>{{ tutoria.fecha|date:"P" }}</td>
                                                     <!--Se agregó |join:", " para quitar notación de lista-->
                                                     <td>{{ tutoria.get_tema_display |join:", " }} </td>
-                                                    <td>{{ tutoria.tutor.first_name }} {{ tutoria.tutor.last_name }}</td>
-                                                    <td>
+                                                    <td>{{ tutoria.tutor.first_name }} {{ tutoria.tutor.last_name }} {{ tutoria.tutor.second_last_name }} </td>
+                                                    <td class="text-center text-title-bold">
                                                         {% if tutoria.estado == 'ACE' %}
                                                         <span class="badge bg-success">Aceptada</span>
                                                         {% elif tutoria.estado == 'REJ' %}
                                                         <span class="badge badge-warning text-dark">Rechazada</span>
+                                                        {% elif tutoria.get_estado_display == 'Cancelada' %}
+                                                        <span class="badge badge-danger text-dark">Cancelada</span>
                                                         {% else %}
                                                         <span class="badge badge-warning text-dark">Pendiente</span>
                                                         {% endif %}
@@ -66,7 +72,7 @@
     <!-- No borras por si lo que hiso felipe la caga
         <section style="background-color: #eee;">
             <div class="container">
-                <h3 class="fw-bold mb-5 text-primary">Tutorias Solicitadas</h3>
+                <h3 class=" mb-5 text-primary">Tutorias Solicitadas</h3>
                 <div class="row justify-content-center align-items-center">
                 <div class="col-lg-10">
                     <table class="table table-striped">

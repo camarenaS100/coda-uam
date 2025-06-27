@@ -1,0 +1,121 @@
+{% extends "Usuarios/HeaderAndFooterFachada.html" %}
+
+{% block title %}Cargar Plantilla{% endblock %}
+
+{% block body %}
+    <section id="section" style="background-color: #eee;">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-lg-8 col-xl-6">
+                    <div class="card border-top border-bottom border-4" style="border-color: #F08200 !important;">
+                        <div class="card-body p-4 text-title">
+                            <h3 class=" mb-3 text-primary text-title-bold">Cargar plantilla</h3>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0 text-secondary">Copia o arrastra el archivo que deseas subir.</h6>
+                            </div>
+                            {% load widget_tweaks %}
+
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                
+                                <!-- Nombre del documento -->
+                                <div class="form-outline mb-3 text-body">
+                                    {% render_field form.nombre type="text" class="form-control" id="nombre" %}
+                                    <label class="form-label" for="nombre">Nombre del documento</label>
+                                </div>
+                                <label class="form-label mb-3" style="font-size: 13px;">Este es el nombre con el que identificarás la plantilla</label>
+
+                                <!-- Área para arrastrar y soltar -->
+                                <div id="drop-area" style="border: 2px dashed #ccc; border-radius: 10px; padding: 40px; text-align: center;">
+                                    <input type="file" id="fileElem" name="archivo" style="display:none" onchange="handleFiles(this.files)">
+                                    <div id="upload-instructions" class="text-body">
+                                        <div class="upload-icon" style="color:#F08200">
+                                            <i class="fas fa-file-upload"></i>
+                                        </div>
+                                        <label for="fileElem" style="cursor:pointer; color:#F08200; display: inline;">Link</label>
+                                        <p style="display: inline; margin-left: 5px;">or drag and drop</p>
+                                        <p style="font-size: 12px; color: #666;">DOCX (max. 3MB)</p>
+                                    </div>
+
+                                    <!-- Mostrar el archivo adjunto -->
+                                    <div id="file-display" style="display: none; margin-top: 20px;">
+                                        <i class="fas fa-check-circle" style="color: green; margin-right: 10px;"></i>
+                                        <span id="file-name"></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Botones -->
+                                <div class="d-grid gap-2 d-md-flex justify-content-center mt-4">
+                                    <a href="{% url 'ajustes' %}"><button type="button" class="btn btn-outline-primary">Cancelar</button></a>
+                                    <button type="submit" class="btn btn-primary">Guardar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Manejar el arrastrar y soltar -->
+    <script>
+        var dropArea = document.getElementById('drop-area');
+        var fileDisplay = document.getElementById('file-display');
+        var fileNameDisplay = document.getElementById('file-name');
+        var fileElem = document.getElementById('fileElem');
+        var uploadInstructions = document.getElementById('upload-instructions'); // Nuevo
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Animación
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.style.borderColor = '#000', false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.style.borderColor = '#ccc', false);
+        });
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            let dt = e.dataTransfer;
+            let files = dt.files;
+
+            handleFiles(files);
+            fileElem.files = files;
+        }
+
+        fileElem.addEventListener('change', function(e) {
+            handleFiles(this.files);
+        });
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                // Ocultar las indicaciones para subir el archivo
+                uploadInstructions.style.display = 'none';
+
+                // Mostrar el nombre del archivo y el ícono de confirmación
+                fileNameDisplay.textContent = files[0].name;
+                fileDisplay.style.display = 'block';
+
+                // Animación de confirmación
+                fileDisplay.style.opacity = '0';
+                setTimeout(() => {
+                    fileDisplay.style.transition = 'opacity 0.5s';
+                    fileDisplay.style.opacity = '1';
+                }, 10);
+            }
+        }
+    </script>
+
+    <!-- Incluir MDB UI Kit si es necesario -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"></script>
+{% endblock %}

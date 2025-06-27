@@ -33,9 +33,6 @@ class TutoriaResource(resources.ModelResource):
     def dehydrate_tutor_matricula(self, tutoria):
         return f"{tutoria.tutor.matricula}"
 
-
-
-
 class TutoriasAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     """Define admin model for Tutoria objects"""
 
@@ -49,5 +46,23 @@ class TutoriasAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     tema_display.short_description = 'Temas'
     
     search_fields = ('tema', 'alumno', 'tutor', 'fecha')
+
+class PlantillaResource(resources.ModelResource):
+    titulo_display = fields.Field(column_name='titulo', attribute='titulo', widget=CharWidget())
+    archivo = fields.Field(column_name='archivo')
+
+    class Meta:
+        model = Tutoria
+        fields = ('id', 'titulo', 'nombre_de_archivo')
+
+class PlantillasAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    """Define admin model for Plantilla objects"""
+
+    resource_class = PlantillaResource
+    
+    list_display = ('titulo', 'archivo')
+
+    search_fields = ('titulo', 'archivo')
+
 
 admin.site.register(Tutoria, TutoriasAdmin)

@@ -8,17 +8,21 @@ ROLES = [
     (TUTOR, "Tutor"),
     (COORDINADOR, "Coordinador"),
     (ALUMNO, "Alumno"),
-    (CODA, "Coda"),
+    (CODA, "CODDAA"),
 ]
 
 
 MATEMATICAS = "MAT"
 COMPUTACION = "COM"
+IBIOLOGICA = "IB"
+BMOLECULAR = "BM"
 
 CARRERAS = [
         ('', "Seleccione una"),
         (MATEMATICAS, "Matemáticas Aplicadas"),
         (COMPUTACION, "Ingeniería en Computación"),
+        (IBIOLOGICA, "Ingeniería Biológica"),
+        (BMOLECULAR, "Biología Molecular")
     ]
 
 TEMPLATES = {
@@ -35,8 +39,8 @@ CORREO = 'tutorias.beta.uamc@gmail.com'
 
 SEXOS = [
     ('', "Seleccione un sexo"),
-    ("M","Masculino"),
-    ("F","Femenino"),
+    ('M',"Masculino"),
+    ('F',"Femenino"),
 ]
 
 ESTADOS_ALUMNO = [

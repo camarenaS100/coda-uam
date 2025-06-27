@@ -2,7 +2,9 @@
 
 # Collect static files
 echo "Collect static files"
-python manage.py collectstatic --noinput
+if [ "$DJANGO_ENV" = "production" ]; then
+    python manage.py collectstatic --noinput
+fi
 
 # Apply database migrations
 echo "Apply database migrations"

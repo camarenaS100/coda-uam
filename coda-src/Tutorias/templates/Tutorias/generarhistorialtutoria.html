@@ -4,42 +4,79 @@
 
 {% block body %}
 <!--Ver Tutorias-->
-<section class="min-vh-100" style="background-color: #eee">
+<section id="section"  style="background-color: #eee">
     <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
             <div class="col-lg-5 col-xl-6">
                 <div class="card border-top border-bottom border-4" style="border-color: #f08200 !important">
                     <div class="card-body p-4">
-                        <h3 class="fw-bold mb-3 text-primary">Generar PDF Historial Tutorias</h3>
+                        <h3 class=" mb-4 text-primary text-title-bold">Reporte Tutorías Atendidas</h3>
+                        <div class="card-body text-body b-3">
+                            {% load widget_tweaks%}
+                            <form method="post"> {% csrf_token %}
+                                <div class="form-outline mb-4 disabled">                              
+                                    {% render_field form.tutor type="text" class="form-control" id="tutor"%}
+                                    <label class="form-label" for="tutor">Tutor</label>
+                                </div>
 
-                        <div class="card-body">
-                            <form action="{% url 'generar_pdf' %}" method="get">
-                                <div class="mb-3">
-                                    <label for="fecha_inicio" class="form-label">Fecha de inicio:</label>
-                                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" />
+                                <div class="form-outline mb-3">
+                                    <div class="form-outline">                                
+                                        {% render_field form.oficio type="text" class="form-control" id="oficio" rows="3" placeholder="DNC_CODDAA_XXX_20XX"%}
+                                        <label class="form-label" for="oficio">No. Oificio</label>
+                                    </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="fecha_fin" class="form-label">Fecha de fin:</label>
-                                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" />
+
+                                <div class="d-flex w-100 justify-content-between">
+                                    <div class="mb-3 w-50 pe-2">
+                                        <label for="fecha_fin" class="form-label">Fecha de inicio:</label>
+                                        {% render_field form.fecha_inicio class="form-control" type="date" id="fecha_inicio"%}
+                                    </div>
+                                    <div class="mb-3 w-50 ps-2">
+                                        <label for="fecha_fin" class="form-label">Fecha de fin:</label>
+                                        {% render_field form.fecha_fin class="form-control" type="date" id="fecha_fin"%}
+                                    </div>
                                 </div>
+
+                                <div class="form-floating mb-3">
+                                    {% render_field form.fecha class="form-control" id="fecha" placeholder="Fecha y hora"%}
+                                    <label for="fecha">Fecha de emisión</label>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    {% render_field form.plantilla class="form-select" id="plantilla" %}
+                                    <label for="plantilla">Plantilla</label>
+                                </div>
+
                                 <!--Checkboxs para las columnas-->
-                                <div class="mb-3">
-                                    <label for="" class="form-label">Columnas:</label>
-                                    <br>
-                                    <input type="checkbox" class="" id="" name="todo"/>
-                                    <label for="todo" class="">Todas</label>
-                                    <input type="checkbox" class="" id="" name="alumno"/>
-                                    <label for="alumno" class="">Alumno</label>
-                                    <input type="checkbox" class="" id="" name="fecha"/>
-                                    <label for="fecha" class="">Fecha</label>
-                                    <input type="checkbox" class="" id="" name="hora"/>
-                                    <label for="hora" class="">Hora</label>
-                                    <input type="checkbox" class="" id="" name="tema"/>
-                                    <label for="tema" class="">Temas</label>
-                                    <input type="checkbox" class="" id="" name="notas"/>
-                                    <label for="notas" class="">Notas</label>
+                                <div class="w-100 d-flex flex-wrap justify-content-start align-items-center">
+                                    <label for="" class="text-primary me-3">Columnas:</label>
+                                    <div class="form-check me-3">
+                                        <input class="form-check-input" type="checkbox" id="col_alumno" name="col_alumno" checked>
+                                        <label class="form-check-label" for="col_alumno">Alumno</label>
+                                    </div>
+                                    <div class="form-check me-3">
+                                        <input class="form-check-input" type="checkbox" id="col_fecha" name="col_fecha" checked>
+                                        <label class="form-check-label" for="col_fecha">Fecha</label>
+                                    </div>
+                                    <div class="form-check me-3">
+                                        <input class="form-check-input" type="checkbox" id="col_hora" name="col_hora">
+                                        <label class="form-check-label" for="col_hora">Hora</label>
+                                    </div>
+                                    <div class="form-check me-3">
+                                        <input class="form-check-input" type="checkbox" id="col_tema" name="col_tema">
+                                        <label class="form-check-label" for="col_tema">Temas</label>
+                                    </div>
+                                    <div class="form-check me-3">
+                                        <input class="form-check-input" type="checkbox" id="col_notas" name="col_notas">
+                                        <label class="form-check-label" for="col_notas">observaciones</label>
+                                    </div>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Generar PDF</button>
+
+                                <div class="w-100 d-flex justify-content-evenly align-items-center my-3">
+                                    <button type="submit" class="btn btn-primary text-title">
+                                        Generar Reporte
+                                    </button>
+                                </div>
                             </form>
                         </div>
                         

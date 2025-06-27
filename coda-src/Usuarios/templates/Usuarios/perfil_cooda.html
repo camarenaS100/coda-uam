@@ -9,11 +9,21 @@
         <div class="col-md-4 gradient-custom text-center my-4"
             style="border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem">
             {% load static %}
-            <img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" alt="" class="img-fluid shadow-2-strong mt-4 mb-2"
-                style="width: 150px; height: 150px; object-fit: cover; z-index: 1" />
-            <h5 class="text-black">{{ coda.first_name }}</h5>
-            <h5 class="text-black">{{ coda.last_name }}</h5>
-            <a href="#"><i class="far fa-edit fa-lg"></i></a>
+            <!-- <img 
+                src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" 
+                alt="" class="img-fluid shadow-2-strong mt-4 mb-2"
+                style="width: 150px; height: 150px; object-fit: cover; z-index: 1"
+            /> -->
+            <img 
+                src="{% static 'Alumnos/img/user.png'%}"
+                alt="" class="img-fluid shadow-2-strong mt-4 mb-2"
+                style="width: 150px; height: 150px; object-fit: cover; z-index: 1"
+            />
+                
+            <h6 class="text-black">{{ usuario.first_name }} {{ usuario.last_name }}</h6>
+            <h6 class="text-black">{{ usuario.second_last_name }}</h6>
+            <h6 class="text-black">{{ coda.second_last_name }}</h6>
+            <!-- <a href="#"><i class="far fa-edit fa-lg"></i></a> -->
         </div>
         <div class="col-md-8">
             <div class="card-body p-4 mt-5">
@@ -21,16 +31,16 @@
                 <hr class="mt-0 mb-4" />
                 <div class="row pt-1">
                     <div class="col-6 mb-3">
-                        <h6>Correo institucional</h6>
-                        <p class="text-muted">{{coda.email}}</p>
+                        <h6>Correo</h6>
+                        <p class="text-muted ">{{usuario.email}}</p>
                     </div>
-                    <div class="col-6 mb-3">
+                    {% comment %} <div class="col-6 mb-3">
                         <h6>Correo personal</h6>
-                        <p class="text-muted">{{coda.correo_personal}}</p>
-                    </div>
+                        <p class="text-muted">{{usuario.correo_personal}}</p>
+                    </div> {% endcomment %}
                     <div class="col-6 mb-3">
                         <h6>Número económico</h6>
-                        <p class="text-muted">{{ coda.matricula }}</p>
+                        <p class="text-muted">{{ usuario.matricula }}</p>
                     </div>
                 </div>
             </div>

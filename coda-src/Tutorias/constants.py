@@ -38,9 +38,19 @@ TEMAS = [
 ACEPTADO = 'ACE'
 RECHAZADO = 'REJ'
 PENDIENTE = 'PEN'
+CANCELADO = 'CAN'
 
 ESTADO = [
     (ACEPTADO, 'Aceptada'),
     (RECHAZADO, 'Rechazada'),
-    (PENDIENTE, 'Pendiente')
+    (PENDIENTE, 'Pendiente'),
+    (CANCELADO, 'Cancelada')
+]
+
+DURACION_ASESORIA = [
+    (0, 'Menos de 30 minutos'),
+    (1, '30 minutos'),
+    (2, '1 hora'),
+    (3, '2 horas'),
+    (4, 'Más de dos horas')
 ]

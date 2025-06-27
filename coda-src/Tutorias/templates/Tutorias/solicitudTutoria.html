@@ -5,7 +5,7 @@
 {% block body %}
 
     <!--Formulario Solicitud tutoria-->
-    <section class="min-vh-100" style="background-color: #eee;">
+    <section id="section" style="background-color: #eee;">
         <div class="container py-5 h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-lg-8 col-xl-6">
@@ -13,18 +13,29 @@
                     
                     {% load widget_tweaks%}
                     <form method="post">{% csrf_token %}
-                        <div class="card-body p-5">
-                            <h3 class="fw-bold mb-5 text-primary">Solicitud de Tutoria</h3>
+                        <div class="card-body py-4 px-4 text-body">
+                            <h3 class=" mb-4 text-primary text-title-bold">Solicitud de Tutoría</h3>
 
                             <!-- Tema de la tutoria input -->
-                            <div class="row mb-4">
-                                <div class="col">
-                                    
-                                
-                                    {% render_field form.tema class="form-select" id="tema"%}
-                                    <label class="form-label" for="tema">Tema de la tutoria</label>
-                                    
+                            <div class="form-group mb-4">
+                                <label class="mb-2 text-body-bold text-muted">Tema(s) de la tutoría.</label>
+                                <p class="text-muted">Selecciona al menos un tema para tratar en la tutoría</p>
+                                <div class="row">
+                                    {% for checkbox in form.tema %}
+                                    <div class="col-6 mb-2">
+                                    <label class="form-check-label">
+                                        {{ checkbox.tag }} {{ checkbox.choice_label }}
+                                    </label>
+                                    </div>
+                                    {% endfor %}
                                 </div>
+
+                                 <!-- Campo "Otro (especificar)" -->
+                                <div id="otro-campo-container" class="mt-3" style="display: none;">
+                                    <label for="otro" class="form-label">Especifica el tema:</label>
+                                    <input type="text" class="form-control" name="otro_tema" id="otro" placeholder="Describe el tema...">
+                                </div>
+
                             </div>
 
                             <!-- Hora y Dia imput-->
@@ -47,7 +58,7 @@
                             </div>
 
                             <!-- Submit button -->
-                            <button type="submit" value="Save" class="btn btn-primary btn-block mb-4">Solicitar Tutoria</button>
+                            <button type="submit" value="Save" class="btn btn-primary btn-block mb-4 text-title">Solicitar Tutoria</button>
                         </div>
                     </form>
                     </div>
@@ -55,5 +66,49 @@
             </div>
         </div>
     </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const otroCampo = document.getElementById("otro-campo-container");
+
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener("change", function () {
+                    const otroMarcado = Array.from(checkboxes).some(cb => cb.value === "OTRO" && cb.checked);
+                    otroCampo.style.display = otroMarcado ? "block" : "none";
+                });
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const otroCampo = document.getElementById("otro-campo-container");
+            const otroInput = document.getElementById("otro");
+
+            function verificarOtro() {
+            const otroMarcado = Array.from(checkboxes).some(cb =>
+                cb.value === "OTRO" && cb.checked
+            );
+
+            if (otroMarcado) {
+                otroCampo.style.display = "block";
+                otroInput.setAttribute("required", "required");
+            } else {
+                otroCampo.style.display = "none";
+                otroInput.removeAttribute("required");
+                otroInput.value = "";  // Limpia el campo si no se va a enviar
+            }
+            }
+
+            // Validación inicial (por si ya está marcado)
+            verificarOtro();
+            checkboxes.forEach(function (checkbox) {
+            checkbox.addEventListener("change", verificarOtro);
+            });
+        });
+</script>
+
 
 {% endblock %}
