@@ -34,8 +34,8 @@
                         <td>{{ tutor.first_name }} {{ tutor.last_name }} {% if tutor.second_last_name %}{{ tutor.second_last_name }}{% endif %}</td>
                         <td>{{ tutor.email }}</td>
                         <td>{{ tutor.get_coordinacion_display }}</td>
-                        <td><a class="text-body-bold" href="{% url 'Tutorias-Coda' tutor.pk %}">Ver tutorías</a></td>
-                        <td><a class="text-body-bold" href="{% url 'Tutorados-Coda' tutor.pk %}">Ver tutorados</a></td>
+                        <td><a class="text-body-bold" href="{% url 'Tutorias-Coda' tutor.pk %}">Ver Tutorías</a></td>
+                        <td><a class="text-body-bold" href="{% url 'Tutorados-Coda' tutor.pk %}">Ver Tutorados</a></td>
                       </tr>
                     {% endfor %}
                   </tbody>
