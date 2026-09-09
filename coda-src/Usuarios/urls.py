@@ -56,3 +56,4 @@ urlpatterns = [
     path('webpush/save_information/', views.save_information, name='save_webpush_info'),
     # ... (other existing URL patterns)    
 ]
+

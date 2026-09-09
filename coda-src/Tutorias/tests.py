@@ -279,9 +279,7 @@ class PanelTutoriasAlumnoTests(TestCase):
 
     def test_cambio_sugerido_de_agendada_vuelve_a_pendiente(self):
         tutoria = self.crear_tutoria(ACEPTADO)
-        nueva_fecha = timezone.localtime(timezone.now() + timedelta(days=5)).replace(
-            hour=12, minute=30, second=0, microsecond=0
-        )
+        nueva_fecha = self.siguiente_fecha_con_dia(0, hora=12).replace(minute=30)
 
         response = self.client.post(
             reverse("solicitar_cambio_fecha_tutoria", args=[tutoria.pk]),
