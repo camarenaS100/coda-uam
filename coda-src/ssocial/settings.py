@@ -30,7 +30,9 @@ SESSION_COOKIE_SECURE=False
 #SECURE_SSL_REDIRECT=True
 #SECURE_HSTS_SECONDS=60
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', 'False').strip().lower() in (
+    '1', 'true', 'yes', 'on'
+)
 
 # Para confeccionar los dominios permitidos y la URL completa.
 TUTORIAS_DOMINIO = os.environ["TUTORIAS_DOMINIO"].strip()
@@ -198,12 +200,15 @@ NOTIFICATIONS_CODDAA_PHONE = os.getenv('NOTIFICATIONS_CODDAA_PHONE', '(55) 5814 
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
 if os.getenv('DJANGO_ENV') == 'development':
-    STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-    STATIC_ROOT = ''  # Desactivar STATIC_ROOT en desarrollo
+    STATIC_ROOT = None  # Desactivar STATIC_ROOT en desarrollo
 else:
-    STATICFILES_DIRS = []  # En producción, no se usa STATICFILES_DIRS
-    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # `collectstatic` copiará archivos aquí
+    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles") # `collectstatic` copiará archivos aquí
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

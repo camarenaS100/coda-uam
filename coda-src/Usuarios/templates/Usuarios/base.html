@@ -19,10 +19,7 @@
     <link rel="apple-touch-icon"
           href="{% static 'Alumnos/img/tutorias_dcni_icon2.png' %}">
 
-    <link rel="icon"
-          href="{% static 'Alumnos/img/icon.png' %}"
-          sizes="32x32"
-          type="image/png">
+    {% include "Usuarios/includes/favicon.html" %}
 
     <!-- Bootstrap CDN Bundle with Popper-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
@@ -173,19 +170,15 @@
               {% endif %}
 
               <li>
-                <a class="dropdown-item text-title h8"
-                   href="{% url 'configuracion_app' %}">
+                <button class="dropdown-item text-title h8"
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#configuracionModal"
+                        aria-haspopup="dialog"
+                        aria-controls="configuracionModal">
                   <i class="bi bi-gear"></i>
                   Configuración
-                </a>
-              </li>
-
-              <li>
-                <a class="dropdown-item text-title h8"
-                   href="{% url 'change_password' %}">
-                  <i class="bi bi-key"></i>
-                  Cambiar Contraseña
-                </a>
+                </button>
               </li>
 
               <li>
@@ -195,7 +188,7 @@
               <li>
                 <a class="dropdown-item text-danger h8" href="{% url 'logout' %}">
                   <i class="bi bi-box-arrow-right"></i>
-                Cerrar Sesión</a>
+                Cerrar sesión</a>
               </li>
             </ul>
           </div>
@@ -206,6 +199,44 @@
       <!-- Container wrapper -->
     </nav>
     <!-- Navbar -->
+
+    <div class="modal fade"
+         id="configuracionModal"
+         tabindex="-1"
+         aria-labelledby="configuracionModalLabel"
+         aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title fs-5" id="configuracionModalLabel">Configuración</h2>
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="list-group list-group-flush">
+              <a href="{% url 'configuracion_app' %}"
+                 class="list-group-item list-group-item-action d-flex align-items-center gap-3 p-3">
+                <i class="bi bi-bell fs-4 text-primary" aria-hidden="true"></i>
+                <div>
+                  <div class="fw-semibold">Notificaciones en pantalla</div>
+                  <small class="text-muted">Activa o desactiva las notificaciones en tus dispositivos.</small>
+                </div>
+              </a>
+              <a href="{% url 'change_password' %}"
+                 class="list-group-item list-group-item-action d-flex align-items-center gap-3 p-3">
+                <i class="bi bi-key fs-4 text-primary" aria-hidden="true"></i>
+                <div>
+                  <div class="fw-semibold">Cambiar contraseña</div>
+                  <small class="text-muted">Actualiza la contraseña de tu cuenta.</small>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!--  Inicia el body -->
     <!-- <div class="container py-5"> -->

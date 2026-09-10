@@ -1,117 +1,160 @@
 {% extends "Usuarios/HeaderAndFooterFachada.html" %}
 
-{% block title %}Tutorias Coordinador{% endblock %}
+{% block title %}Tutorías de la coordinación{% endblock %}
 
 {% block body %}
   <style>
-  body {
-    background-color: #f8f9fa;
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
   }
-  .container {
-    margin-top: 50px;
+
+  .tooltip-cafe {
+    --bs-tooltip-bg: #4b2f10;
+    --bs-tooltip-color: #fff;
+    --mdb-tooltip-bg: #4b2f10;
+    --mdb-tooltip-color: #fff;
   }
-  th {
-    background-color: #ff6600;
-    color: black;
+
+  .estado-con-motivo { cursor: pointer; }
+  .estado-con-motivo:focus-visible {
+    outline: 3px solid rgba(240, 130, 0, .35);
+    outline-offset: 2px;
   }
+
+  .tabla-tutorias-coordinador th,
+  .tabla-tutorias-coordinador td { vertical-align: middle; }
   </style>
 
   <section id="section" style="background-color: #eee;">
-    <div class="d-flex mb-5 mt-5">
+    <div class="container-fluid px-3 px-xl-5 py-5 min-vh-100">
       <div class="card border-top border-bottom border-4"
            style="border-color: #F08200 !important">
         <div class="card-body p-4">
-          <h3 class="mb-4 text-primary text-title-bold">Lista de Tutorias</h3>
-          <!--         
-        <div class="filter-bar text-body mb-3">
-          <label for="docente-filter">Filtrar por Docente:</label>
-          <select id="docente-filter">
-            <option value="todos">Todos</option>
-            {% for tutor in tutores %}
-              <option value="{{ tutor.first_name }} {{ tutor.last_name }} {{ tutor.second_last_name }}">
-                {{ tutor.first_name }} {{ tutor.last_name }} {{ tutor.second_last_name }}
-              </option>
-            {% endfor %}
-          </select>
-        </div> -->
+          <h3 class="mb-4 text-primary text-title-bold">Historial de tutorías de la coordinación</h3>
 
-          <!--Inicio de Formulario de Filtro-->
           <form method="post" class="mb-4">
             {% csrf_token %}
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="id_estado">{{ form.estado.label }}</label>
-                  {{ form.estado }}
-                </div>
+            <div class="row g-3 align-items-end">
+              <div class="col-sm-8 col-lg-5">
+                <label class="form-label" for="id_estado">{{ form.estado.label }}</label>
+                {{ form.estado }}
               </div>
-              <div class="col-md-6 d-flex align-items-end">
+              <div class="col-sm-auto">
                 <button type="submit" class="btn btn-primary">Filtrar</button>
               </div>
             </div>
           </form>
-          <!--Fin de Formulario de Filtro-->
 
-          <table class="table table-striped table-hover datatable text-body">
-            <thead>
-              <tr class="text-title text-center">
-                <th>Id</th>
-                <th>Matrícula</th>
-                <th>Alumno</th>
-                <th>Licenciatura</th>
-                <th>Estado Guardado</th>
-                <th>Estado Actual</th>
-                <th>Fecha</th>
-                <th>Hora</th>
-                <th>Tutor</th>
-                <th>Tema</th>
-                <th class="text-center">¿Asistió el alumno?</th>
-              </tr>
-            </thead>
-            <tbody id="data">
-              {% for tutoria in object_list %}
-                <tr class=""
-                    data-docente="{{ tutoria.tutor.first_name }} {{ tutoria.tutor.last_name }} {{ tutoria.tutor.second_last_name }}">
-                  <td>{{ tutoria.pk }}</td>
-                  <td>{{ tutoria.alumno.matricula }}</td>
-                  <td>{{ tutoria.alumno.first_name }} {{ tutoria.alumno.last_name }} {{ tutoria.alumno.second_last_name }}</td>
-                  <td>{{ tutoria.alumno.get_carrera_display }}</td>
-                  <td>{{ tutoria.get_estado_alumno_historico_display }}</td>
-                  <td>{{ tutoria.alumno.get_estado_display }}</td>
-                  <td>{{ tutoria.fecha|date }}</td>
-                  <td>{{ tutoria.fecha|date:"P" }}</td>
-                  <td>{{ tutoria.tutor.first_name }} {{ tutoria.tutor.last_name }} {{ tutoria.tutor.second_last_name }}</td>
-                  <td>{{ tutoria.get_tema_display|join:", " }}</td>
-                  <td class="text-center">
-                    {% if tutoria.asistencia %}
-                      Sí
-                    {% else %}
-                      No
-                    {% endif %}
-                  </td>
+          <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle datatable tabla-tutorias-coordinador">
+              <thead>
+                <tr class="text-title text-center">
+                  <th>Matrícula</th>
+                  <th>Estudiante</th>
+                  <th>Carrera</th>
+                  <th>Estado académico</th>
+                  <th>Tutor</th>
+                  <th>Fecha solicitud</th>
+                  <th>Fecha tutoría</th>
+                  <th>Tema(s)</th>
+                  <th>Descripción</th>
+                  <th>Estado</th>
+                  <th>Acción</th>
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {% for tutoria in object_list %}
+                  <tr class="text-body text-center" data-tutoria-id="{{ tutoria.pk }}">
+                    <td>{{ tutoria.alumno.matricula }}</td>
+                    <td>{{ tutoria.alumno.nombre_completo }}</td>
+                    <td>{{ tutoria.alumno.get_carrera_display }}</td>
+                    <td>{{ tutoria.alumno.get_estado_display }}</td>
+                    <td>{{ tutoria.tutor.nombre_completo }}</td>
+                    <td class="text-nowrap">
+                      <span class="d-block fw-semibold">{{ tutoria.fecha_solicitud|date:"j M Y" }}</span>
+                      <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ tutoria.fecha_solicitud|date:"P" }}</small>
+                    </td>
+                    <td class="text-nowrap">
+                      <span class="d-block fw-semibold">{{ tutoria.fecha|date:"j M Y" }}</span>
+                      <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ tutoria.fecha|date:"P" }}</small>
+                    </td>
+                    <td>{{ tutoria.get_tema_display|join:", " }}</td>
+                    <td style="min-width: 180px; max-width: 240px;">
+                      <span class="tooltip-dinamico"
+                            data-descripcion="{{ tutoria.descripcion|default:''|escape }}"
+                            data-mdb-placement="top"
+                            data-mdb-custom-class="tooltip-cafe">
+                        <span class="line-clamp-2 text-wrap">{{ tutoria.descripcion|default:"—" }}</span>
+                      </span>
+                    </td>
+                    <td>{% include "Tutorias/includes/partials/badge_estado_historial.html" with tutoria=tutoria %}</td>
+                    <td>
+                      {% if tutoria.fecha_reporte %}
+                        <button type="button"
+                                class="btn btn-outline-primary btn-sm text-nowrap js-ver-reporte"
+                                data-url="{% url 'Reporte-tutoria-coordinador' tutoria.pk %}">
+                          <i class="bi bi-eye me-1" aria-hidden="true"></i>Ver reporte
+                        </button>
+                      {% else %}
+                        <span class="text-muted" title="Esta tutoría no tiene reporte">—</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="11" class="py-4 text-center text-muted">No hay tutorías que mostrar.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Script de filtro por docente -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <div id="contenedor-modal-reporte-coordinador"></div>
+
   <script>
-$(document).ready(function() {
-  $('#docente-filter').on('change', function() {
-    const selectedDocente = $(this).val();
-    
-    if (selectedDocente === 'todos') {
-      $('#data tr').show();
-    } else {
-      $('#data tr').hide();
-      $('#data tr[data-docente="' + selectedDocente + '"]').show();
-    }
+  document.addEventListener("DOMContentLoaded", function () {
+    const contenedor = document.getElementById("contenedor-modal-reporte-coordinador");
+
+    document.addEventListener("click", async function (event) {
+      const boton = event.target.closest(".js-ver-reporte");
+      if (!boton) return;
+
+      boton.disabled = true;
+      try {
+        const respuesta = await fetch(boton.dataset.url, {
+          headers: {"X-Requested-With": "XMLHttpRequest"}
+        });
+        if (!respuesta.ok) throw new Error("No fue posible cargar el reporte.");
+
+        contenedor.innerHTML = await respuesta.text();
+        const elementoModal = contenedor.querySelector("#modalReporteTutoriaLectura");
+        new mdb.Modal(elementoModal).show();
+      } catch (error) {
+        window.alert(error.message);
+      } finally {
+        boton.disabled = false;
+      }
+    });
+
+    document.querySelectorAll(".tooltip-dinamico").forEach(function (elemento) {
+      const descripcion = elemento.dataset.descripcion;
+      if (descripcion) {
+        elemento.setAttribute("title", descripcion);
+        new mdb.Tooltip(elemento);
+      }
+    });
+
+    document.querySelectorAll('[data-bs-toggle="popover"]').forEach(function (elemento) {
+      new bootstrap.Popover(elemento);
+    });
   });
-});
   </script>
 {% endblock %}

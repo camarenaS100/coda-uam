@@ -2188,12 +2188,18 @@ class VerTutoriasCoordinadorListView(CordinadorViewMixin, FormView):
     template_name='Tutorias/verTutorias_cordinador.html'
     form_class = FormVerTutorias
 
+    def get_tutorias(self):
+        coord = get_object_or_404(Cordinador, pk=self.request.user.pk)
+        return (
+            Tutoria.objects.filter(tutor__coordinacion=coord.coordinacion)
+            .select_related("alumno", "tutor")
+            .order_by("-fecha")
+        )
+
     def form_valid(self, form):
         estado = form.cleaned_data.get("estado")
 
-        coord = get_object_or_404(Cordinador, pk=self.request.user.pk)
-        tutores = Tutor.objects.all().filter(coordinacion=coord.coordinacion)
-        tutorias = Tutoria.objects.filter(tutor__in=tutores)
+        tutorias = self.get_tutorias()
 
         if estado:
             tutorias = tutorias.filter(alumno__estado=estado)
@@ -2203,9 +2209,7 @@ class VerTutoriasCoordinadorListView(CordinadorViewMixin, FormView):
 
     def get(self, request, *args, **kwargs):
         form = self.get_form()
-        coord = get_object_or_404(Cordinador, pk=request.user.pk)
-        tutores = Tutor.objects.all().filter(coordinacion=coord.coordinacion)
-        tutorias = Tutoria.objects.filter(tutor__in=tutores)
+        tutorias = self.get_tutorias()
         return self.render_to_response(self.get_context_data(form=form, object_list=tutorias))
     
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
@@ -2216,6 +2220,26 @@ class VerTutoriasCoordinadorListView(CordinadorViewMixin, FormView):
         context["tutores"] = tutores
 
         return context
+
+
+class ReporteTutoriaCoordinadorDetailView(CordinadorViewMixin, DetailView):
+    """Muestra al coordinador un reporte sin permitir su modificación."""
+
+    model = Tutoria
+    context_object_name = "tutoria"
+    template_name = "Tutorias/includes/partials/modal_reporte_tutoria_lectura.html"
+
+    def get_queryset(self):
+        coord = get_object_or_404(Cordinador, pk=self.request.user.pk)
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                tutor__coordinacion=coord.coordinacion,
+                fecha_reporte__isnull=False,
+            )
+            .select_related("alumno", "tutor")
+        )
     
 class VerTutoriasCoordinadorPorTutorListView(CordinadorViewMixin, FormView):
      

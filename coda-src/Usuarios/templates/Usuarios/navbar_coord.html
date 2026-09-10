@@ -3,11 +3,17 @@
 {% block navbar %}
 
   <li class="nav-item">
-    <a class="nav-link text-primary" href="{% url 'Tutores-Cordinador' %}">Tutores</a>
+    <a class="nav-link text-primary" href="{% url 'Tutores-Cordinador' %}">
+      <i class="bi bi-people"></i>
+      Tutores
+    </a>
   </li>
   <li class="nav-item">
     <a class="nav-link text-primary"
-       href="{% url 'Tutorias-Coordinacion' %}">Tutorías</a>
+       href="{% url 'Tutorias-Coordinacion' %}">
+      <i class="bi bi-archive"></i>
+      Tutorías
+    </a>
   </li>
 
 {% endblock %}

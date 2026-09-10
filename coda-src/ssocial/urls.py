@@ -23,7 +23,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # Django default auth urls
     path('logout/', auth_views.logout_then_login, name='logout'),
-    path('reset-password/', auth_views.PasswordResetView.as_view(template_name='Usuarios/reset_password.html'), name='reset_password'),
+    path('reset-password/', auth_views.PasswordResetView.as_view(
+        template_name='Usuarios/reset_password.html',
+        email_template_name='Usuarios/correos/password_reset.txt',
+        html_email_template_name='Usuarios/correos/password_reset.html',
+        subject_template_name='Usuarios/correos/password_reset_subject.txt',
+    ), name='reset_password'),
     path('password-reset-confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='Usuarios/password_reset_confirm.html'), name='password_reset_confirm'), 
     path('password-reset-complete/', auth_views.PasswordResetCompleteView.as_view(template_name='Usuarios/password_reset_complete.html'), name='password_reset_complete'),
     path('password-reset-done/', auth_views.PasswordResetDoneView.as_view(template_name='Usuarios/reset_password_done.html'), name='password_reset_done'),

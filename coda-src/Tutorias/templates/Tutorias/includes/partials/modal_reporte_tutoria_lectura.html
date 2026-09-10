@@ -1,0 +1,50 @@
+<div class="modal fade"
+     id="modalReporteTutoriaLectura"
+     tabindex="-1"
+     aria-labelledby="modalReporteTutoriaLecturaLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title text-primary text-title-bold"
+              id="modalReporteTutoriaLecturaLabel">Reporte de tutoría</h5>
+          <p class="mb-1 mt-2"><strong>Estudiante:</strong> {{ tutoria.alumno.nombre_completo }}</p>
+          <p class="mb-0"><strong>Tutor:</strong> {{ tutoria.tutor.nombre_completo }}</p>
+        </div>
+        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="modal-body text-start">
+        <dl class="row mb-0">
+          <dt class="col-sm-5 py-2">Fecha de la tutoría</dt>
+          <dd class="col-sm-7 py-2">{{ tutoria.fecha|date:"d/m/Y H:i" }}</dd>
+          <dt class="col-sm-5 py-2">Fecha de llenado del reporte</dt>
+          <dd class="col-sm-7 py-2">{{ tutoria.fecha_reporte|date:"d/m/Y H:i" }}</dd>
+          <dt class="col-sm-5 py-2">¿Asistió el alumno?</dt>
+          <dd class="col-sm-7 py-2">{{ tutoria.asistencia|yesno:"Sí,No,Sin registro" }}</dd>
+          <dt class="col-sm-5 py-2">Duración</dt>
+          <dd class="col-sm-7 py-2">{{ tutoria.get_duracion_display }}</dd>
+          <dt class="col-sm-5 py-2">¿Se firmó una solicitud de beca?</dt>
+          <dd class="col-sm-7 py-2">{{ tutoria.firma_documentos_beca|yesno:"Sí,No,Sin registro" }}</dd>
+          <dt class="col-sm-5 py-2">Beca otorgada</dt>
+          <dd class="col-sm-7 py-2">{{ tutoria.beca_otorgada|default:"Sin registro" }}</dd>
+          <dt class="col-sm-5 py-2">¿Requirió asesoría especializada?</dt>
+          <dd class="col-sm-7 py-2">{{ tutoria.asesoria_especializada|yesno:"Sí,No,Sin registro" }}</dd>
+          <dt class="col-sm-5 py-2">Impacto en el desempeño académico</dt>
+          <dd class="col-sm-7 py-2">
+            {% if tutoria.impacto_tutoria %}{{ tutoria.impacto_tutoria }} de 5{% else %}Sin registro{% endif %}
+          </dd>
+          <dt class="col-sm-5 py-2">Aspectos tratados, acuerdos o canalizaciones</dt>
+          <dd class="col-sm-7 py-2 text-break">{{ tutoria.observaciones|default:"Sin registro"|linebreaksbr }}</dd>
+          <dt class="col-sm-5 py-2">Resultados de la tutoría</dt>
+          <dd class="col-sm-7 py-2 text-break">{{ tutoria.resultados_tutoria|default:"Sin registro"|linebreaksbr }}</dd>
+        </dl>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>

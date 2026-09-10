@@ -14,7 +14,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.contrib.auth.models import AnonymousUser
 
-from Usuarios.models import Coda, Tutor, Alumno, HorarioTutor, PushDevice
+from Usuarios.models import Coda, Cordinador, Tutor, Alumno, HorarioTutor, PushDevice
 from webpush.models import PushInformation, SubscriptionInfo
 from pywebpush import WebPushException
 from Tutorias.models import Tutoria, HistorialCambioTutoria
@@ -48,6 +48,90 @@ from Tutorias.signals.notification_service import (
     notify_tutoria_event,
 )
 from Tutorias.signals.signals_definitions import tutoria_notification_requested
+
+
+class ReporteTutoriaCoordinadorAccessTests(TestCase):
+    def setUp(self):
+        self.coordinador = Cordinador.objects.create_user(
+            first_name="Coordinadora",
+            last_name="Computación",
+            email="coordinacion.com@example.com",
+            matricula="COORDCOM1",
+            password="password123",
+            coordinacion="COM",
+        )
+        self.tutor_misma_coordinacion = Tutor.objects.create_user(
+            first_name="Tutor",
+            last_name="Computación",
+            email="tutor.com@example.com",
+            matricula="TCOM001",
+            password="password123",
+            coordinacion="COM",
+        )
+        self.tutor_otra_coordinacion = Tutor.objects.create_user(
+            first_name="Tutor",
+            last_name="Matemáticas",
+            email="tutor.mat@example.com",
+            matricula="TMAT001",
+            password="password123",
+            coordinacion="MAT",
+        )
+        self.alumno = Alumno.objects.create_user(
+            first_name="Alumno",
+            last_name="Prueba",
+            email="alumno.coord@example.com",
+            matricula="ACOORD001",
+            password="password123",
+            carrera="COM",
+            estado=1,
+            tutor_asignado=self.tutor_misma_coordinacion,
+        )
+        datos = {
+            "alumno": self.alumno,
+            "tema": ["BEC"],
+            "fecha": timezone.now() - timedelta(days=1),
+            "estado": ACEPTADO,
+            "fecha_reporte": timezone.now(),
+        }
+        self.reporte_propio = Tutoria.objects.create(
+            tutor=self.tutor_misma_coordinacion,
+            **datos,
+        )
+        self.reporte_ajeno = Tutoria.objects.create(
+            tutor=self.tutor_otra_coordinacion,
+            **datos,
+        )
+        self.sin_reporte = Tutoria.objects.create(
+            tutor=self.tutor_misma_coordinacion,
+            alumno=self.alumno,
+            tema=["BEC"],
+            fecha=timezone.now() - timedelta(days=1),
+            estado=ACEPTADO,
+        )
+        self.client.force_login(self.coordinador)
+
+    def test_coordinador_puede_ver_reporte_de_su_coordinacion(self):
+        response = self.client.get(
+            reverse("Reporte-tutoria-coordinador", args=[self.reporte_propio.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Reporte de tutoría")
+        self.assertNotContains(response, "Guardar reporte")
+
+    def test_coordinador_no_puede_ver_reporte_de_otra_coordinacion(self):
+        response = self.client.get(
+            reverse("Reporte-tutoria-coordinador", args=[self.reporte_ajeno.pk])
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_no_se_muestra_como_reporte_una_tutoria_sin_fecha_reporte(self):
+        response = self.client.get(
+            reverse("Reporte-tutoria-coordinador", args=[self.sin_reporte.pk])
+        )
+
+        self.assertEqual(response.status_code, 404)
 
 
 class HistorialTutoriasGenerateAccessTests(TestCase):
