@@ -1,11 +1,16 @@
 from django.test import TestCase
 from django.test import override_settings
+from django.core import mail
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
 from django.db import models
 from django.core.files.uploadedfile import SimpleUploadedFile
 from Usuarios.models import Alumno, Tutor, Cordinador, Coda, Documento
 from Usuarios.constants import ALUMNO, TUTOR, COORDINADOR, CODA
 from django.contrib.auth import get_user_model
-from django.urls import reverse
+from django.urls import reverse, resolve
+from urllib.parse import urlsplit
 import json
 import tempfile
 from io import BytesIO
@@ -34,6 +39,38 @@ from Usuarios.services.importacion_tutores import (
 
 # Importar el modelo de Usuario
 Usuario = get_user_model()
+
+
+@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+class PasswordResetEmailTests(TestCase):
+    def test_envia_correo_personalizado_con_enlace_valido(self):
+        usuario = Usuario.objects.create_user(
+            email="recuperacion@cua.uam.mx",
+            first_name="Ana",
+            password="ClaveOriginal123!",
+        )
+
+        response = self.client.post(
+            reverse("reset_password"), {"email": usuario.email}, secure=True
+        )
+
+        self.assertRedirects(response, reverse("password_reset_done"))
+        self.assertEqual(len(mail.outbox), 1)
+        correo = mail.outbox[0]
+        self.assertEqual(correo.to, [usuario.email])
+        self.assertEqual(correo.subject, "Restablece tu contraseña | CODDAA")
+        self.assertIn("Hola Ana", correo.body)
+        enlace = next(line for line in correo.body.splitlines() if line.startswith("https://"))
+        ruta = resolve(urlsplit(enlace).path)
+        self.assertEqual(ruta.url_name, "password_reset_confirm")
+        self.assertEqual(force_str(urlsafe_base64_decode(ruta.kwargs["uidb64"])), str(usuario.pk))
+        self.assertTrue(default_token_generator.check_token(usuario, ruta.kwargs["token"]))
+        html, tipo = correo.alternatives[0]
+        self.assertEqual(tipo, "text/html")
+        self.assertIn(f'href="{enlace}"', html)
+        self.assertIn("Restablecer contraseña", html)
+        usuario.refresh_from_db()
+        self.assertTrue(usuario.check_password("ClaveOriginal123!"))
 
 
 class TutorResourceTests(TestCase):

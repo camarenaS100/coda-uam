@@ -333,7 +333,7 @@
                           </tr>
                         {% empty %}
                           <tr>
-                            <td colspan="8" class="py-4 text-center text-muted">No tienes solicitudes pendientes.</td>
+                            <td colspan="9" class="py-4 text-center text-muted">No tienes solicitudes pendientes.</td>
                           </tr>
                         {% endfor %}
                       </tbody>
@@ -448,7 +448,7 @@
                           </tr>
                         {% empty %}
                           <tr>
-                            <td colspan="7" class="py-4 text-center text-muted">No tienes tutorías agendadas.</td>
+                            <td colspan="8" class="py-4 text-center text-muted">No tienes tutorías agendadas.</td>
                           </tr>
                         {% endfor %}
                       </tbody>
@@ -502,13 +502,11 @@
                                 <span class="line-clamp-2 text-wrap">{{ tutoria.descripcion|default:"-" }}</span>
                               </span>
                             </td>
-                            <td>
-                              {% include "Tutorias/includes/partials/badge_estado_historial.html" with tutoria=tutoria %}
-                            </td>
+                            <td>{% include "Tutorias/includes/partials/badge_estado_historial.html" with tutoria=tutoria %}</td>
                             <td>
                               {% if tutoria.estado_efectivo == 'REA' %}
                                 <button type="button"
-                                        class="btn btn-primary btn-sm js-abrir-reporte"
+                                        class="btn btn-outline-primary btn-sm js-abrir-reporte"
                                         data-url="{% url 'save_seguimiento' tutoria.pk %}">Llenar reporte</button>
                               {% elif tutoria.estado_efectivo == 'REP' %}
                                 <button type="button"
@@ -523,7 +521,7 @@
                           </tr>
                         {% empty %}
                           <tr>
-                            <td colspan="6" class="py-4 text-center text-muted">Aún no tienes tutorías en el historial.</td>
+                            <td colspan="8" class="py-4 text-center text-muted">Aún no tienes tutorías en el historial.</td>
                           </tr>
                         {% endfor %}
                       </tbody>

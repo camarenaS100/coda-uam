@@ -655,7 +655,7 @@ def login_success(request):
         return redirect("Tutorias-alumno")
 
     if selected_role == "tutor" and user.has_role("TUT"):
-        return redirect("Tutorias-tutor")
+        return redirect("Panel-tutorias-tutor")
 
     if selected_role == "coordinador" and user.has_role("COR"):
         return redirect("Tutorias-Coordinacion")

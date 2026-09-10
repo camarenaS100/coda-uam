@@ -273,7 +273,7 @@
                               <!-- CASO 1: PROPUESTA (El tutor propuso 2 horarios) -->
                               {% if tutoria.estado_efectivo == 'PRO' %}
                                 <button type="button"
-                                        class="btn btn-sm btn-primary text-white text-capitalize shadow-0"
+                                        class="btn btn-sm btn-outline-primary text-capitalize shadow-0"
                                         data-mdb-toggle="modal"
                                         data-mdb-target="#modalSeleccionar-{{ tutoria.pk }}">Elegir horario</button>
 
@@ -320,7 +320,7 @@
                           </tr>
                         {% empty %}
                           <tr>
-                            <td colspan="6" class="py-4 text-center text-muted">No tienes solicitudes pendientes.</td>
+                            <td colspan="7" class="py-4 text-center text-muted">No tienes solicitudes pendientes.</td>
                           </tr>
                         {% endfor %}
                       </tbody>
@@ -437,7 +437,7 @@
                           </tr>
                         {% empty %}
                           <tr>
-                            <td colspan="6" class="py-4 text-center text-muted">Aún no hay tutorías en tu historial.</td>
+                            <td colspan="7" class="py-4 text-center text-muted">Aún no hay tutorías agendadas.</td>
                           </tr>
                         {% endfor %}
                       </tbody>
@@ -490,13 +490,11 @@
                               </span>
                             </td>
                             <!-- Celda que muestra el estado de la tutoría con un badge -->
-                            <td>
-                              {% include "Tutorias/includes/partials/badge_estado_historial.html" with tutoria=tutoria %}
-                            </td>
+                            <td>{% include "Tutorias/includes/partials/badge_estado_historial.html" with tutoria=tutoria %}</td>
                           </tr>
                         {% empty %}
                           <tr>
-                            <td colspan="5" class="py-4 text-center text-muted">Aún no hay tutorías en tu historial.</td>
+                            <td colspan="6" class="py-4 text-center text-muted">Aún no hay tutorías en tu historial.</td>
                           </tr>
                         {% endfor %}
                       </tbody>
